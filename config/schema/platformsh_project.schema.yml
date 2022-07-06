@@ -1,0 +1,4 @@
+# If an action is configurable, then its configs need to be declared as schema.
+action.configuration.platformsh_project_refresh_from_api_action:
+  type: action_configuration_default
+  label: 'Update local project info from the API'

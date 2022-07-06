@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: platformsh_project_refresh_from_api_action
+label: 'Refresh from API'
+type: node
+plugin: platformsh_project_refresh_from_api_action
+# If an action is configurable, then its configs need to be declared as schema.
+configuration: {  }
