@@ -3,8 +3,10 @@
 namespace Drupal\platformsh_project\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\platformsh\ApiClient;
+use Drupal\platformsh_api\ApiService;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * When adding actions to a module,
@@ -25,10 +27,33 @@ use Drupal\platformsh\ApiClient;
  *   category = @Translation("Custom")
  * )
  *
- * @DCG
- * For a simple updating entity fields consider extending FieldUpdateActionBase.
  */
-class RefreshFromApi extends ActionBase {
+class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterface {
+
+  private ApiService $api_service;
+
+  /**
+   * Constructs a MessageAction object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param ApiService $api_service
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->api_service = $api_service;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static($configuration, $plugin_id, $plugin_definition, $container->get('platformsh_api.fetcher'));
+  }
 
   /**
    * {@inheritdoc}
@@ -44,19 +69,26 @@ class RefreshFromApi extends ActionBase {
    * {@inheritdoc}
    */
   public function execute($node = NULL) {
-    /** @var \Drupal\node\NodeInterface $node */
-    $node->setTitle($this->t('New title'))->save();
 
-    $apiClient = new \Drupal\platformsh_api\ApiClient;
-
-    $projectID = $node->get('id');
+    $projectID = $node->get('field_id')->value;
     if (!empty($projectID)) {
-      $this->messenger()
-        ->addStatus($this->t('Running API request getProjectInfo.'));
-      $response = $apiClient->getProject($projectID);
-      $this->messenger()->addStatus($this->t('Ran API request.'));
-      $response = $this->projectInfoToRenderable($response);
-      $this->messenger()->addStatus($response);
+      /** @var \Platformsh\Client\Model\Project $response */
+      $response = $this->api_service->getProject($projectID);
+      $dump = print_r($response->getData(), TRUE);
+      $this->messenger()->addStatus('<pre>' . $dump . '</pre>');
+      /** @var \Drupal\node\NodeInterface $node */
+      $node->setTitle($response->title);
+      // Store the raw data for review
+      $node->set('body', $dump);
+      $node->body->format = 'full_html';
+      // Now set the values we extracted
+      $keys = ['plan', 'default_domain', 'region'];
+      foreach($keys as $keyname) {
+        if (isset($response->getData()[$keyname])) {
+          $node->set('field_' . $keyname , $response->getData()[$keyname]);
+        }
+      }
+      $node->save();
     }
     else {
       $this->messenger()->addError("No valid project ID");
