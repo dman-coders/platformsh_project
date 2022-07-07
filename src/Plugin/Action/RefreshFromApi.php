@@ -74,13 +74,12 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
     if (!empty($projectID)) {
       /** @var \Platformsh\Client\Model\Project $response */
       $response = $this->api_service->getProject($projectID);
-      $dump = print_r($response->getData(), TRUE);
-      $this->messenger()->addStatus('<pre>' . $dump . '</pre>');
+      $dump = json_encode($response->getData(), JSON_PRETTY_PRINT);
+      $this->messenger()->addStatus($dump );
       /** @var \Drupal\node\NodeInterface $node */
       $node->setTitle($response->title);
       // Store the raw data for review
-      $node->set('body', $dump);
-      $node->body->format = 'full_html';
+      $node->set('field_data', $dump);
       // Now set the values we extracted
       $keys = ['plan', 'default_domain', 'region'];
       foreach($keys as $keyname) {
