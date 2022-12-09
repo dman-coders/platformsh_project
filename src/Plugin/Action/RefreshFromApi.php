@@ -3,6 +3,7 @@
 namespace Drupal\platformsh_project\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\platformsh_api\ApiService;
@@ -74,25 +75,101 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
     if (!empty($projectID)) {
       /** @var \Platformsh\Client\Model\Project $response */
       $response = $this->api_service->getProject($projectID);
-      $dump = json_encode($response->getData(), JSON_PRETTY_PRINT);
-      $this->messenger()->addStatus($dump );
+      $raw_dump=$response->getData();
+      // Excise the links for brevity
+      unset($raw_dump['_links']);
+      $json_dump = json_encode($raw_dump, JSON_PRETTY_PRINT);
+      $this->messenger()->addStatus($json_dump );
       /** @var \Drupal\node\NodeInterface $node */
       $node->setTitle($response->title);
       // Store the raw data for review
-      $node->set('field_data', $dump);
+      $node->set('field_data', $json_dump);
       // Now set the values we extracted
-      $keys = ['plan', 'default_domain', 'region'];
+      $keys = ['plan', 'default_domain', 'region', 'namespace'];
       foreach($keys as $keyname) {
         if (isset($response->getData()[$keyname])) {
           $node->set('field_' . $keyname , $response->getData()[$keyname]);
         }
       }
+
+      // References need extra help.
+      // They probably need to trigger autocomplete
+      $keys = ['owner', 'organization'];
+      foreach($keys as $keyname) {
+        if (isset($response->getData()[$keyname])) {
+          // Fetch or create the target first
+          $target_guid = $response->getData()[$keyname];
+          $target = $this->api_service::getEntityById($target_guid);
+
+          if (empty($target)) {
+            // Attempt autocreate.
+            $target = $this->autocreateTargetEntityFromFieldWidget($keyname, $target_guid);
+
+            if (!empty($target)) {
+              $target_info = ['target_id' => $target->id];
+              $node->set('field_' . $keyname , $target_info);
+            } else {
+              throw new \InvalidArgumentException("Could not find or autocreate target entity $target_guid");
+            }
+
+          }
+        }
+      }
+      #$node->set('field_' . 'updated_at' , $response->getData()['updated_at']);
+
       $node->save();
     }
     else {
       $this->messenger()->addError("No valid project ID");
     }
 
+  }
+
+  /*
+   * The parameters we need to know in order to create a target entity can be extracted from the field widget.
+   */
+  private function autocreateTargetEntityFromFieldWidget($field_name = 'organsation', $label = 'New Organisation') {
+    // In order to leverage most of the existing autocreate functionality,
+    // This should start by retrieving the form field $element that contains all the settings.
+    // The options and things are all derived from that.
+
+    // Alternatively I can short cut that introspection and make a bunch of assumptions.
+    $options = [
+      'auto_create' => true,
+      'auto_create_bundle' => '',
+      'target_type' => 'node',
+      'target_bundles' => ['organisation' => 'organisation'],
+      'handler' => 'default:node'
+    ];
+    // Identify the field handler
+    /** @var \Drupal\node\Plugin\EntityReferenceSelection\NodeSelection $handler */
+    $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance($options);
+    // Just check that worked:
+    if ($handler instanceof SelectionWithAutocreateInterface) {
+
+      $entity_type_id = $options['target_type'];
+      $bundle = reset($options['target_bundles']);
+      $uid = 1;
+
+      // Invoke the handlers Create func.
+      $target = $handler->createNewEntity($entity_type_id, $bundle, $label, $uid);
+
+    }
+    else {
+      throw new \InvalidArgumentException("Could not find or autocreate target entity $target_guid - autocomplete widget handelr not found.");
+    }
+    return $target;
+  }
+
+  private function autocreateTargetEntity($entity_type_id = 'node', $bundle = 'organisation', $label = 'New organisation', $uid = 1) {
+    $values = [
+      'bundle' => $bundle,
+      'label' => $label,
+      'uid' => $uid,
+    ];
+    $entity = $this->entityTypeManager->getStorage($entity_type_id)->create($values);
+    $entity->save();
+    return $entity;
   }
 
 }
