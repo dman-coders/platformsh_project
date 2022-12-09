@@ -7,3 +7,4 @@ dependencies:
   - platformsh_api
   - action
   - menu_ui
+  - string_field_formatter
