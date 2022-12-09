@@ -1,0 +1,45 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.project.body
+    - field.field.node.project.field_data
+    - field.field.node.project.field_default_domain
+    - field.field.node.project.field_id
+    - field.field.node.project.field_namespace
+    - field.field.node.project.field_organization
+    - field.field.node.project.field_owner
+    - field.field.node.project.field_plan
+    - field.field.node.project.field_region
+    - node.type.project
+  module:
+    - text
+    - user
+id: node.project.teaser
+targetEntityType: node
+bundle: project
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_data: true
+  field_default_domain: true
+  field_id: true
+  field_namespace: true
+  field_organization: true
+  field_owner: true
+  field_plan: true
+  field_region: true

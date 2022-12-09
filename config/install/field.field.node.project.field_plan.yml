@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_plan
+    - node.type.project
+  module:
+    - options
+id: node.project.field_plan
+field_name: field_plan
+entity_type: node
+bundle: project
+label: Plan
+description: 'Plan Labels, as listed at "https://accounts.platform.sh/api/v1/plans"'
+required: false
+translatable: false
+default_value:
+  -
+    value: Development
+default_value_callback: ''
+settings: {  }
+field_type: list_string
