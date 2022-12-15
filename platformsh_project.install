@@ -9,7 +9,11 @@
  * Implements hook_install().
  */
 function platformsh_project_install() {
-  \Drupal::messenger()->addStatus(__FUNCTION__);
+  \Drupal::messenger()->addStatus(__FUNCTION__ . " is installing content definitions from its yaml configs");
+  // The creation of all content types and fields is managed by config/install.
+  // Crating content types programatically here is tedious,
+  // Yaml definitions are fine, as long as we keep the dependencies aligned
+
 }
 
 
@@ -21,7 +25,7 @@ function platformsh_project_install() {
  * and their field storage definitions.
  */
 function platformsh_project_uninstall(): void {
-  \Drupal::messenger()->addStatus(__FUNCTION__);
+  \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all content associated with its content types.");
 
   $content_type_names = ['project'];
   foreach ($content_type_names as $content_type_name) {
