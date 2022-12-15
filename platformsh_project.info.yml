@@ -1,7 +1,7 @@
 name: 'Platform.sh Project'
 type: module
 description: 'Reflects a project entity on the Platform.sh hosting environment, and provides access to diagnostics and actions on it'
-package: Platform.sh
+package: 'Platform.sh'
 core_version_requirement: '^9 || ^10'
 dependencies:
   - platformsh_api
