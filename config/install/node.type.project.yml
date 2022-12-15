@@ -1,12 +1,9 @@
 langcode: en
 status: true
 dependencies:
-  module:
-    - menu_ui
-third_party_settings:
-  menu_ui:
-    available_menus: {  }
-    parent: ''
+  enforced:
+    module:
+    - platformsh_api
 name: Project
 type: project
 description: 'Reflects a Platform.sh Project data structure'
