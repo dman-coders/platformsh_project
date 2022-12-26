@@ -52,14 +52,14 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): RefreshFromApi|ContainerFactoryPluginInterface|static {
     return new static($configuration, $plugin_id, $plugin_definition, $container->get('platformsh_api.fetcher'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function access($node, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($node, AccountInterface $account = NULL, $return_as_object = FALSE): bool|\Drupal\Core\Access\AccessResultInterface {
     /** @var \Drupal\node\NodeInterface $node */
     $access = $node->access('update', $account, TRUE)
       ->andIf($node->title->access('edit', $account, TRUE));
@@ -86,9 +86,9 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
       $node->set('field_data', $json_dump);
       // Now set the values we extracted
       $keys = ['plan', 'default_domain', 'region', 'namespace'];
-      foreach($keys as $keyname) {
-        if (isset($response->getData()[$keyname])) {
-          $node->set('field_' . $keyname , $response->getData()[$keyname]);
+      foreach($keys as $key_name) {
+        if (isset($response->getData()[$key_name])) {
+          $node->set('field_' . $key_name , $response->getData()[$key_name]);
         }
       }
 
@@ -102,7 +102,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
           $target = $this->api_service::getEntityById($target_guid);
 
           if (empty($target)) {
-            // Attempt autocreate.
+            // Attempt auto create.
             $target = $this->autocreateTargetEntityFromFieldWidget($keyname, $target_guid);
 
             if (!empty($target)) {
