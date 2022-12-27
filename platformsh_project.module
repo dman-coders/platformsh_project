@@ -4,3 +4,20 @@
  * @file
  * Primary module hooks for platformsh_project module.
  */
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for node entities.
+ *
+ * Synchronises a project entry with API info on first creation.
+ */
+function platformsh_project_node_presave(Drupal\Node\Entity\Node $entity) {
+  if ($entity->getType() == 'project' && $entity->isNew()) {
+    \Drupal::logger('platformsh_project')->notice("Creating a new project");
+    $action = \Drupal::entityTypeManager()
+      ->getStorage('action')
+      ->load('platformsh_project_refresh_from_api_action');
+    if ($action) {
+      $action->execute([$entity]);
+    }
+  }
+}

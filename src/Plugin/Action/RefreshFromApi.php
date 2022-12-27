@@ -2,8 +2,10 @@
 
 namespace Drupal\platformsh_project\Plugin\Action;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\platformsh_api\ApiService;
@@ -59,10 +61,10 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public function access($node, AccountInterface $account = NULL, $return_as_object = FALSE): bool|\Drupal\Core\Access\AccessResultInterface {
-    /** @var \Drupal\node\NodeInterface $node */
-    $access = $node->access('update', $account, TRUE)
-      ->andIf($node->title->access('edit', $account, TRUE));
+  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
+    /** @var \Drupal\node\NodeInterface $object */
+    $access = $object->access('update', $account, TRUE)
+      ->andIf($object->title->access('edit', $account, TRUE));
     return $return_as_object ? $access : $access->isAllowed();
   }
 
@@ -72,57 +74,77 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   public function execute($node = NULL) {
 
     $projectID = $node->get('field_id')->value;
-    if (!empty($projectID)) {
-      /** @var \Platformsh\Client\Model\Project $response */
-      $response = $this->api_service->getProject($projectID);
-      $raw_dump=$response->getData();
-      // Excise the links for brevity
-      unset($raw_dump['_links']);
-      $json_dump = json_encode($raw_dump, JSON_PRETTY_PRINT);
-      $this->messenger()->addStatus($json_dump );
-      /** @var \Drupal\node\NodeInterface $node */
-      $node->setTitle($response->title);
-      // Store the raw data for review
-      $node->set('field_data', $json_dump);
-      // Now set the values we extracted
-      $keys = ['plan', 'default_domain', 'region', 'namespace'];
-      foreach($keys as $key_name) {
-        if (isset($response->getData()[$key_name])) {
-          $node->set('field_' . $key_name , $response->getData()[$key_name]);
-        }
-      }
-
-      // References need extra help.
-      // They probably need to trigger autocomplete
-      $keys = ['owner', 'organization'];
-      foreach($keys as $keyname) {
-        if (isset($response->getData()[$keyname])) {
-          // Fetch or create the target first
-          $target_guid = $response->getData()[$keyname];
-          $target = $this->api_service::getEntityById($target_guid);
-
-          if (empty($target)) {
-            // Attempt auto create.
-            $target = $this->autocreateTargetEntityFromFieldWidget($keyname, $target_guid);
-
-            if (!empty($target)) {
-              $target_info = ['target_id' => $target->id];
-              $node->set('field_' . $keyname , $target_info);
-            } else {
-              throw new \InvalidArgumentException("Could not find or autocreate target entity $target_guid");
-            }
-
-          }
-        }
-      }
-      #$node->set('field_' . 'updated_at' , $response->getData()['updated_at']);
-
-      $node->save();
-    }
-    else {
+    if (empty($projectID)) {
       $this->messenger()->addError("No valid project ID");
+      return false;
     }
 
+    /** @var \Platformsh\Client\Model\Project $response */
+    try {
+      // Calling the API may fail for may reasons.
+      $response = $this->api_service->getProject($projectID);
+      // The API may return without error, but still not have data - if project is invalid.
+      if (empty($response)) {
+        $this->messenger()->addError("API call returned empty. Probably an invalid Project ID. Update failed.");
+        return false;
+      }
+    }
+    catch (\Exception $e) {
+      $this->messenger()->addError("API call failed: " . $e->getMessage());
+      return false;
+    }
+
+    $raw_dump=$response->getData();
+    // Excise the links for brevity
+    unset($raw_dump['_links']);
+    $json_dump = json_encode($raw_dump, JSON_PRETTY_PRINT);
+    $this->messenger()->addStatus($json_dump );
+    /** @var \Drupal\node\NodeInterface $node */
+    $node->setTitle($response->title);
+    // Store the raw data for review
+    $node->set('field_data', $json_dump);
+    // Now set the values we extracted
+    $keys = ['plan', 'default_domain', 'region', 'namespace'];
+    foreach($keys as $key_name) {
+      if (isset($response->getData()[$key_name])) {
+        $node->set('field_' . $key_name , $response->getData()[$key_name]);
+      }
+    }
+
+    // References need extra help.
+    // They probably need to trigger autocomplete
+    $keys = ['owner', 'organization'];
+    foreach($keys as $keyname) {
+      if (isset($response->getData()[$keyname])) {
+        // Fetch or create the target first
+        $target_guid = $response->getData()[$keyname];
+        $target = $this->api_service::getEntityById($target_guid);
+
+        if (empty($target)) {
+          // Attempt auto create.
+          $target = $this->autocreateTargetEntityFromFieldWidget($keyname, $target_guid);
+
+          if (!empty($target)) {
+            $target_info = ['target_id' => $target->id];
+            $node->set('field_' . $keyname , $target_info);
+          } else {
+            throw new \InvalidArgumentException("Could not find or auto create target entity $target_guid");
+          }
+
+        }
+      }
+    }
+    #$node->set('field_' . 'updated_at' , $response->getData()['updated_at']);
+
+    // Take care, as this action may be called on hook_entity_presave, avoid a loop.
+    if (! $node->isNew()) {
+      try {
+        $node->save();
+      } catch (EntityStorageException $e) {
+        $this->messenger()->addError("Failed to save node " . $e->getMessage());
+      }
+    }
+    return true;
   }
 
   /*
@@ -167,7 +189,9 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
       'label' => $label,
       'uid' => $uid,
     ];
-    $entity = $this->entityTypeManager->getStorage($entity_type_id)->create($values);
+    $entity = $this->entityTypeManager
+      ->getStorage($entity_type_id)
+      ->create($values);
     $entity->save();
     return $entity;
   }

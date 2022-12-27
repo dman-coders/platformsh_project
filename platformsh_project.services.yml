@@ -4,3 +4,9 @@ services:
     arguments: ['@messenger']
     tags:
       - { name: event_subscriber }
+
+
+  drush_create_project.commands:
+    class: \Drupal\platformsh_project\Commands\ProjectCommands
+    tags:
+      - { name: drush.command }
