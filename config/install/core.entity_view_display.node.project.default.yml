@@ -7,7 +7,7 @@ dependencies:
     - field.field.node.project.field_default_domain
     - field.field.node.project.field_id
     - field.field.node.project.field_namespace
-    - field.field.node.project.field_organization
+    - field.field.node.project.field_organization_id
     - field.field.node.project.field_owner
     - field.field.node.project.field_plan
     - field.field.node.project.field_region
@@ -62,7 +62,7 @@ content:
     third_party_settings: {  }
     weight: 109
     region: content
-  field_organization:
+  field_organization_id:
     type: entity_reference_label
     label: above
     settings:

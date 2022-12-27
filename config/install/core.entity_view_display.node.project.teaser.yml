@@ -8,7 +8,7 @@ dependencies:
     - field.field.node.project.field_default_domain
     - field.field.node.project.field_id
     - field.field.node.project.field_namespace
-    - field.field.node.project.field_organization
+    - field.field.node.project.field_organization_id
     - field.field.node.project.field_owner
     - field.field.node.project.field_plan
     - field.field.node.project.field_region
@@ -39,7 +39,7 @@ hidden:
   field_default_domain: true
   field_id: true
   field_namespace: true
-  field_organization: true
+  field_organization_id: true
   field_owner: true
   field_plan: true
   field_region: true

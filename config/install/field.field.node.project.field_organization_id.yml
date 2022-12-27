@@ -2,11 +2,11 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.field_organization
+    - field.storage.node.field_organization_id
     - node.type.organization
     - node.type.project
-id: node.project.field_organization
-field_name: field_organization
+id: node.project.field_organization_id
+field_name: field_organization_id
 entity_type: node
 bundle: project
 label: Organization

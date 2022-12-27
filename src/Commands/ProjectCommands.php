@@ -27,23 +27,9 @@ class ProjectCommands extends DrushCommands {
     $project = \Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($field_values);
+    // hook_entity_presave() will do a lookup to prepopulate new project info.
     $project->save();
-    $this->output()->writeln("Created a project $project_id");
+    $this->output()->writeln(sprintf("Created a project %s", $project->getTitle()));
   }
 
-
-  /**
-   * A custom Drush command to displays the given text.
-   *
-   * @command platformsh:print-me
-   * @param $text Argument with text to be printed
-   * @option uppercase Uppercase the text
-   * @aliases ccepm,cce-print-me
-   */
-  public function printMe($text = 'Hello world!', $options = ['uppercase' => FALSE]) {
-    if ($options['uppercase']) {
-      $text = strtoupper($text);
-    }
-    $this->output()->writeln($text);
-  }
 }

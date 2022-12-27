@@ -6,6 +6,7 @@ use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\platformsh_api\ApiService;
@@ -17,7 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * cid=system.action.node_unpublish_action etc.
  *
  * This can be seen with `drush cget system.action.node_make_sticky_action` etc
- * so `drush cget platformsh_project.action.platformsh_project_refresh_from_api_action`
+ * so `drush cget
+ * platformsh_project.action.platformsh_project_refresh_from_api_action`
  */
 
 /**
@@ -34,6 +36,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterface {
 
   private ApiService $api_service;
+  private EntityTypeManager $entity_type_manager;
 
   /**
    * Constructs a MessageAction object.
@@ -45,17 +48,20 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param ApiService $api_service
+   *   The plugin implementation definition.
+   * @param EntityTypeManager $entity_type_manager
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service, EntityTypeManager $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->api_service = $api_service;
+    $this->entity_type_manager = $entity_type_manager;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): RefreshFromApi|ContainerFactoryPluginInterface|static {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('platformsh_api.fetcher'));
+    return new static($configuration, $plugin_id, $plugin_definition, $container->get('platformsh_api.fetcher'), $container->get('entity_type.manager'));
   }
 
   /**
@@ -71,125 +77,116 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public function execute($node = NULL) {
+  public function execute($object = NULL) {
+    /** @var \Drupal\node\NodeInterface $object **/
 
-    $projectID = $node->get('field_id')->value;
+    $field = $object->get('field_id');
+    $projectID = $object->get('field_id')->value;
     if (empty($projectID)) {
       $this->messenger()->addError("No valid project ID");
-      return false;
+      return FALSE;
     }
 
     /** @var \Platformsh\Client\Model\Project $response */
     try {
-      // Calling the API may fail for may reasons.
+      // Calling the API may fail for many reasons.
       $response = $this->api_service->getProject($projectID);
       // The API may return without error, but still not have data - if project is invalid.
       if (empty($response)) {
-        $this->messenger()->addError("API call returned empty. Probably an invalid Project ID. Update failed.");
-        return false;
+        $this->messenger()
+          ->addError("API call returned empty. Probably an invalid Project ID. Update failed.");
+        return FALSE;
       }
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->messenger()->addError("API call failed: " . $e->getMessage());
-      return false;
+      return FALSE;
     }
 
-    $raw_dump=$response->getData();
+    $raw_dump = $response->getData();
     // Excise the links for brevity
     unset($raw_dump['_links']);
     $json_dump = json_encode($raw_dump, JSON_PRETTY_PRINT);
-    $this->messenger()->addStatus($json_dump );
+    $this->messenger()->addStatus($json_dump);
     /** @var \Drupal\node\NodeInterface $node */
-    $node->setTitle($response->title);
+    $object->setTitle($response->title);
     // Store the raw data for review
-    $node->set('field_data', $json_dump);
+    $object->set('field_data', $json_dump);
     // Now set the values we extracted
     $keys = ['plan', 'default_domain', 'region', 'namespace'];
-    foreach($keys as $key_name) {
+    foreach ($keys as $key_name) {
       if (isset($response->getData()[$key_name])) {
-        $node->set('field_' . $key_name , $response->getData()[$key_name]);
+        $object->set('field_' . $key_name, $response->getData()[$key_name]);
       }
     }
 
-    // References need extra help.
-    // They probably need to trigger autocomplete
-    $keys = ['owner', 'organization'];
-    foreach($keys as $keyname) {
-      if (isset($response->getData()[$keyname])) {
-        // Fetch or create the target first
-        $target_guid = $response->getData()[$keyname];
-        $target = $this->api_service::getEntityById($target_guid);
-
-        if (empty($target)) {
-          // Attempt auto create.
-          $target = $this->autocreateTargetEntityFromFieldWidget($keyname, $target_guid);
-
-          if (!empty($target)) {
-            $target_info = ['target_id' => $target->id];
-            $node->set('field_' . $keyname , $target_info);
-          } else {
-            throw new \InvalidArgumentException("Could not find or auto create target entity $target_guid");
-          }
-
-        }
-      }
-    }
+    $this->autocreateTargetEntities($object, $response->getData());
     #$node->set('field_' . 'updated_at' , $response->getData()['updated_at']);
 
     // Take care, as this action may be called on hook_entity_presave, avoid a loop.
-    if (! $node->isNew()) {
+    if (!$object->isNew()) {
       try {
-        $node->save();
+        $object->save();
       } catch (EntityStorageException $e) {
         $this->messenger()->addError("Failed to save node " . $e->getMessage());
       }
     }
-    return true;
+    return TRUE;
   }
 
-  /*
-   * The parameters we need to know in order to create a target entity can be extracted from the field widget.
+
+  /**
+   * For each external entity that a Project refers to,
+   * Ensure the named target exists, creating it if neccessary.
+   *
+   * @var \Drupal\node\NodeInterface $node
+   * @return void
    */
-  private function autocreateTargetEntityFromFieldWidget($field_name = 'organsation', $label = 'New Organisation') {
-    // In order to leverage most of the existing autocreate functionality,
-    // This should start by retrieving the form field $element that contains all the settings.
-    // The options and things are all derived from that.
-
-    // Alternatively I can short cut that introspection and make a bunch of assumptions.
-    $options = [
-      'auto_create' => true,
-      'auto_create_bundle' => '',
-      'target_type' => 'node',
-      'target_bundles' => ['organisation' => 'organisation'],
-      'handler' => 'default:node'
+  function autocreateTargetEntities(\Drupal\node\NodeInterface $node, array $raw_data): void {
+    // References need extra help.
+    $keys = [
+      'user' => 'owner',
+      'organization' => 'organization_id'
     ];
-    // Identify the field handler
-    /** @var \Drupal\node\Plugin\EntityReferenceSelection\NodeSelection $handler */
-    $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance($options);
-    // Just check that worked:
-    if ($handler instanceof SelectionWithAutocreateInterface) {
+    foreach ($keys as $key_type => $key_name) {
+      /** @var \Drupal\Core\Field\FieldItemListInterface $value */
+      $value = $raw_data[$key_name];
+      if (!empty($target_guid = $value)) {
+        // Fetch or create the target first
+        $target = $this->api_service::getEntityById($target_guid);
 
-      $entity_type_id = $options['target_type'];
-      $bundle = reset($options['target_bundles']);
-      $uid = 1;
+        if (empty($target)) {
+          // Attempt auto create.
+          $entity_type_id = 'node';
+          $target_data = [
+            'bundle' => $key_type, # it's aliased as 'type'. yay.
+            'type' => $key_type,
+            'title' => $target_guid,
+            'field_id' => $target_guid,
+          ];
+          $target = $this->autocreateTargetEntity($entity_type_id, $target_data);
+        }
 
-      // Invoke the handlers Create func.
-      $target = $handler->createNewEntity($entity_type_id, $bundle, $label, $uid);
-
+        if (!empty($target)) {
+          $target_info = ['target_id' => $target->id()];
+          $node->set('field_' . $key_name, $target_info);
+        }
+        else {
+          throw new \InvalidArgumentException("Could not find or auto create target entity $target_guid");
+        }
+      }
     }
-    else {
-      throw new \InvalidArgumentException("Could not find or autocreate target entity $target_guid - autocomplete widget handelr not found.");
-    }
-    return $target;
   }
 
-  private function autocreateTargetEntity($entity_type_id = 'node', $bundle = 'organisation', $label = 'New organisation', $uid = 1) {
-    $values = [
-      'bundle' => $bundle,
-      'label' => $label,
-      'uid' => $uid,
-    ];
-    $entity = $this->entityTypeManager
+  /**
+   * @param string $entity_type_id
+   * @param array $values
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   */
+  private function autocreateTargetEntity(string $entity_type_id, array $values) {
+    $this->messenger()
+      ->addStatus("Auto-creating an ${values['bundle']} called ${values['field_id']}");
+    $entity = $this->entity_type_manager
       ->getStorage($entity_type_id)
       ->create($values);
     $entity->save();
