@@ -4,12 +4,14 @@ namespace Drupal\platformsh_project\Plugin\Action;
 
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Action\ActionBase;
-use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeInterface;
 use Drupal\platformsh_api\ApiService;
+use Exception;
+use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -17,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * the declaration f the action gets saved into the `cache_config` database as
  * cid=system.action.node_unpublish_action etc.
  *
- * This can be seen with `drush cget system.action.node_make_sticky_action` etc
+ * This can be seen with `drush cget system.action.node_make_sticky_action` etc.
  * so `drush cget
  * platformsh_project.action.platformsh_project_refresh_from_api_action`
  */
@@ -61,7 +63,13 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): RefreshFromApi|ContainerFactoryPluginInterface|static {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('platformsh_api.fetcher'), $container->get('entity_type.manager'));
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('platformsh_api.fetcher'),
+      $container->get('entity_type.manager')
+    );
   }
 
   /**
@@ -80,7 +88,6 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   public function execute($object = NULL) {
     /** @var \Drupal\node\NodeInterface $object **/
 
-    $field = $object->get('field_id');
     $projectID = $object->get('field_id')->value;
     if (empty($projectID)) {
       $this->messenger()->addError("No valid project ID");
@@ -97,7 +104,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
           ->addError("API call returned empty. Probably an invalid Project ID. Update failed.");
         return FALSE;
       }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       $this->messenger()->addError("API call failed: " . $e->getMessage());
       return FALSE;
     }
@@ -139,9 +146,12 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
    * Ensure the named target exists, creating it if neccessary.
    *
    * @var \Drupal\node\NodeInterface $node
+   *
+   * @param array $raw_data
+   *
    * @return void
    */
-  function autocreateTargetEntities(\Drupal\node\NodeInterface $node, array $raw_data): void {
+  function autocreateTargetEntities(NodeInterface $node, array $raw_data): void {
     // References need extra help.
     $keys = [
       'user' => 'owner',
@@ -171,7 +181,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
           $node->set('field_' . $key_name, $target_info);
         }
         else {
-          throw new \InvalidArgumentException("Could not find or auto create target entity $target_guid");
+          throw new InvalidArgumentException("Could not find or auto create target entity " . $target_guid->getString());
         }
       }
     }
