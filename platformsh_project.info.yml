@@ -5,6 +5,11 @@ package: 'Platform.sh'
 core_version_requirement: '^9 || ^10'
 dependencies:
   - platformsh_api
-  - action
-  - menu_ui
+  - drupal:action
+  - drupal:menu_ui
   - string_field_formatter
+  # if running tests with minimal install profile, be prolific about the requirements.
+# test_dependencies:
+  - drupal:node
+  - drupal:path
+
