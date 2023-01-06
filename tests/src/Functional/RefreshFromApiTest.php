@@ -15,7 +15,9 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['platformsh_project'];
+  protected static $modules = [
+    'platformsh_project'
+  ];
 
   /**
    * The installation profile to use with this test.
