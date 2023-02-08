@@ -10,6 +10,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * platformsh_project event subscriber.
+ *
+ * 2023-02: Just a skeleton to capture and trace event handling.
+ * Currently does nothing useful beyond providing boilerplate proving that it can be done.
  */
 class PlatformshProjectSubscriber implements EventSubscriberInterface {
 
@@ -37,7 +40,7 @@ class PlatformshProjectSubscriber implements EventSubscriberInterface {
    *   Response event.
    */
   public function onKernelRequest(GetResponseEvent $event) {
-    $this->messenger->addStatus(__FUNCTION__);
+    #$this->messenger->addStatus(__FUNCTION__);
   }
 
   /**
@@ -47,13 +50,14 @@ class PlatformshProjectSubscriber implements EventSubscriberInterface {
    *   Response event.
    */
   public function onKernelResponse(FilterResponseEvent $event) {
-    $this->messenger->addStatus(__FUNCTION__);
+    #$this->messenger->addStatus(__FUNCTION__);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    // Run my own custom stuff before and after each main thread request.
     return [
       KernelEvents::REQUEST => ['onKernelRequest'],
       KernelEvents::RESPONSE => ['onKernelResponse'],
