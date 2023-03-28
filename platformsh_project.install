@@ -27,7 +27,7 @@ function platformsh_project_install() {
 function platformsh_project_uninstall(): void {
   \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all content associated with its content types.");
 
-  $content_type_names = ['project'];
+  $content_type_names = ['project','user','organization'];
   foreach ($content_type_names as $content_type_name) {
     $storage_handler = \Drupal::entityTypeManager()
       ->getStorage('node');
@@ -36,30 +36,12 @@ function platformsh_project_uninstall(): void {
   }
   // To ensure that our content type definitions and field definitions
   // associated with this module go away also, add
-  // `dependencies:enforced:module:platformsh_api`
+  // `dependencies:enforced:module:platformsh_project`
   // To every `field.storage.node.*.yml` file in `config/install`
   // Otherwise they will remain behind as orphaned fields,
   // and conflict if you try to re-install this module.
 }
 
-
-/**
- * Implements hook_requirements().
- */
-function platformsh_project_requirements($phase) {
-  $requirements = [];
-
-  if ($phase == 'runtime') {
-    $value = mt_rand(0, 100);
-    $requirements['platformsh_project_status'] = [
-      'title' => t('platformsh_project status'),
-      'value' => t('platformsh_project value: @value', ['@value' => $value]),
-      'severity' => $value > 50 ? REQUIREMENT_INFO : REQUIREMENT_WARNING,
-    ];
-  }
-
-  return $requirements;
-}
 
 // Trigger a config update if actions are added.
 /*
