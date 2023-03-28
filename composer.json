@@ -10,7 +10,6 @@
         }
     ],
     "require": {
-        "dman-coders/platformsh_api": "dev-master",
-        "drupal/hook_event_dispatcher": "^3.0"
+        "dman-coders/platformsh_api": "dev-master"
     }
 }

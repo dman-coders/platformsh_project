@@ -83,124 +83,18 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   }
 
   /**
+   * Tell the given target entity to refreshFromAPI() itself,
+   * if that method is implemented.
+   *
    * {@inheritdoc}
    */
   public function execute($object = NULL) {
     /** @var \Drupal\node\NodeInterface $object **/
-
-    $projectID = $object->get('field_id')->value;
-    if (empty($projectID)) {
-      $this->messenger()->addError("No valid project ID");
-      return FALSE;
+    if (method_exists($object, 'refreshFromAPI')) {
+      return $object->refreshFromAPI();
     }
-
-    /** @var \Platformsh\Client\Model\Project $response */
-    try {
-      // Calling the API may fail for many reasons.
-      $response = $this->api_service->getProject($projectID);
-      // The API may return without error, but still not have data - if project is invalid.
-      if (empty($response)) {
-        $this->messenger()
-          ->addError("API call returned empty. Probably an invalid Project ID. Update failed.");
-        return FALSE;
-      }
-    } catch (Exception $e) {
-      $this->messenger()->addError("API call failed: " . $e->getMessage());
-      return FALSE;
-    }
-
-    $raw_dump = $response->getData();
-    // Excise the links for brevity
-    unset($raw_dump['_links']);
-    $json_dump = json_encode($raw_dump, JSON_PRETTY_PRINT);
-    $this->messenger()->addStatus($json_dump);
-    /** @var \Drupal\node\NodeInterface $node */
-    $object->setTitle($response->title);
-    // Store the raw data for review
-    $object->set('field_data', $json_dump);
-    // Now set the values we extracted
-    $keys = ['plan', 'default_domain', 'region', 'namespace'];
-    foreach ($keys as $key_name) {
-      if (isset($response->getData()[$key_name])) {
-        $object->set('field_' . $key_name, $response->getData()[$key_name]);
-      }
-    }
-
-    $this->autocreateTargetEntities($object, $response->getData());
-    #$node->set('field_' . 'updated_at' , $response->getData()['updated_at']);
-
-    // Take care, as this action may be called on hook_entity_presave, avoid a loop.
-    if (!$object->isNew()) {
-      try {
-        $object->save();
-      } catch (EntityStorageException $e) {
-        $this->messenger()->addError("Failed to save node " . $e->getMessage());
-      }
-    }
-    return TRUE;
-  }
-
-
-  /**
-   * For each external entity that a Project refers to,
-   * Ensure the named target exists, creating it if neccessary.
-   *
-   * @var \Drupal\node\NodeInterface $node
-   *
-   * @param array $raw_data
-   *
-   * @return void
-   */
-  function autocreateTargetEntities(NodeInterface $node, array $raw_data): void {
-    // References need extra help.
-    $keys = [
-      'user' => 'owner',
-      'organization' => 'organization_id'
-    ];
-    foreach ($keys as $key_type => $key_name) {
-      /** @var \Drupal\Core\Field\FieldItemListInterface $value */
-      $value = $raw_data[$key_name];
-      if (!empty($target_guid = $value)) {
-        // Fetch or create the target first
-        $target = $this->api_service::getEntityById($target_guid);
-
-        if (empty($target)) {
-          // Attempt auto create.
-          $entity_type_id = 'node';
-          $target_data = [
-            'bundle' => $key_type, # it's aliased as 'type'. yay.
-            'type' => $key_type,
-            'title' => $target_guid,
-            'field_id' => $target_guid,
-          ];
-          $target = $this->autocreateTargetEntity($entity_type_id, $target_data);
-        }
-
-        if (!empty($target)) {
-          $target_info = ['target_id' => $target->id()];
-          $node->set('field_' . $key_name, $target_info);
-        }
-        else {
-          throw new InvalidArgumentException("Could not find or auto create target entity " . $target_guid->getString());
-        }
-      }
-    }
-  }
-
-  /**
-   * @param string $entity_type_id
-   * @param array $values
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   */
-  private function autocreateTargetEntity(string $entity_type_id, array $values) {
-    $this->messenger()
-      ->addStatus("Auto-creating an ${values['bundle']} called ${values['field_id']}");
-    $entity = $this->entity_type_manager
-      ->getStorage($entity_type_id)
-      ->create($values);
-    $entity->save();
-    return $entity;
+    $this->messenger()->addError("This entity does not implement refreshFromAPI()");
+    return FALSE;
   }
 
 }

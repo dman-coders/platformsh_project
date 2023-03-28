@@ -9,9 +9,7 @@
  * Implements hook_ENTITY_TYPE_presave() for node entities.
  *
  * Synchronises a project entry with API info on first creation.
- *
- * This hook SHOULD be a Drupal core event instead.
- * @see  drupal/hook_event_dispatcher
+ * See also hook_ENTITY_TYPE_create - this may be what I mean to use sometimes.
  */
 function platformsh_project_node_presave(Drupal\Node\Entity\Node $entity) {
   // Update from API if brand new
