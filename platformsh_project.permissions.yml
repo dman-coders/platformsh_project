@@ -1,0 +1,3 @@
+administer metrics:
+  title: 'Administer metrics'
+  restrict access: true

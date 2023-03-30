@@ -1,0 +1,18 @@
+entity.metric.view:
+  title: 'View'
+  route_name: entity.metric.canonical
+  base_route: entity.metric.canonical
+entity.metric.edit_form:
+  title: 'Edit'
+  route_name: entity.metric.edit_form
+  base_route: entity.metric.canonical
+entity.metric.delete_form:
+  title: 'Delete'
+  route_name: entity.metric.delete_form
+  base_route: entity.metric.canonical
+  weight: 10
+entity.metric.collection:
+  title: 'Platformsh metrics'
+  route_name: entity.metric.collection
+  base_route: system.admin_content
+  weight: 10

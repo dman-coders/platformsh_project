@@ -1,0 +1,5 @@
+metric.add_form:
+  title: 'Add platformsh metric'
+  route_name: entity.metric.add_form
+  appears_on:
+    - entity.metric.collection
