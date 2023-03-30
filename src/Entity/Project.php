@@ -4,21 +4,15 @@ namespace Drupal\platformsh_project\Entity;
 
 use Platformsh\Client\Model\ApiResourceBase;
 
-// Custom behavior here.
-$field_keys = [
-  'user' => 'owner',
-  'organization' => 'organization_id',
-];
-$reference_keys = [
-  'user' => 'owner',
-  'organization' => 'organization_id',
-];
-
 /**
  * Defines the Project node entity.
  */
 class Project extends ApiResource {
 
+  // These array list the mappings between the fields in the
+  // API response, and the local content model.
+  // It would be good if they match closely.
+  // BUT the API changed schema remotely, so we have to translate sometimes.
   protected array $field_keys = [
     'plan',
     'default_domain',
@@ -28,7 +22,6 @@ class Project extends ApiResource {
 
   protected array $reference_keys = [
     'user' => 'owner',
-    'organization' => 'organization_id',
   ];
 
   protected string $title_key = 'title';
@@ -56,7 +49,7 @@ class Project extends ApiResource {
    * "organization": "01GSXM6C326HKKNCV8Z0C0Z7WY"
    *
    * version newer:
-   * "owner": "94d2a9e5-c20c-45fc-bffd-50f738c13459", # <- an org GUID
+   * "owner": "94d2a9e5-c20c-45fc-bffd-50f738c13459", # <- owner is now an org GUID
    * "owner_info": {"type": "organization"},
    * "organization_id": "01FF4NDBVSTHNZSTTWQVPBMMD8" # <- visible org slug
    *
@@ -71,7 +64,9 @@ class Project extends ApiResource {
     if (isset($raw_data['owner_info'])) {
       if ($raw_data['owner_info']['type'] == 'organization') {
         // This slightly changes our schema def.
-        // The 'owner' is of type 'organization', there is no ref to a 'user'
+        // The 'owner' is of type 'organization',
+        // there is no ref to a 'user',
+        // and there is no `organization_id`
         $this->reference_keys = [
           'organization' => 'owner',
         ];

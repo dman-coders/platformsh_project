@@ -444,7 +444,7 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: metrics
+      path: admin/content/metric
       menu:
         type: normal
         title: 'Metrics View'

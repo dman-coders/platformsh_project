@@ -5,10 +5,11 @@ namespace Drupal\platformsh_project\Entity;
 use Drupal\Core\Entity\Annotation\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\platformsh_project\MetricInterface;
 
 /**
  * Defines the Metric entity.
@@ -29,6 +30,14 @@ use Drupal\platformsh_project\MetricInterface;
  * `Drupal\Core\Entity\ContentEntityForm`
  * It exists just for messaging, as ContentEntityForm::save() is weak.
  *
+ * Although it's declared, we do not use the list_builder
+ * to create the tab that is seen at /admin/content/metric
+ * Avoid using a mediocre listbuilder, we provide a full admin view instead
+ * as that allows us to add build operations. See
+ *   /admin/structure/views/view/metrics
+ *   views.view.metrics.yml
+ *
+ *
  * @ContentEntityType(
  *   id = "metric",
  *   label = @Translation("Metric"),
@@ -40,7 +49,7 @@ use Drupal\platformsh_project\MetricInterface;
  *     plural = "@count platformsh metrics",
  *   ),
  *   handlers = {
- *     "list_builder" = "Drupal\platformsh_project\MetricListBuilder",
+ *     "list_builder" = "Drupal\Core\Entity\EntityListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "default" = "Drupal\platformsh_project\Form\MetricForm",
@@ -66,7 +75,7 @@ use Drupal\platformsh_project\MetricInterface;
  *   },
  * )
  */
-class Metric extends ContentEntityBase implements MetricInterface {
+class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 
   use EntityChangedTrait;
 
@@ -82,6 +91,8 @@ class Metric extends ContentEntityBase implements MetricInterface {
     // Internal tooling (EntityChangedTrait)  helps it work the same as other entities.
     // `changed` will only get updated if some value actually changed.
     // Setting a value and running save() will NOT touch `changed` unless appropriate.
+    // This seems to be provided by the EntityChangedInterface that we use.
+
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the metric was last updated.'))

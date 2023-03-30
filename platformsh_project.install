@@ -24,7 +24,7 @@ function platformsh_project_install() {
  * the content type definitions,
  * and their field storage definitions.
  */
-function platformsh_project_uninstall(): void {
+function platformsh_project_pre_uninstall(): void {
   \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all content associated with its content types.");
 
   $content_type_names = ['project','user','organization'];

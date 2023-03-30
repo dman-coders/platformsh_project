@@ -14,14 +14,13 @@ use Platformsh\Client\PlatformClient;
  */
 class User extends ApiResource {
 
-
   // Custom behavior here.
 
   protected array $field_keys = ['country', 'first_name', 'last_name'];
 
   protected array $reference_keys = [];
 
-  protected string $title_key = 'company';
+  protected string $title_key = 'username';
 
   /**
    * @param $remoteEntityID
