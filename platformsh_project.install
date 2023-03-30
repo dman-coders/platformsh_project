@@ -40,6 +40,17 @@ function platformsh_project_uninstall(): void {
   // To every `field.storage.node.*.yml` file in `config/install`
   // Otherwise they will remain behind as orphaned fields,
   // and conflict if you try to re-install this module.
+
+  \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all metrics.");
+
+  $entity_type_names = ['metric'];
+  foreach ($entity_type_names as $entity_type) {
+    $storage_handler = \Drupal::entityTypeManager()
+      ->getStorage($entity_type);
+    $entities = $storage_handler->loadByProperties([]);
+    $storage_handler->delete($entities);
+  }
+
 }
 
 

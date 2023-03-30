@@ -7,6 +7,10 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Form controller for the platformsh metric entity edit forms.
+ *
+ * This only exists to provide friendly messages during save().
+ * The parent `save()` method is fine, but does no messaging,
+ * and no redirect after save.
  */
 class MetricForm extends ContentEntityForm {
 

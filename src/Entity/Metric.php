@@ -24,6 +24,11 @@ use Drupal\platformsh_project\MetricInterface;
  * the corresponding routes are listed with underscores
  * /metric/{metric}/edit : entity.metric.edit_form
  *
+ * `Drupal\platformsh_project\Form\MetricForm`
+ * is really just a wrapper around
+ * `Drupal\Core\Entity\ContentEntityForm`
+ * It exists just for messaging, as ContentEntityForm::save() is weak.
+ *
  * @ContentEntityType(
  *   id = "metric",
  *   label = @Translation("Metric"),
@@ -63,7 +68,6 @@ use Drupal\platformsh_project\MetricInterface;
  */
 class Metric extends ContentEntityBase implements MetricInterface {
 
-  // Hidden nastyness. If THIS is not here, then the `entity.metric.collection` route never shows up by magic.
   use EntityChangedTrait;
 
   /**
@@ -73,6 +77,21 @@ class Metric extends ContentEntityBase implements MetricInterface {
     // Base fields - ID etc - are provided by the system if we ask for them
     // in the annotation.
     $fields = parent::baseFieldDefinitions($entity_type);
+
+    // The 'changed' field is a special thing.
+    // Internal tooling (EntityChangedTrait)  helps it work the same as other entities.
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time that the mything was last edited.'))
+      ->setDisplayOptions('form', [
+        'type' => 'datetime_timestamp',
+        'weight' => 10,
+      ])
+      ->setDisplayOptions('view', [
+        'type' => 'number',
+        'weight' => 0,
+      ])
+    ;
 
 
     // The type field.
@@ -90,24 +109,42 @@ class Metric extends ContentEntityBase implements MetricInterface {
       ->setRequired(TRUE)
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('form', ['weight' => 10])
+      ->setDisplayOptions('view', ['weight' => 0])
       ;
 
 
     // The data field.
-    $fields['data'] = BaseFieldDefinition::create('text_long')
+    $fields['data'] = BaseFieldDefinition::create('string_long')
       ->setLabel(t('Data'))
       ->setDescription(t('The data for the Metric.'))
-      ->setRequired(FALSE);
+      ->setRequired(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'text_textarea',
+        'weight' => 10,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('view', ['weight' => 0,])
+    ;
 
     // The date field.
+    // Default widget is datetime_timestamp but that's annoying.
+    // Drupal\Core\Datetime\Plugin\Field\FieldWidget\TimestampDatetimeWidget
+    // I wanna paste.
+    // Should set the default value to now()
+    // Maybe can just re-use `changed` for most of the purpose this exists.
     $fields['timestamp'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Timestamp'))
       ->setDescription(t('The time the metric was measured.'))
-      ->setRequired(TRUE)
+      ->setRequired(FALSE)
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'number',
+        'weight' => 0,
+      ])
     ;
-
 
     // The target entity reference field.
     $fields['target'] = BaseFieldDefinition::create('entity_reference')
@@ -117,6 +154,7 @@ class Metric extends ContentEntityBase implements MetricInterface {
       ->setSetting('target_type', 'node')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('form', ['weight' => 10])
     ;
 
 

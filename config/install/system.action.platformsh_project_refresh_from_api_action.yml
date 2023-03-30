@@ -1,8 +1,8 @@
 langcode: en
 status: true
-dependencies:
-  module:
-    - node
+#dependencies:
+#  module:
+#    - platform_project
 id: platformsh_project_refresh_from_api_action
 label: 'Refresh from API'
 type: node
