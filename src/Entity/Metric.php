@@ -80,9 +80,11 @@ class Metric extends ContentEntityBase implements MetricInterface {
 
     // The 'changed' field is a special thing.
     // Internal tooling (EntityChangedTrait)  helps it work the same as other entities.
+    // `changed` will only get updated if some value actually changed.
+    // Setting a value and running save() will NOT touch `changed` unless appropriate.
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the mything was last edited.'))
+      ->setDescription(t('The time that the metric was last updated.'))
       ->setDisplayOptions('form', [
         'type' => 'datetime_timestamp',
         'weight' => 10,

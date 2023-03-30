@@ -21,12 +21,14 @@ use Drupal\Core\Session\AccountInterface;
 class RefreshMetric extends ActionBase {
 
   /**
-   * {@inheritdoc}
+   *
    */
-  public function access($node, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var \Drupal\node\NodeInterface $node */
-    $access = $node->access('update', $account, TRUE)
-      ->andIf($node->title->access('edit', $account, TRUE));
+  public function access($metric, AccountInterface $account = NULL, $return_as_object = FALSE) {
+    return true; # TODO: maybe support access?
+
+    /** @var \Drupal\platformsh_project\Entity\Metric $metric */
+    $access = $metric->access('update', $account, TRUE)
+      ->andIf($metric->title->access('edit', $account, TRUE));
     return $return_as_object ? $access : $access->isAllowed();
   }
 
@@ -36,7 +38,7 @@ class RefreshMetric extends ActionBase {
   public function execute($metric = NULL) {
     /** @var \Drupal\platformsh_project\Entity\Metric $metric */
     $metric
-      ->set('data', 'New title')
+      ->set('data', 'New title ' . date("Y-m-d H:i:s"))
       ->save();
   }
 
