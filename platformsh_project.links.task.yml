@@ -16,3 +16,8 @@ entity.metric.collection:
   route_name: entity.metric.collection
   base_route: system.admin_content
   weight: 10
+
+entity.metric.settings:
+  title: 'Settings'
+  route_name: entity.metric.settings
+  base_route: entity.metric.settings

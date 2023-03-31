@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * I don't trust annotations, too much magic is happening.
+ * Rake over the job that annotations is doing and
+ * assign the behaviours to our entity management CRUD stuff post-hoc.
+ *
+ * This means I can extract the boilerplate from the core functionality.
+ * In use, there will be no need to have an admin UI for this stuff.
+ * But the boilerplate construction kit gave it to me.
+ * I just want to make it optional.
+ *
+ * @implements hook_entity_type_alter()
+ * @return void
+ */
+function platformsh_project_ui_entity_type_alter(&$entity_info) {
+
+  if (!empty($entity_info['metric_type'])) {
+    // Add the crud pages for managing metric types.
+    // This all is stuff that is usually added to the entity annotation,
+    // but we are extending it here instead.
+    /** @var Drupal\Core\Config\Entity\ConfigEntityType $info */
+    $info = &$entity_info['metric_type'];
+    // I write out this in the original json format as seen in annotations for "clarity"
+    // to assist copy-paste updating and diffing.
+    // ... hang on,. annotations aren't actually json!
+    $additional = [
+      "handlers" => [
+        "form" => [
+          "add" => "Drupal\\platformsh_project_ui\\Form\\MetricTypeForm",
+          "edit" => "Drupal\\platformsh_project_ui\\Form\\MetricTypeForm",
+          "delete" => "Drupal\\Core\\Entity\\EntityDeleteForm",
+          ],
+        "list_builder" => "Drupal\\platformsh_project_ui\\MetricTypeListBuilder"
+      ],
+      "links" => [
+        "add-form" => "/admin/structure/metric_types/add",
+        "edit-form" => "/admin/structure/metric_types/manage/{metric_type}",
+        "delete-form" => "/admin/structure/metric_types/manage/{metric_type}/delete",
+        "collection" => "/admin/structure/metric_types",
+      ],
+    ];
+    // Seems cannot just bulk 'update from json' so do it tediously instead.
+    $info->setHandlerClass('form', $additional['handlers']['form']);
+    $info->setHandlerClass('list_builder', $additional['handlers']['list_builder']);
+    foreach ($additional['links'] as $key => $path) {
+      $info->setLinkTemplate($key, $path);
+    }
+  }
+}

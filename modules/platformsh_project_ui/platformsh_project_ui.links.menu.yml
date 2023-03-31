@@ -1,0 +1,6 @@
+
+entity.metric_type.collection:
+  title: 'metric types'
+  description: 'Manage and CRUD actions on metric type.'
+  parent: system.admin_structure
+  route_name: entity.metric_type.collection

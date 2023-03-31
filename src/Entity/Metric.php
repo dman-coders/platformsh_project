@@ -64,16 +64,21 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   base_table = "metric",
  *   admin_permission = "administer metrics",
  *   entity_keys = {
- *     "id" = "id"
+ *     "id" = "id",
+ *     "bundle" = "bundle",
  *   },
  *   links = {
  *     "collection" = "/admin/content/metric",
- *     "add-form" = "/metric/add",
+ *     "add-page" = "/metric/add",
+ *     "add-form" = "/metric/add/{metric_type}",
  *     "canonical" = "/metric/{metric}",
  *     "edit-form" = "/metric/{metric}/edit",
  *     "delete-form" = "/metric/{metric}/delete",
  *   },
+ *   bundle_entity_type = "metric_type",
+ *   bundle_label = @Translation("Minimetric type")
  * )
+ *
  */
 class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 

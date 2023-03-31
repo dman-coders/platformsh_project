@@ -1,5 +1,15 @@
+# Adding a metric wither with no bundle known,
+#  or with the bundle known.
+# These routes exist because of @links in Metric.php
 metric.add_form:
-  title: 'Add platformsh metric'
+  title: 'Add specific metric'
   route_name: entity.metric.add_form
   appears_on:
     - entity.metric.collection
+    - view.metrics.collection
+metric.add_page:
+  title: 'Add some sort of metric'
+  route_name: entity.metric.add_page
+  appears_on:
+    - entity.metric.collection
+    - view.metrics.collection

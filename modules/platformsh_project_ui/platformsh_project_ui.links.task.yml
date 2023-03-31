@@ -1,0 +1,10 @@
+
+entity.metric_type.edit_form:
+  title: 'Edit'
+  route_name: entity.metric_type.edit_form
+  base_route: entity.metric_type.edit_form
+entity.metric_type.collection:
+  title: 'List'
+  route_name: entity.metric_type.collection
+  base_route: entity.metric_type.collection
+

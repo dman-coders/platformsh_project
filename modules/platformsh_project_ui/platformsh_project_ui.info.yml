@@ -1,0 +1,8 @@
+name: 'Platform.sh Project UI'
+type: module
+description: 'Additional CRUD for entity types - redundant, but useful for debugging'
+package: 'Platform.sh'
+core_version_requirement: '^9 || ^10'
+dependencies:
+  - platformsh_project
+

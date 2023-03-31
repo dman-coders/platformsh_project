@@ -1,0 +1,6 @@
+
+metric.type_add:
+  title: 'Add metric type'
+  route_name: entity.metric_type.add_form
+  appears_on:
+    - entity.metric_type.collection

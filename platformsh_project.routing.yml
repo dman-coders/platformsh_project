@@ -1,0 +1,7 @@
+entity.metric.settings:
+  path: 'admin/structure/metric'
+  defaults:
+    _form: '\Drupal\platformsh_project\Form\MetricSettingsForm'
+    _title: 'Metric'
+  requirements:
+    _permission: 'administer metric'

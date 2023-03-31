@@ -437,9 +437,9 @@ display:
         - 'languages:language_interface'
         - url.query_args
       tags: {  }
-  page_1:
-    id: page_1
-    display_title: Page
+  collection:
+    id: collection
+    display_title: Collection Page
     display_plugin: page
     position: 1
     display_options:
@@ -447,8 +447,8 @@ display:
       path: admin/content/metric
       menu:
         type: normal
-        title: 'Metrics View'
-        description: ''
+        title: 'All Metrics'
+        description: 'Enumerate & manage the metric items gathered so far'
         weight: 0
         expanded: false
         menu_name: admin
