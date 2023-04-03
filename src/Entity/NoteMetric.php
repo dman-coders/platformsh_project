@@ -9,10 +9,6 @@ use Drupal\Core\Entity\EntityChangedInterface;
 /**
  * A metric entity that performs no special action,
  * it just exists as a repository for notes entered manually.
- * @ContentEntityType(
- *   id = "NOTE",
- *   label = @Translation("Note"),
- * )
  */
 class NoteMetric extends Metric {
 

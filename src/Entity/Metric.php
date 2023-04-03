@@ -14,6 +14,21 @@ use Drupal\Core\Field\BaseFieldDefinition;
 /**
  * Defines the Metric entity.
  *
+ * The Metric object holds a single measurement on a single axis.
+ * The metric abstract class is subclassed by metrics that define their
+ * own dimension and their own way of measuring it.
+ * A 'Ping' metric will measure response time, and provide a summary
+ * about it being "good" or "bad" or other.
+ *
+ * This generic Class defines attributes common to all.
+ *
+ * Every new type of metric that we create with a subclass
+ * also needs a corresponding
+ * `platformsh_project.metric_type.{bundle}}.yml`
+ * and must be referred to by
+ * `platformsh_project_entity_bundle_info_alter`
+ * to register it.
+ *
  * Too much magic is packed into annotations.
  * The existence of 'links' creates magic routes.
  *  links[collection] brings into existence route `entity.metric.collection`
@@ -112,19 +127,20 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     ;
 
 
-    // The type field.
-    // TODO - this is really a bundle, probably.
-    $fields['type'] = BaseFieldDefinition::create('list_string')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The type of Metric.'))
+    // The simple status field.
+    $fields['status'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Status'))
+      ->setDescription(t('The last known summary of this metric.'))
       ->setSettings([
         'allowed_values' => [
-          'cache_check' => 'Cache header check',
-          'cdn_check' => 'CDN check',
-          'storage_check' => 'Storage check',
+          'good' => 'Good',
+          'bad' => 'Bad',
+          'ugly' => "It's complicated",
+          'null' => "No value",
         ],
       ])
       ->setRequired(TRUE)
+      ->setDefaultValue('null')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', ['weight' => 10])

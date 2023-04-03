@@ -4,10 +4,10 @@ description: 'Reflects a project entity on the Platform.sh hosting environment, 
 package: 'Platform.sh'
 core_version_requirement: '^9 || ^10'
 dependencies:
-  - platformsh_api
+  - drupal:platformsh_api
   - drupal:action
-  - drupal:menu_ui
-  - string_field_formatter
+  - drupal:views
+  - drupal:string_field_formatter
   # if running tests with minimal install profile, be prolific about the requirements.
 # test_dependencies:
   - drupal:node
