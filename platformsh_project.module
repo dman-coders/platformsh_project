@@ -17,6 +17,12 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
   if (isset($bundles['node']['organization'])) {
     $bundles['node']['organization']['class'] = \Drupal\platformsh_project\Entity\Organization::class;
   }
+  if (isset($bundles['metric']['note'])) {
+    $bundles['metric']['note']['class'] = \Drupal\platformsh_project\Entity\NoteMetric::class;
+  }
+  if (isset($bundles['metric']['ping'])) {
+    $bundles['metric']['ping']['class'] = \Drupal\platformsh_project\Entity\PingMetric::class;
+  }
 }
 
 

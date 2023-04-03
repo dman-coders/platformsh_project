@@ -40,6 +40,10 @@ class RefreshMetric extends ActionBase {
     $metric
       ->set('data', 'New title ' . date("Y-m-d H:i:s"))
       ->save();
+
+    if( method_exists($metric, 'refresh')) {
+      $metric->refresh();
+    }
   }
 
 }

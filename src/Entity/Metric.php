@@ -76,7 +76,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "delete-form" = "/metric/{metric}/delete",
  *   },
  *   bundle_entity_type = "metric_type",
- *   bundle_label = @Translation("Minimetric type")
+ *   bundle_label = @Translation("Metric type")
  * )
  *
  */
