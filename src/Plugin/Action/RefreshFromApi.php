@@ -4,16 +4,16 @@ namespace Drupal\platformsh_project\Plugin\Action;
 
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Action\ActionBase;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\platformsh_api\ApiService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * notes-to-self about how actions work, ignore.
+ *
  * When adding actions to a module,
- * the declaration f the action gets saved into the `cache_config` database as
+ * the declaration of the action gets saved into the `cache_config` database as
  * cid=system.action.node_unpublish_action etc.
  *
  * This can be seen with `drush cget system.action.node_make_sticky_action` etc.
@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a Refresh from API action.
+ *
+ * See \Drupal\platformsh_project\Entity\ApiResource::refreshFromAPI()
  *
  * @Action(
  *   id = "platformsh_project_refresh_from_api_action",
@@ -35,7 +37,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterface {
 
   private ApiService $api_service;
-  private EntityTypeManager $entity_type_manager;
 
   /**
    * Constructs a MessageAction object.
@@ -47,10 +48,8 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param ApiService $api_service
-   *   The plugin implementation definition.
-   * @param EntityTypeManager $entity_type_manager
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service, EntityTypeManager $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->api_service = $api_service;
     $this->entity_type_manager = $entity_type_manager;
