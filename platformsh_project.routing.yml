@@ -5,3 +5,17 @@ entity.metric.settings:
     _title: 'Metric'
   requirements:
     _permission: 'administer metric'
+
+# Interstitial config form fired during an action
+# to request info about what type of metric to create.
+# maybe should be similar to /metric/add
+
+add_metric_action.form:
+  path: /admin/add_metric_action
+  defaults:
+    _title: Add Metric
+    _form: \Drupal\platformsh_project\Form\AddMetricActionForm
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer users'

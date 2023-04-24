@@ -45,6 +45,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "uuid" = "uuid"
  *   },
  *   links = {
+ *     "add-form" = "/admin/structure/metric_types/add"
  *   },
  *   config_export = {
  *     "id",

@@ -13,3 +13,17 @@ metric.add_page:
   appears_on:
     - entity.metric.collection
     - view.metrics.collection
+
+# Although I want this action (type management)
+#  to be taken care of by platformsh_project_ui,
+# this route HAS to be present because the (metric)entity_add form contains
+# logic that constructs a link to here before it decides whether a link is needed.
+# @see EntityController::addPage()
+# DSue to this, we cannot legally just add a metric without also
+#  having the theoretical capability to add a metric_type.
+
+metric.type_add:
+  title: 'Add metric type'
+  route_name: entity.metric_type.add_form
+  appears_on:
+    - entity.metric_type.collection

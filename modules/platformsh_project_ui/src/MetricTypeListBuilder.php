@@ -51,7 +51,7 @@ class MetricTypeListBuilder extends ConfigEntityListBuilder {
 
     $build['table']['#empty'] = $this->t(
       'No minimetric types available. <a href=":link">Add metric type</a>.',
-      [':link' => Url::fromRoute('entity.metric_type.add_form')->toString()]
+      [':link' => Url::fromRoute('entity.metric_type_fake.add_form')->toString()]
     );
 
     return $build;

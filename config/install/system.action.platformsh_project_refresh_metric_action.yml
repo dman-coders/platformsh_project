@@ -1,0 +1,10 @@
+langcode: en
+status: true
+#dependencies:
+#  module:
+#    - platformsh_project
+id: platformsh_project_refresh_metric_action
+label: 'Refresh Metric'
+type: metric
+plugin: platformsh_project_refresh_metric_action
+configuration: {  }

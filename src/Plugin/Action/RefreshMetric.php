@@ -9,7 +9,7 @@ use Drupal\Core\Session\AccountInterface;
  * Provides a refresh metric action.
  *
  * @Action(
- *   id = "platform_project_refresh_metric_action",
+ *   id = "platformsh_project_refresh_metric_action",
  *   label = @Translation("refresh metric"),
  *   type = "metric",
  *   category = @Translation("Custom")

@@ -1,0 +1,10 @@
+langcode: en
+status: true
+#dependencies:
+#  module:
+#    - platform_project
+id: platformsh_project_add_metric_action
+label: 'Add Metric'
+type: node
+plugin: platformsh_project_add_metric_action
+configuration: {  }
