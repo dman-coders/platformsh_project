@@ -7,6 +7,6 @@ services:
 
 
   drush_create_project.commands:
-    class: \Drupal\platformsh_project\Commands\ProjectCommands
+    class: \Drupal\platformsh_project\Commands\PlatformshProjectCommands
     tags:
       - { name: drush.command }

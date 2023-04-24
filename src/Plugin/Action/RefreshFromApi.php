@@ -52,7 +52,6 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->api_service = $api_service;
-    $this->entity_type_manager = $entity_type_manager;
   }
 
   /**
@@ -64,7 +63,6 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
       $plugin_id,
       $plugin_definition,
       $container->get('platformsh_api.fetcher'),
-      $container->get('entity_type.manager')
     );
   }
 

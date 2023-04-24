@@ -11,5 +11,12 @@
     ],
     "require": {
         "dman-coders/platformsh_api": "dev-master"
+    },
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9 || ^10 || ^11"
+            }
+        }
     }
 }

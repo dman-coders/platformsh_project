@@ -1,0 +1,5 @@
+services:
+  platformsh_project.commands:
+    class: \Drupal\platformsh_project\Commands\PlatformshProjectCommands
+    tags:
+      - { name: drush.command }
