@@ -47,3 +47,51 @@ function platformsh_project_node_presave(Drupal\Node\Entity\Node $entity) {
   $api_service = \Drupal::service('platformsh_api.fetcher');
   $referrees = [];
 }
+
+/**
+ * Delete all nodes of content types defined by this module,
+ * the content type definitions,
+ * and their field storage definitions.
+ *
+ * Implements hook_module_preuninstall().
+ *
+ * Note, it appears that `hook_module_preuninstall()`
+ * cannot be placed in the {module}.install file.
+ * It is .. uncertain when this gets invoked in practice.
+ *
+ * Arg! This gets called any time ANYTHING is uninstalled!
+ * Danger. Maybe this is not the right place to be invoking this.
+ * maybe it's hook_uninstall after all.
+ */
+function platformsh_project_module_preuninstall($module): void {
+  if ('platformsh_project' !== $module) {
+    return;
+  }
+  $content_type_names = ['project','user','organization'];
+
+  \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all content associated with its content types: " . implode(', ', $content_type_names));
+
+  foreach ($content_type_names as $content_type_name) {
+    $storage_handler = \Drupal::entityTypeManager()
+      ->getStorage('node');
+    $nodes = $storage_handler->loadByProperties(['type' => $content_type_name]);
+    $storage_handler->delete($nodes);
+  }
+  // To ensure that our content type definitions and field definitions
+  // associated with this module go away also, add
+  // `dependencies:enforced:module:platformsh_project`
+  // To every `field.storage.node.*.yml` file in `config/install`
+  // Otherwise they will remain behind as orphaned fields,
+  // and conflict if you try to re-install this module.
+
+  \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all metrics.");
+
+  $entity_type_names = ['metric'];
+  foreach ($entity_type_names as $entity_type) {
+    $storage_handler = \Drupal::entityTypeManager()
+      ->getStorage($entity_type);
+    $entities = $storage_handler->loadByProperties([]);
+    $storage_handler->delete($entities);
+  }
+
+}

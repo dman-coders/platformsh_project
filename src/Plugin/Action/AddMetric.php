@@ -7,22 +7,37 @@ use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Form\ConfirmFormInterface;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Plugin\ContextAwarePluginTrait;
+use Drupal\Core\Session\SessionManagerInterface;
+use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides an Add Metric action.
  *
  * 'Add Metric' is an action performed upon a project node.
- * It creates a metric of a selected type,
- * associates the metric with the source node, and starts monitoring it
+ * It creates a metric (a placeholder to record the last measurement)
+ * of a selected type,
+ * associates the metric with the source node,
+ * and starts monitoring it
  *
- * The source project node remains untouched, as metrics reference the projects.
+ * The source project node remains untouched,
+ * as metrics reference the projects.
  *
  * For an action to be configurable with extra parameters,
  * we add a confirm_form_route_name
  * and define a form
  * And define that route.
+ *
+ * Drupal\Core\Config\Schema\SchemaIncompleteException: Schema errors for
+ * system.action.platformsh_project_add_metric_action with the following
+ * errors: system.action.platformsh_project_add_metric_action:configuration
+ * missing schema
+ * Not all metrics have parameters, but the presence of confirm_form_route_name
+ * implies that they do.
+ * And every metric that is parameterized also must have a schema yaml that defines these parameters?
  *
  * @Action(
  *   id = "platformsh_project_add_metric_action",
@@ -33,7 +48,57 @@ use Drupal\Core\Plugin\ContextAwarePluginTrait;
  * )
  *
  */
-class AddMetric extends ActionBase{
+class AddMetric extends ActionBase implements ContainerFactoryPluginInterface{
+
+  /**
+   * The tempstore factory.
+   *
+   * @var tempStoreFactory
+   */
+  protected $tempStoreFactory;
+  private string $tempstore_id = 'add_metric_action';
+
+  /**
+   * User id is used to index the tempdatastore to remember who is doing what.
+   *
+   * @var currentUser
+   */
+  private $currentUser;
+
+  /**
+   * Constructor.
+   *
+   * Uses a TempStore for continuity of selections between confirmation forms.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
+   *   The tempstore factory.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The session.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, PrivateTempStoreFactory $temp_store_factory, AccountInterface $current_user) {
+    $this->configuration = $configuration;
+    $this->pluginId = $plugin_id;
+    $this->pluginDefinition = $plugin_definition;
+    $this->tempStoreFactory = $temp_store_factory;
+    $this->currentUser = $current_user;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static($configuration, $plugin_id, $plugin_definition,
+      $container->get('tempstore.private'),
+      $container->get('current_user')
+    );
+  }
+
 
   function getFormId() {
     return 'add_metric_confirm_form';
@@ -112,8 +177,26 @@ class AddMetric extends ActionBase{
     // Do it.
   }
 
+  /**
+   * The common way of executing the action is from the multiple content admin screen.
+   *
+   * When doing this, we want to present the parameter form once, then apply the
+   * action with identical settings to all items.
+   * Thus, we need to use a temp store to remember the selected items
+   * while we ask for the configs.
+   * THis should also make batch processing more robust?
+   *
+   * @param array $entities
+   *
+   * @return void
+   */
   public function executeMultiple(array $entities) {
-    return;
+    $ids = [];
+    foreach ($entities as $entity) {
+      $ids[$entity->id()] = $entity;
+    }
+    $this->tempStoreFactory->get($this->tempstore_id)
+      ->set($this->currentUser->id(), $ids);
   }
 
 }

@@ -16,42 +16,14 @@ function platformsh_project_install() {
 
 }
 
-
 /**
- * Implements hook_uninstall().
+ * Implements hook_preuninstall().
  *
- * Delete all nodes of content types defined by this module,
- * the content type definitions,
- * and their field storage definitions.
- */
-function platformsh_project_pre_uninstall(): void {
-  \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all content associated with its content types.");
-
-  $content_type_names = ['project','user','organization'];
-  foreach ($content_type_names as $content_type_name) {
-    $storage_handler = \Drupal::entityTypeManager()
-      ->getStorage('node');
-    $nodes = $storage_handler->loadByProperties(['type' => $content_type_name]);
-    $storage_handler->delete($nodes);
-  }
-  // To ensure that our content type definitions and field definitions
-  // associated with this module go away also, add
-  // `dependencies:enforced:module:platformsh_project`
-  // To every `field.storage.node.*.yml` file in `config/install`
-  // Otherwise they will remain behind as orphaned fields,
-  // and conflict if you try to re-install this module.
-
-  \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all metrics.");
-
-  $entity_type_names = ['metric'];
-  foreach ($entity_type_names as $entity_type) {
-    $storage_handler = \Drupal::entityTypeManager()
-      ->getStorage($entity_type);
-    $entities = $storage_handler->loadByProperties([]);
-    $storage_handler->delete($entities);
-  }
-
+*/
+function platformsh_project_uninstall(){
+  platformsh_project_module_preuninstall('platformsh_project');
 }
+
 
 
 // Trigger a config update if actions are added.

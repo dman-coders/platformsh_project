@@ -2,14 +2,29 @@
 
 Provides the entity type definition of a `Project` and publishes a few actions relevant to working with them.
 
+## Utility
+
+### drush extension
+
+    drush platformsh:create-content {PROJECT_ID}
+
+
 ## Development
+
+### Testing
+
+There is a drush utility to support testing.
+This will add a couple of known projects to the site.
+
+    drush platformsh:create-test-content
 
 ### Re-installation
 
-To test if things are re-installing correctly, and removng traces of themselves,
-it's handy to provide a full remove &replace.
-But existing content may get jammed up ion the works.
-Manually delete our stuff.
+To test if things are re-installing correctly, and removing traces of themselves,
+it's handy to provide a full remove & replace.
+The platformsh_project provides a hook_uninstall that should remove all of its entities and content.
+
+But to *manually* delete our stuff.
 
     drush entity:delete metric; \
     drush pm:uninstall -y platformsh_project; \
