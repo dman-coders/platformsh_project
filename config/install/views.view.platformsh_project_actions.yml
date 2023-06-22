@@ -5,11 +5,14 @@ dependencies:
     - node
     - user
     - views_bulk_operations
+  enforced: # makes this go away on uninstall
+    module:
+      - platformsh_project
 
 id: platformsh_project_actions
 label: 'Platformsh Project Actions'
 module: views
-description: 'Provides a UI for actions that can be performed on an individual entity. Views Bulk Operations without the ''Bulk'' part.'
+description: 'Provides buttons for actions that can be performed on an individual entity. Views Bulk Operations without the ''Bulk'' part.'
 tag: admin_actions
 base_table: node_field_data
 base_field: nid

@@ -5,11 +5,14 @@ dependencies:
     - platformsh_project
     - user
     - views_bulk_operations
+  enforced: # makes this go away on uninstall
+    module:
+      - platformsh_project
 
 id: metrics_admin_actions
-label: 'Metrics Admin Actions'
+label: 'Platformsh Metrics Actions'
 module: views
-description: ''
+description: 'Provides buttons for actions that can be performed on individual metrics. Views Bulk Operations without the ''Bulk'' part.'
 tag: admin_actions
 base_table: metric
 base_field: id

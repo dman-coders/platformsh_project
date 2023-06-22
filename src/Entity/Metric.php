@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Entity\FieldableEntityInterface;
 
 /**
  * Defines the Metric entity.
@@ -24,13 +25,14 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *
  * Every new type of metric that we create with a subclass
  * also needs a corresponding
- * `platformsh_project.metric_type.{bundle}}.yml`
+ * `config/install/platformsh_project.metric_type.{bundle}}.yml`
  * and must be referred to by
- * `platformsh_project_entity_bundle_info_alter`
+ * `platformsh_project.module:platformsh_project_entity_bundle_info_alter()`
  * to register it.
  *
+ * Implementation notes:
  * Too much magic is packed into annotations.
- * The existence of 'links' creates magic routes.
+ * The existence of 'links' annotation creates magic routes.
  *  links[collection] brings into existence route `entity.metric.collection`
  *  links[add-page] brings into existence route `entity.metric.add-page`
  *  It seem these links need to be aligned with yamls like
@@ -44,6 +46,12 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * is really just a wrapper around
  * `Drupal\Core\Entity\ContentEntityForm`
  * It exists just for messaging, as ContentEntityForm::save() is weak.
+ * MetricForm also preloads a reference to
+ * the target project that a node is attached to
+ * - if it is called in a special context,
+ * that refers to the project node,
+ * so that we can be directed to an 'add metric' form with the target pre-filled.
+ * see routes.yaml.
  *
  * Although it's declared, we do not use the list_builder
  * to create the tab that is seen at /admin/content/metric
@@ -91,7 +99,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "delete-form" = "/metric/{metric}/delete",
  *   },
  *   bundle_entity_type = "metric_type",
- *   bundle_label = @Translation("Metric type")
+ *   bundle_label = @Translation("Metric type"),
+ *   field_ui_base_route = "entity.metric_type.edit_form"
  * )
  *
  */
@@ -121,7 +130,8 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
         'weight' => 10,
       ])
       ->setDisplayOptions('view', [
-        'type' => 'number',
+        'label' => 'hidden',
+        'type' => 'timestamp',
         'weight' => 0,
       ])
     ;
@@ -175,10 +185,20 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'number',
+        'label' => 'hidden',
+        'type' => 'timestamp',
         'weight' => 0,
       ])
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'timestamp',
+        'weight' => 0,
+        'settings' => [
+          'date_format' => 'medium',
+        ],
+      ])
     ;
+
 
     // The target entity reference field.
     $fields['target'] = BaseFieldDefinition::create('entity_reference')
@@ -188,7 +208,15 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setSetting('target_type', 'node')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayOptions('form', ['weight' => 10])
+      ->setDisplayOptions('form', [
+        'weight' => 10
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'entity_reference_label',
+        'weight' => 0,
+        'settings' => [ 'link' => true ]
+      ])
     ;
 
 

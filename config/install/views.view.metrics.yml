@@ -6,6 +6,9 @@ dependencies:
   module:
     - options
     - platformsh_project
+  enforced: # makes this go away on uninstall
+    module:
+      - platformsh_project
 id: metrics
 label: 'Metrics admin view'
 module: views

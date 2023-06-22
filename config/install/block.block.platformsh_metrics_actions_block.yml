@@ -7,6 +7,9 @@ dependencies:
   module:
     - system
     - views
+  enforced: # makes this go away on uninstall
+    module:
+      - platformsh_project
   theme:
     - olivero
 id: platformsh_metrics_actions_block

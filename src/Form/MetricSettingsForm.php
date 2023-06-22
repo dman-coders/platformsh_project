@@ -31,7 +31,7 @@ class MetricSettingsForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     $form['settings'] = [
-      '#markup' => $this->t('Settings form for a minimetric entity type.'),
+      '#markup' => $this->t('Settings form for a "Metric" entity type.'),
     ];
 
     $form['actions'] = [

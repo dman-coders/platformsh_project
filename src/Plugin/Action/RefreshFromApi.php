@@ -24,6 +24,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a Refresh from API action.
  *
+ * This will initiate an API request to the remote service,
+ * and update the local entity with data retrieved.
+ *
+ * This should be applied to a node of type Platformsh 'project',
+ * though organizations and users can use it also.
+ *
  * See \Drupal\platformsh_project\Entity\ApiResource::refreshFromAPI()
  *
  * @Action(
@@ -39,8 +45,6 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   private ApiService $api_service;
 
   /**
-   * Constructs a MessageAction object.
-   *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id

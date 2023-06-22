@@ -4,7 +4,7 @@ entity.metric.settings:
     _form: '\Drupal\platformsh_project\Form\MetricSettingsForm'
     _title: 'Metric'
   requirements:
-    _permission: 'administer metric'
+    _permission: 'administer metrics'
 
 # Interstitial config form fired during an action
 # to request info about what type of metric to create.
@@ -18,4 +18,36 @@ add_metric_action.form:
   options:
     _admin_route: TRUE
   requirements:
-    _permission: 'administer users'
+    _permission: 'administer metrics'
+
+
+metric.add_unknown_metric_to_project:
+  path: '/node/{project}/metric/add'
+  defaults:
+    _title: Add Metric
+    _form: \Drupal\platformsh_project\Form\AddMetricForm
+  requirements:
+    _permission: 'administer metrics'
+  options:
+    parameters:
+      project:
+        type: entity:node
+
+metric.add_known_metric_to_project:
+  path: '/node/{project}/metric/add/{metric_type}'
+  defaults:
+    _title: Add Metric
+    _form: \Drupal\platformsh_project\Form\MetricForm
+    # By defining the _entity_form controller,
+    # the system should be told to use the rest of the features
+    # that are set up when editing a normal contentEntityForm:,
+    _controller: 'controller.entity_form:getContentResult'
+    _entity_form: metric.add
+  requirements:
+    _permission: 'administer metrics'
+  options:
+    parameters:
+      project:
+        type: entity:node
+      metric_type:
+        type: entity:metric_type

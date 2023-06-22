@@ -7,6 +7,9 @@ dependencies:
   module:
     - node
     - views
+  enforced: # makes this go away on uninstall
+    module:
+      - platformsh_project
   theme:
     - olivero
 id: platformsh_project_actions_block

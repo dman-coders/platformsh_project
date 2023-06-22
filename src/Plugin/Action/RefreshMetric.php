@@ -10,7 +10,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @Action(
  *   id = "platformsh_project_refresh_metric_action",
- *   label = @Translation("refresh metric"),
+ *   label = @Translation("Refresh Metric"),
  *   type = "metric",
  *   category = @Translation("Custom")
  * )

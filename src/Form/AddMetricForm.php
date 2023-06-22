@@ -16,16 +16,18 @@ use Drupal\Core\TempStore\PrivateTempStoreFactory;
 /**
  * AddMetricActionForm.
  *
- * When adding a metric via an action, need to say which type of metric to add.
- * To do this, we provide a confirmation form that will be used to intercept the
- * flow before the Action::execute() runs.
+ * UNUSED, we are recycling the entity content form MetricForm
+ * instead.
+ *
+ * This can be called either with or without the attached project,
+ * and with or without the known metric type.
+ * If unknown, they will be required, and displayed on the form.
+ *
+ * If all is known, and the metric type requires no additional configuration
+ * (or the additional config is added in the query)
+ * then the metric will be created and to form auto-submitted.
  */
-class AddMetricActionForm extends ConfirmFormBase {
-
-  /**
-   * Keep track of user input.
-   */
-  protected $userInput = [];
+class AddMetricForm extends FormBase {
 
   /**
    * @return string
@@ -48,16 +50,21 @@ class AddMetricActionForm extends ConfirmFormBase {
     $return_verify = $this->updateFields();
   }
 
+
+
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['#title'] = $this->t('Choose the type of metric');
+  public function buildForm(array              $form,
+                            FormStateInterface $form_state,
+                            \Drupal\node\NodeInterface  $project = null,
+                            \Drupal\platformsh_project\Entity\MetricType                     $metric_type = null) {
+    $form['#title'] = $this->t('Add Metric');
 
     // This form may be called with an owning entity (a project node)
     // already chosen. This info should be retained and used to populate the data.
     // Store the node ID in the form's state.
-    $form_state->set('node_id', $node_id);
+    $form_state->set('node_id', $project->id());
 
     // List all available metric types.
     $bundleInfo = \Drupal::service('entity_type.bundle.info')->getBundleInfo('metric');
@@ -70,6 +77,7 @@ class AddMetricActionForm extends ConfirmFormBase {
       '#title' => $this->t('Type of metric'),
       '#type' => 'select',
       '#options' => $bundleOptions,
+      '#default_value' => $metric_type->id(),
       '#required' => TRUE,
     ];
 
@@ -84,12 +92,5 @@ class AddMetricActionForm extends ConfirmFormBase {
   }
 
 
-  public function getQuestion() {
-    // TODO: Implement getQuestion() method.
-  }
-
-  public function getCancelUrl() {
-    // TODO: Implement getCancelUrl() method.
-  }
 
 }
