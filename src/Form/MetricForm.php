@@ -19,6 +19,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
  * Invoked by routes:
  * - metric.add_unknown_metric_to_project
  * - metric.add_known_metric_to_project
+ *
+ * I need to use an HtmlEntityFormController, not just an HtmlFormController
  */
 class MetricForm extends ContentEntityForm {
 
@@ -26,12 +28,14 @@ class MetricForm extends ContentEntityForm {
   public function buildForm(array              $form,
                             FormStateInterface $form_state,
                             \Drupal\node\NodeInterface  $project = null,
-                            \Drupal\platformsh_project\Entity\MetricType  $metric_type = null) {
+                            \Drupal\platformsh_project\Entity\MetricType  $metric_type = null
+  ) {
     # Need to create a dummy entity if it's not already done.
     # When we 'add metric' through the usual forms, magic happens to prepare that.
     # If this form is being called from a custom context,
     # I need to fill in some context for contentEntityForm requirements.
     if (empty($this->entity)) {
+      throw new \exception('Pretty sure we should no longer hit the case where an entity form is being built without a placeholder entity being instantiated. If this logic is never hit, then this chunk should be removed.');
       # Emulate:
       # $entity = $this->getEntityFromRouteMatch($route_match, $metric_type->id());
       # Instantiate a new metric entity of the requested type.
@@ -49,8 +53,14 @@ class MetricForm extends ContentEntityForm {
       $this->entity->set('target', $project);
     }
 
+    $form = parent::buildForm($form, $form_state);
 
-    return parent::buildForm($form, $form_state);
+    // This form may be called with The desired metric type already defined.
+    // Pre-fill that selection.
+    if ($metric_type) {
+      $form['metric_type']['#default_value'] = $metric_type->id();
+    }
+    return $form;
   }
 
   /**

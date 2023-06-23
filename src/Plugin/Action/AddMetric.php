@@ -6,6 +6,7 @@ use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
 
 /**
  *
@@ -19,6 +20,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * The source project node remains untouched,
  * as metrics reference the projects.
+ *
+ * The "action" is published and becomes available through Bulk operations
+ * (available on the select at /admin/content)
+ * Or Views Bulk operations.
  *
  * For an action to be configurable with extra parameters,
  * we add a confirm_form_route_name
@@ -86,6 +91,12 @@ class AddMetric extends ActionBase implements ContainerFactoryPluginInterface{
     }
 
     // Do it.
+    $this->messenger()->addMessage($this->t('Open the add metric form'));
+    $this->context['results']['redirect_url'] = \Drupal\Core\Url::fromRoute('metric.add_unknown_metric_to_project', ['project' => $object->id()]);
+    $url = \Drupal\Core\Url::fromRoute('metric.add_unknown_metric_to_project', ['project' => $object->id()]);
+    $redirect = new \Symfony\Component\HttpFoundation\RedirectResponse($url->toString());
+    // Immediately sending here is ill-advised.
+    $redirect->send();
   }
 
 }

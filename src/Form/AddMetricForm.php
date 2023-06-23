@@ -2,12 +2,15 @@
 
 namespace Drupal\platformsh_project\Form;
 
+use Drupal;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\SessionManagerInterface;
+use Drupal\node\NodeInterface;
+use Drupal\platformsh_project\Entity\MetricType;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\RouteBuilderInterface;
@@ -51,14 +54,15 @@ class AddMetricForm extends FormBase {
   }
 
 
-
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array              $form,
+  public function buildForm(array $form,
                             FormStateInterface $form_state,
-                            \Drupal\node\NodeInterface  $project = null,
-                            \Drupal\platformsh_project\Entity\MetricType                     $metric_type = null) {
+                            NodeInterface $project = NULL,
+                            MetricType $metric_type = NULL
+  ) {
+
     $form['#title'] = $this->t('Add Metric');
 
     // This form may be called with an owning entity (a project node)
@@ -66,8 +70,12 @@ class AddMetricForm extends FormBase {
     // Store the node ID in the form's state.
     $form_state->set('node_id', $project->id());
 
+    // This form may be called with The desired metric type already defined.
+    // Pre-fill that selection.
+
     // List all available metric types.
-    $bundleInfo = \Drupal::service('entity_type.bundle.info')->getBundleInfo('metric');
+    $bundleInfo = Drupal::service('entity_type.bundle.info')
+      ->getBundleInfo('metric');
     // Extract the bundle IDs and labels into a flat array.
     $bundleOptions = array_map(function ($bundle) {
       return $bundle['label'];
@@ -77,11 +85,13 @@ class AddMetricForm extends FormBase {
       '#title' => $this->t('Type of metric'),
       '#type' => 'select',
       '#options' => $bundleOptions,
-      '#default_value' => $metric_type->id(),
       '#required' => TRUE,
     ];
+    if ($metric_type) {
+      $form['metric_type']['#default_value'] = $metric_type->id();
+    }
 
-    return $form;
+#    return $form;
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -90,7 +100,6 @@ class AddMetricForm extends FormBase {
     ];
     return $form;
   }
-
 
 
 }
