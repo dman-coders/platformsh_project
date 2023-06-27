@@ -15,6 +15,8 @@ The Tests will warn if these values are not found.
 
 ### Testing inside ddev
 
+* First check whether you want xdebug on! tests are MUCH slower with debugging, and may also stall on breakpoints or in non-debuggable places. `php -d xdebug.mode=off ... ` didsn't work, best to fully disable it with `ddev xdebug off`
+
     ddev ssh
     cd web
     # Confirm that Drupal is stable and responsive here

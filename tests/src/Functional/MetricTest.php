@@ -50,4 +50,12 @@ class MetricTest extends BrowserTestBase {
 
   }
 
-}
+  /**
+   * Tests UI buttons and routes around metric management
+   *
+   */
+  public function testMetricUI() {
+
+  }
+
+  }
