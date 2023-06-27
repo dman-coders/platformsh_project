@@ -2,12 +2,8 @@
 
 namespace Drupal\platformsh_project\Form;
 
-use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
-use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Form controller for the platformsh metric entity edit forms.
@@ -49,13 +45,15 @@ class MetricForm extends ContentEntityForm {
     }
     // If this form was called from the context of a project,
     // then the metric should be preset to use that node as a target.
+    // @see MetricController, that serves this form when called as
+    // '/node/{project}/metric/add/{metric_type}'
     if (!empty($project)) {
       $this->entity->set('target', $project);
     }
 
     $form = parent::buildForm($form, $form_state);
 
-    // This form may be called with The desired metric type already defined.
+    // This form may be called with the desired metric type already defined.
     // Pre-fill that selection.
     if ($metric_type) {
       $form['metric_type']['#default_value'] = $metric_type->id();
