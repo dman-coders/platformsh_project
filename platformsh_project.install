@@ -5,15 +5,85 @@
  * Install, update and uninstall functions for the platformsh_project module.
  */
 
+use Drupal\block\Entity\Block;
+
 /**
  * Implements hook_install().
  */
 function platformsh_project_install() {
   \Drupal::messenger()->addStatus(__FUNCTION__ . " is installing content definitions from its yaml configs");
   // The creation of all content types and fields is managed by config/install.
-  // Crating content types programatically here is tedious,
+  // Creating content types programatically here is tedious,
   // Yaml definitions are fine, as long as we keep the dependencies aligned
 
+  // I also want to place our admin blocks at install time.
+  // But doing that via yamls will hard-code the theme ID. No good.
+  // Place block instances by code.
+  // Note the difference between a block definition (available blocks)
+  // and a block instance - a "block" that is placed in a region.
+  // We need to "create" a new block instance (config object)
+  // in order to place a defined block in a defined place.
+  // Need to do this just to soft-code the current theme first.
+  $theme_name = \Drupal::service('theme.manager')->getActiveTheme()->getName();
+  // These values are all as would be seen in config:
+  // block.block.platformsh_metrics_actions_block.yml
+
+  $values = [
+    'id' => 'platformsh_metrics_actions_block',
+    'plugin' => 'views_block:metrics_admin_actions-platformsh_metrics_actions_block',
+    'region' => 'content',
+    'settings' => [
+      'label' => 'Actions for Platform.sh Metrics',
+      'id' => 'views_block:metrics_admin_actions-platformsh_metrics_actions_block',
+      'provider' => 'views',
+      'label_display' => 'visible',
+    ],
+    'theme' => $theme_name,
+    'visibility' => [
+      'request_path' => [
+        'id' => 'request_path',
+        'negate' => false,
+        'pages' => '/metric/*'
+      ],
+    ],
+    'weight' => -7,
+  ];
+  $block = Block::create($values);
+  $block->save();
+
+  // Again, this is copied from what would be seen in
+  // block.block.platformsh_project_actions_block.yml
+  $values = [
+    'id' => 'platformsh_project_actions_block',
+    'plugin' => 'views_block:project_admin_actions-platformsh_project_actions_block',
+    'region' => 'content',
+    'settings' => [
+      'label' => 'Actions for Platform.sh Projects',
+      'id' => 'views_block:project_admin_actions-platformsh_project_actions_block',
+      'provider' => 'views',
+      'label_display' => 'visible',
+    ],
+    'theme' => $theme_name,
+    'visibility' => [
+      'entity_bundle:node' => [
+        'id' => 'entity_bundle:node',
+        'negate' => false,
+      ],
+      'context_mapping' => [
+        'node' => '@node.node_route_context:node',
+      ],
+      'bundles' => [
+        'project' => 'project',
+      ]
+    ],
+    'weight' => -7,
+  ];
+
+  /*
+  $block = Block::load('platformsh_project_actions_block');
+  $block->setRegion('content');
+  $block->save();
+  */
 }
 
 /**

@@ -24,11 +24,8 @@ class RefreshMetric extends ActionBase {
    *
    */
   public function access($metric, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    return true; # TODO: maybe support access?
-
     /** @var \Drupal\platformsh_project\Entity\Metric $metric */
-    $access = $metric->access('update', $account, TRUE)
-      ->andIf($metric->title->access('edit', $account, TRUE));
+    $access = $metric->access('update', $account, TRUE);
     return $return_as_object ? $access : $access->isAllowed();
   }
 

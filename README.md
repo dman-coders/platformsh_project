@@ -2,6 +2,11 @@
 
 Provides the entity type definition of a `Project` and publishes a few actions relevant to working with them.
 
+## Requirements
+
+* drupal/admin_actions , drupal/vbo
+  are used to provide the UI actions blocks seen on 'Project' and 'Metric' pages.
+
 ## Utility
 
 ### drush extension
