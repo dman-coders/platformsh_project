@@ -5,10 +5,9 @@ dependencies:
     - node
     - user
     - views_bulk_operations
-  enforced: # makes this go away on uninstall
+  enforced:
     module:
       - platformsh_project
-
 id: platformsh_project_actions
 label: 'Platformsh Project Actions'
 module: views
@@ -185,6 +184,93 @@ display:
       header: {  }
       footer: {  }
       display_extenders: {  }
+    cache_metadata:
+      max-age: 0
+      contexts:
+        - 'languages:language_interface'
+        - url
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
+  platformsh_organization_actions_block:
+    id: platformsh_organization_actions_block
+    display_title: 'Organization Actions'
+    display_plugin: block
+    position: 1
+    display_options:
+      title: 'Platformsh Organization Actions'
+      fields:
+        views_bulk_operations_bulk_form:
+          id: views_bulk_operations_bulk_form
+          table: views
+          field: views_bulk_operations_bulk_form
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: views_bulk_operations_bulk_form
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          batch: false
+          batch_size: 10
+          form_step: true
+          buttons: true
+          action_title: Action
+          clear_on_exposed: false
+          force_selection_info: false
+          selected_actions:
+            6:
+              action_id: platformsh_project_refresh_from_api_action
+              preconfiguration:
+                add_confirmation: false
+      defaults:
+        title: false
+        fields: false
+      display_description: 'Administrative actions that can be applied to Platform.sh Projects or entities'
+      display_comment: 'Contextual actions to expose alongside Platform.sh "Organization" or "User" entities.'
+      display_extenders: {  }
+      block_description: 'Project Actions'
+      block_category: 'Admin Actions'
+      allow:
+        items_per_page: false
     cache_metadata:
       max-age: 0
       contexts:
