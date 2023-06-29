@@ -5,11 +5,10 @@ package: 'Platform.sh'
 core_version_requirement: '^9 || ^10'
 dependencies:
   - drupal:platformsh_api
-  - drupal:action
   - drupal:views
   - drupal:string_field_formatter
   - drupal:admin_actions
-  # if running tests with minimal install profile, be prolific about the requirements.
+# if running tests with minimal install profile, be prolific about the requirements.
 # test_dependencies:
   - drupal:node
   - drupal:path

@@ -1,10 +1,11 @@
+id: platformsh_project_refresh_metric_action
 langcode: en
 status: true
-#dependencies:
-#  module:
-#    - platformsh_project
-id: platformsh_project_refresh_metric_action
+dependencies:
+  enforced:
+    module:
+      - platformsh_project
 label: 'Refresh Metric'
 type: metric
 plugin: platformsh_project_refresh_metric_action
-configuration: {  }
+# No `configuration:{}` for this action.

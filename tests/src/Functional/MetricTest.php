@@ -30,7 +30,7 @@ class MetricTest extends BrowserTestBase {
   public function testMetric() {
     // Create a new Metric entity.
     $metric = Metric::create([
-      'type' => 'foo',
+      'type' => 'note',
       'data' => 'bar',
       'timestamp' => strtotime('2022-03-01'),
       'target' => NULL,
@@ -43,7 +43,7 @@ class MetricTest extends BrowserTestBase {
     $loaded_metric = Metric::load($metric->id());
 
     // Assert that the loaded entity has the same properties as the original.
-    $this->assertEquals('foo', $loaded_metric->get('type')->value);
+    $this->assertEquals('note', $loaded_metric->get('type')->value);
     $this->assertEquals('bar', $loaded_metric->get('data')->value);
     $timestamp = $loaded_metric->get('timestamp')->value;
     $this->assertEquals('2022-03-01', date('Y-m-d', $timestamp));
@@ -55,7 +55,23 @@ class MetricTest extends BrowserTestBase {
    *
    */
   public function testMetricUI() {
+    // Add a metric using the UI form.
+    $web_user = $this->drupalCreateUser(['administer metrics']);
+    $this->drupalLogin($web_user);
+    $this->webUser = $web_user;
+    $edit = [
+      'type' => 'note',
+      'data' => 'bar',
+      'timestamp' => strtotime('2022-03-01'),
+      'target' => NULL,
+    ];
+    $this->drupalGet('metric/add/' . $edit['type']);
+    $this->submitForm($edit, 'Save');
+
+
+    // Verify that visiting the metric cannonic view page shows a
+    // "refresh" button in the UI.
 
   }
 
-  }
+}

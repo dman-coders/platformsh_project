@@ -8,6 +8,15 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Provides a refresh metric action.
  *
+ * Note, every 'Action' that we declare and want to install with a
+ * `system.action.{id}.yml in `config/install` also needs to have its
+ * configuration definition defined
+ * `config/schema:action.configuration.{id}`
+ * EVEN IF this action has no configuration options?
+ * Not using ConfigurableActionBase, but to do a config import of an action like this, still need to define a `configuration` placeholder.
+ * Otherwise the configSchemaChecker complains with 'missing schema`
+ * during importing during module installation during testing ONLY.
+ *
  * @Action(
  *   id = "platformsh_project_refresh_metric_action",
  *   label = @Translation("Refresh Metric"),

@@ -1,4 +1,8 @@
 # If an action is configurable, then its configs need to be declared as schema.
+# @see system.schema.yml:system.action that declares all actions
+# (even ones with no config)
+# have to provide an `action.configuration` schema here.
+
 action.configuration.platformsh_project_refresh_from_api_action:
   type: action_configuration_default
   label: 'Update local project info from the API'
@@ -10,3 +14,11 @@ action.configuration.platformsh_project_add_metric:
     title:
       type: string
       label: Title
+
+action.configuration.platformsh_project_add_metric_action:
+  type: action_configuration_default
+  label: 'Add a metric to a project'
+
+action.configuration.platformsh_project_refresh_metric_action:
+  type: action_configuration_default
+  label: 'Add a metric to a project'

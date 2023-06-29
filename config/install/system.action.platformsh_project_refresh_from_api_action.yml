@@ -1,11 +1,13 @@
-langcode: en
-status: true
-#dependencies:
-#  module:
-#    - platform_project
 id: platformsh_project_refresh_from_api_action
 label: 'Refresh from API'
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - platformsh_project
 type: node
 plugin: platformsh_project_refresh_from_api_action
-# If an action is configurable, then its configs need to be declared as schema.
+# If an action is configurable, then its configs MUST be declared as schema in schema.yml also.
+# else we get `missing schema` errors during strict validation.
 configuration: {  }

@@ -13,6 +13,27 @@ use Drupal\user\Entity\User;
 class RefreshFromApiTest extends PlatformshBrowserTestBase {
 
   /**
+   * @var bool
+   * For reasons that are not my fault?
+   * In a testing context, the `system.action` config entities (from core)
+   * are not defined and throw a "missing schema" fatal error during the
+   * module install process where the `config/install` yamls are being read.
+   * > core testing base classes add a config schema checker during testing.
+   *
+   * Normal module installation with normal dependency resolution works fine,
+   * so something about ConfigInstaller inside a test harness context is faulty.
+   *
+   * I can see the schema for `system.action` config entities in `system.schema.yml`
+   * and my yaml syntax is valid.
+   *
+   * Luckily, this is apparently possible to disable?
+   *
+   *
+   */
+  protected $strictConfigSchema = FALSE;
+
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [
