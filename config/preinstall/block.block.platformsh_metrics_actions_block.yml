@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
-    - views.view.metrics_admin_actions
+    - views.view.platformsh_metrics_actions
   module:
     - system
     - views
@@ -17,9 +17,9 @@ theme: olivero
 region: content
 weight: -6
 provider: null
-plugin: 'views_block:metrics_admin_actions-platformsh_metrics_actions_block'
+plugin: 'views_block:platformsh_metrics_actions-platformsh_metrics_actions_block'
 settings:
-  id: 'views_block:metrics_admin_actions-platformsh_metrics_actions_block'
+  id: 'views_block:platformsh_metrics_actions-platformsh_metrics_actions_block'
   label: ''
   label_display: visible
   provider: views

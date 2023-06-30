@@ -24,6 +24,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a Refresh from API action.
  *
+ * The actual work is done by the objects themselves,
+ * IF they implement their own refreshFromAPI() method.
+ * @see \Drupal\platformsh_project\Entity\ApiResource
+ *
  * This will initiate an API request to the remote service,
  * and update the local entity with data retrieved.
  *
@@ -76,7 +80,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
     /** @var \Drupal\node\NodeInterface $object */
     $access = $object->access('update', $account, TRUE)
-      ->andIf($object->title->access('edit', $account, TRUE));
+      ->andIf($object->get('title')->access('edit', $account, TRUE));
     return $return_as_object ? $access : $access->isAllowed();
   }
 

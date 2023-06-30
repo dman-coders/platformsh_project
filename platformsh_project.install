@@ -15,75 +15,60 @@ function platformsh_project_install() {
   // The creation of all content types and fields is managed by config/install.
   // Creating content types programatically here is tedious,
   // Yaml definitions are fine, as long as we keep the dependencies aligned
+  // I would also like to do this for views and block placements
+  // BUT yaml configs get imported AFTER this hook runs.
+  // Which makes it hard for me to configure a block
+  //  which depends on a view
+  //  that's not yet been created.
 
-  // I also want to place our admin blocks at install time.
+  // I also want to place our admin blocks at install time into the current theme.
   // But doing that via yamls will hard-code the theme ID. No good.
+
+  // Solution,. a hybrid approach - import some yamls manually now,
+  // from the `config/preinstall folder.
+  // Manipulate some things.
+  // let the system import the rest of the normal yamls next.
+
+  // Obtain configuration from yaml files
+  $config_folder = \Drupal::service('extension.list.module')->getPath('platformsh_project') . '/config/preinstall/';
+
+  // Install the view, so we can have a block, so we can position it.
+  $config_id = 'views.view.platformsh_node_actions';
+  $data = \Symfony\Component\Yaml\Yaml::parseFile($config_folder . $config_id .'.yml');
+  \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+  \Drupal::messenger()->addStatus(__FUNCTION__ . " installed " . $config_id);
+
+  $config_id = 'views.view.platformsh_metrics_actions';
+  $data = \Symfony\Component\Yaml\Yaml::parseFile($config_folder . $config_id .'.yml');
+  \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+  \Drupal::messenger()->addStatus(__FUNCTION__ . " installed " . $config_id);
+
   // Place block instances by code.
+  // Take a short cut by loading the config yaml, manipulating it slightly, then saving it.
+  // This means we can recycle all the tedious irrelevant settings in yamls
+  // and not bother too much with CRUD and entity creation.
+  // the config save does all the heavy lifting
+
   // Note the difference between a block definition (available blocks)
-  // and a block instance - a "block" that is placed in a region.
+  // and a block config instance - a "block" that is placed in a region.
   // We need to "create" a new block instance (config object)
   // in order to place a defined block in a defined place.
-  // Need to do this just to soft-code the current theme first.
+  // Need to do al this just to soft-code the current theme.
+  // If theme could have been `%current_theme%` then we'd have been cool.
   $theme_name = \Drupal::service('theme.manager')->getActiveTheme()->getName();
-  // These values are all as would be seen in config:
-  // block.block.platformsh_metrics_actions_block.yml
+  // Fetch a pre-exported yaml from our pre-install folder, and tweak it before import..
+  $block_config_ids = [
+    'block.block.platformsh_metrics_actions_block',
+    'block.block.platformsh_project_actions_block',
+    'block.block.platformsh_organization_actions_block',
+    ];
+  foreach ($block_config_ids as $config_id) {
+    $data = \Symfony\Component\Yaml\Yaml::parseFile($config_folder . $config_id .'.yml');
+    $data['theme'] = $theme_name;
+    \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+  }
+  \Drupal::messenger()->addStatus(__FUNCTION__ . " placed actions blocks on some entity pages for admin purposes.");
 
-  $values = [
-    'id' => 'platformsh_metrics_actions_block',
-    'plugin' => 'views_block:metrics_admin_actions-platformsh_metrics_actions_block',
-    'region' => 'content',
-    'settings' => [
-      'label' => 'Actions for Platform.sh Metrics',
-      'id' => 'views_block:metrics_admin_actions-platformsh_metrics_actions_block',
-      'provider' => 'views',
-      'label_display' => 'visible',
-    ],
-    'theme' => $theme_name,
-    'visibility' => [
-      'request_path' => [
-        'id' => 'request_path',
-        'negate' => false,
-        'pages' => '/metric/*'
-      ],
-    ],
-    'weight' => -7,
-  ];
-  $block = Block::create($values);
-  $block->save();
-
-  // Again, this is copied from what would be seen in
-  // block.block.platformsh_project_actions_block.yml
-  $values = [
-    'id' => 'platformsh_project_actions_block',
-    'plugin' => 'views_block:project_admin_actions-platformsh_project_actions_block',
-    'region' => 'content',
-    'settings' => [
-      'label' => 'Actions for Platform.sh Projects',
-      'id' => 'views_block:project_admin_actions-platformsh_project_actions_block',
-      'provider' => 'views',
-      'label_display' => 'visible',
-    ],
-    'theme' => $theme_name,
-    'visibility' => [
-      'entity_bundle:node' => [
-        'id' => 'entity_bundle:node',
-        'negate' => false,
-      ],
-      'context_mapping' => [
-        'node' => '@node.node_route_context:node',
-      ],
-      'bundles' => [
-        'project' => 'project',
-      ]
-    ],
-    'weight' => -7,
-  ];
-
-  /*
-  $block = Block::load('platformsh_project_actions_block');
-  $block->setRegion('content');
-  $block->save();
-  */
 }
 
 /**

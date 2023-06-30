@@ -1,0 +1,36 @@
+
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.platformsh_node_actions
+  module:
+    - node
+    - views
+  enforced: # makes this go away on uninstall
+    module:
+      - platformsh_project
+  theme:
+    - olivero
+id: platformsh_organization_actions_block
+theme: olivero
+region: content
+weight: -7
+provider: null
+plugin: 'views_block:platformsh_node_actions-platformsh_organization_actions_block'
+settings:
+  id: 'views_block:platformsh_node_actions-platformsh_organization_actions_block'
+  label: ''
+  label_display: visible
+  provider: views
+  context_mapping: {  }
+  views_label: ''
+  items_per_page: none
+visibility:
+  'entity_bundle:node':
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: '@node.node_route_context:node'
+    bundles:
+      organization: organization

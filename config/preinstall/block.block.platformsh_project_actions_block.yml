@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
-    - views.view.platformsh_project_actions
+    - views.view.platformsh_node_actions
   module:
     - node
     - views
@@ -17,9 +17,9 @@ theme: olivero
 region: content
 weight: -7
 provider: null
-plugin: 'views_block:platformsh_project_actions-platformsh_project_actions_block'
+plugin: 'views_block:platformsh_node_actions-platformsh_project_actions_block'
 settings:
-  id: 'views_block:platformsh_project_actions-platformsh_project_actions_block'
+  id: 'views_block:platformsh_node_actions-platformsh_project_actions_block'
   label: ''
   label_display: visible
   provider: views
