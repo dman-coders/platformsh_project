@@ -35,6 +35,12 @@ abstract class ApiResource extends Node {
    * @var string[]
    * Fields that are GUID references, and need to be set to refer to other
    *   entities
+   *
+   * This maps a local object type (like 'User')
+   * against the remote field name (like `owner`)
+   * to state the rule that:
+   * the value of the 'owner' field
+   * becomes a reference to a "User" object.
    */
   protected array $reference_keys = [];
 
@@ -159,7 +165,9 @@ abstract class ApiResource extends Node {
     // There may be special cases that the class needs to deal with.
     $this->alterData($raw_dump);
 
-    // Now set the values we extracted
+    // Now set the values we extracted.
+    // field_keys and reference_keys are the field mapping rules
+    // for converting between the object from the API and the local storage model.
     foreach ($this->field_keys as $key_name) {
       $field_name = 'field_' . $key_name;
       if (

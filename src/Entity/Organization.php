@@ -16,10 +16,12 @@ class Organization extends ApiResource {
   /**
    * @param $remoteEntityID
    *
-   * #@return false|\Platformsh\Client\Model\Organization
+   * @return false|\Platformsh\Client\Model\Organization
    */
   public function getResource($remoteEntityID): bool {
-    return FALSE; # Not yet available?
+    return FALSE;
+    # Platformsh\Client does not yet (2023) have a way to retrieve org info.
+    # Not yet available?
     #$this->getApiClient()->getOrganization($remoteEntityID);
   }
 

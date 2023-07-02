@@ -32,22 +32,27 @@ function platformsh_project_install() {
   // Obtain configuration from yaml files
   $config_folder = \Drupal::service('extension.list.module')->getPath('platformsh_project') . '/config/preinstall/';
 
-  // Install the view, so we can have a block, so we can position it.
-  $config_id = 'views.view.platformsh_node_actions';
-  $data = \Symfony\Component\Yaml\Yaml::parseFile($config_folder . $config_id .'.yml');
-  \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
-  \Drupal::messenger()->addStatus(__FUNCTION__ . " installed " . $config_id);
-
-  $config_id = 'views.view.platformsh_metrics_actions';
-  $data = \Symfony\Component\Yaml\Yaml::parseFile($config_folder . $config_id .'.yml');
-  \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
-  \Drupal::messenger()->addStatus(__FUNCTION__ . " installed " . $config_id);
+  // Install the views, so we can have a views_block, so we can position it.
+  $view_config_ids = [
+    'views.view.platformsh_node_actions',
+    'views.view.platformsh_metrics_actions',
+    'views.view.platformsh_references',
+    'views.view.platformsh_metrics_references',
+  ];
+  foreach ($view_config_ids as $config_id) {
+    $data = \Symfony\Component\Yaml\Yaml::parseFile($config_folder . $config_id . '.yml');
+    \Drupal::configFactory()
+      ->getEditable($config_id)
+      ->setData($data)
+      ->save(TRUE);
+    \Drupal::messenger()->addStatus(__FUNCTION__ . " installed " . $config_id);
+  }
 
   // Place block instances by code.
   // Take a short cut by loading the config yaml, manipulating it slightly, then saving it.
   // This means we can recycle all the tedious irrelevant settings in yamls
   // and not bother too much with CRUD and entity creation.
-  // the config save does all the heavy lifting
+  // The config save does all the heavy lifting
 
   // Note the difference between a block definition (available blocks)
   // and a block config instance - a "block" that is placed in a region.
@@ -56,11 +61,14 @@ function platformsh_project_install() {
   // Need to do al this just to soft-code the current theme.
   // If theme could have been `%current_theme%` then we'd have been cool.
   $theme_name = \Drupal::service('theme.manager')->getActiveTheme()->getName();
+
   // Fetch a pre-exported yaml from our pre-install folder, and tweak it before import..
   $block_config_ids = [
     'block.block.platformsh_metrics_actions_block',
     'block.block.platformsh_project_actions_block',
     'block.block.platformsh_organization_actions_block',
+    'block.block.platformsh_references_project_list_block',
+    'block.block.platformsh_metrics_references_table_block',
     ];
   foreach ($block_config_ids as $config_id) {
     $data = \Symfony\Component\Yaml\Yaml::parseFile($config_folder . $config_id .'.yml');
@@ -77,6 +85,16 @@ function platformsh_project_install() {
 */
 function platformsh_project_uninstall(){
   platformsh_project_module_preuninstall('platformsh_project');
+
+  // TODO: our custom placed blocks from config/preinstall
+  // don't seem to be removing themselves on uninstall().
+  // even though the configs should claim `dependencies:enforced`
+  $block_storage = \Drupal::service('entity_type.manager')->getStorage('block');
+  /** @var \Drupal\block\Entity\Block[] $blocks */
+  $blocks = $block_storage->loadMultiple();
+  foreach ($blocks as $block) {
+    // delete ours
+  }
 }
 
 

@@ -10,8 +10,6 @@ dependencies:
   enforced: # makes this go away on uninstall
     module:
       - platformsh_project
-  theme:
-    - olivero
 id: platformsh_organization_actions_block
 theme: olivero
 region: content

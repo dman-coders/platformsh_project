@@ -1,23 +1,23 @@
-
 langcode: en
 status: true
 dependencies:
   config:
-    - views.view.platformsh_node_actions
+    - views.view.platformsh_references
   module:
     - node
     - views
   enforced: # makes this go away on uninstall
     module:
       - platformsh_project
-id: platformsh_project_actions_block
+
+id: platformsh_references_project_list_block
 theme: olivero
 region: content
-weight: -7
+weight: 0
 provider: null
-plugin: 'views_block:platformsh_node_actions-platformsh_project_actions_block'
+plugin: 'views_block:platformsh_references-project_list_block'
 settings:
-  id: 'views_block:platformsh_node_actions-platformsh_project_actions_block'
+  id: 'views_block:platformsh_references-project_list_block'
   label: ''
   label_display: visible
   provider: views
@@ -31,4 +31,5 @@ visibility:
     context_mapping:
       node: '@node.node_route_context:node'
     bundles:
-      project: project
+      organization: organization
+      user: user
