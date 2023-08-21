@@ -206,7 +206,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
         'label' => 'hidden',
-        'type' => 'timestamp',
+        'type' => 'datetime_timestamp',
         'weight' => 0,
       ])
       ->setDisplayOptions('view', [
