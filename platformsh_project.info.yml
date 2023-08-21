@@ -9,6 +9,7 @@ dependencies:
   - drupal:string_field_formatter
   - drupal:admin_actions
   - drupal:paragraphs
+  - drupal:paragraphs_table
 # if running tests with minimal install profile, be prolific about the requirements.
 # test_dependencies:
   - drupal:node

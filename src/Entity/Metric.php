@@ -238,6 +238,36 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ])
     ;
 
+    /**
+     * The actual paragraph definition and structure is done with yamls.
+     * Here we define and attach a field
+     * that uses that paragraph definition to all
+     * metric bundles.
+     * Can't attach to all bundles generiacally without a lot of yamls,
+     * so here in the abstract class is better.
+     */
+    $fields['requirement'] = BaseFieldDefinition::create('entity_reference_revisions')
+      ->setLabel(t('Requirements'))
+      ->setSetting('target_type', 'paragraph')
+      ->setCardinality(-1)
+      ->setTargetBundle(null)
+      ->setRequired(false)
+      ->setDisplayOptions('view', [
+        'type' => 'paragraphs_table_formatter',
+        'label' => 'above',
+        'weight' => 5,
+        'region' => 'content',
+        'settings' => [
+          'view_mode' => 'default',
+          'vertical' => false,
+          'caption' => '',
+          'mode' => '',
+
+        ],
+      ]);
+
+
+
 
     return $fields;
   }
