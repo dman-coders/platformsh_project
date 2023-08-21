@@ -85,4 +85,35 @@ class PlatformshProjectCommands extends DrushCommands {
     }
   }
 
+  /**
+   * @command platformsh:create-metric
+   * @aliases psh:create-metric
+   * @usage platformsh_project-commandName create-metric $project_id $metric_type
+   *   Add a new metric to the given project.
+   *   $projectid is the platformsh project hash, not the drupal node ID.
+   *   $metrictype is one of 'ping', 'cachestatus' etc.
+   */
+  public function createMetric($project_id = 'abcdefg', $metric_type = 'ping', $options = []) {
+    $this->output()->writeln(sprintf("Creating metric for project"));
+    $field_values = [
+      'bundle' => $metric_type,
+      'field_project' => $project_id
+    ];
+    $entity_type_id = 'metric';
+    $this->output()->writeln(sprintf("Creating a %s metric for %s", $metric_type, $project_id));
+    /** @var \Drupal\platformsh_project\Entity\Metric $metric */
+    $metric = \Drupal::entityTypeManager()
+      ->getStorage($entity_type_id)
+      ->create($field_values);
+    // hook_entity_presave() will do a lookup to prepopulate new project info.
+    $metric->save();
+    $bundle_label = $metric->bundle->entity->label();
+    if ($metric->id()) {
+      $this->output()->writeln(sprintf("Created a metric %s", $bundle_label));
+    } else {
+      $this->output()->writeln(sprintf("Failed to create a metric %s", $bundle_label));
+    }
+
+  }
+
 }

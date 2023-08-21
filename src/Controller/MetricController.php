@@ -105,7 +105,7 @@ class MetricController extends EntityController {
       $build['#bundles'][$bundle_name] = [
         'label' => $bundle_info['label'],
         'description' => $bundle_info['description'] ?? '',
-        'add_link' => Link::createFromRoute($bundle_info['label'] . " woop", $form_route_name, ['project' => $project_id, $bundle_argument => $bundle_name]),
+        'add_link' => Link::createFromRoute($bundle_info['label'], $form_route_name, ['project' => $project_id, $bundle_argument => $bundle_name]),
       ];
     }
 

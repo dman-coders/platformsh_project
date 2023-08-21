@@ -2,15 +2,18 @@
 
 namespace Drupal\platformsh_project\Entity;
 
+use Drupal\aggregator\ItemInterface;
 use Drupal\Core\Entity\Annotation\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityDescriptionInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Url;
 
 /**
  * Defines the Metric entity.
@@ -64,6 +67,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
  * @ContentEntityType(
  *   id = "metric",
  *   label = @Translation("Metric"),
+ *   description = @Translation("Generic Abstract Metric description should get overridden"),
  *   label_collection = @Translation("Platformsh metrics"),
  *   label_singular = @Translation("platformsh metric"),
  *   label_plural = @Translation("platformsh metrics"),
@@ -88,7 +92,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
  *   admin_permission = "administer metrics",
  *   entity_keys = {
  *     "id" = "id",
- *     "bundle" = "bundle",
+ *     "bundle" = "bundle"
  *   },
  *   links = {
  *     "collection" = "/admin/content/metric",
@@ -99,6 +103,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
  *     "delete-form" = "/metric/{metric}/delete",
  *   },
  *   bundle_entity_type = "metric_type",
+ *   uri_callback = "Drupal\platformsh_project\Entity\metric::buildUri",
  *   bundle_label = @Translation("Metric type"),
  *   field_ui_base_route = "entity.metric_type.edit_form"
  * )
@@ -112,9 +117,25 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    // Base fields are attached directly to the main entity table
+    // as additional columns, like a traditional db schema
+    // Base fields are not referred to as `field_data` style lookups
+    // like most other UI-added fields would do.
+
     // Base fields - ID etc - are provided by the system if we ask for them
-    // in the annotation.
+    // in the annotation by defining entity_keys.
+    // This must be done explicitly for every subclass.
     $fields = parent::baseFieldDefinitions($entity_type);
+
+    // The data model refers of the Drupal hook_requirements report model.
+    // A "requirement" check returns a
+    // * title
+    // * value
+    // * description
+    // * severity
+    // And these mini-reports get collated into a larger report on the system status report page.
+    // Our metric checks will be a very similar shape.
+
 
     // The 'changed' field is a special thing.
     // Internal tooling (EntityChangedTrait)  helps it work the same as other entities.
@@ -143,10 +164,10 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDescription(t('The last known summary of this metric.'))
       ->setSettings([
         'allowed_values' => [
-          'good' => 'Good',
-          'bad' => 'Bad',
-          'ugly' => "It's complicated",
-          'null' => "No value",
+          'OK' => 'REQUIREMENT_OK',
+          'Error' => 'REQUIREMENT_ERROR',
+          'Warning' => 'REQUIREMENT_WARNING',
+          'Info' => 'REQUIREMENT_INFO',
         ],
       ])
       ->setRequired(TRUE)
@@ -156,7 +177,6 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDisplayOptions('form', ['weight' => 10])
       ->setDisplayOptions('view', ['weight' => 0])
       ;
-
 
     // The data field.
     $fields['data'] = BaseFieldDefinition::create('string_long')
@@ -199,7 +219,6 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ])
     ;
 
-
     // The target entity reference field.
     $fields['target'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Target'))
@@ -223,4 +242,35 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     return $fields;
   }
 
+  /**
+   * Entity URI callback.
+   *
+   * For some reason this wasn't being autodetected from the bundle.
+   * I'd expected it to be deduced from the annotation links:canonic
+   */
+  public static function buildUri(ItemInterface $item) {
+    return Url::fromUri($item->getLink());
+  }
+
+  /**
+   * Utility to return the referenced project entity.
+   *
+   * @return \Drupal\platformsh_project\Entity\Project
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   */
+  protected function getProject() {
+    // Dereference the entityreference.
+    /**
+     * @var \Drupal\platformsh_project\Entity\Project
+     */
+    static $project;
+    if (!empty($project)) {
+      return $project;
+    }
+    return $this->get('target')
+      ?->first()
+      ?->get('entity')
+      ?->getTarget()
+      ?->getValue();
+  }
 }

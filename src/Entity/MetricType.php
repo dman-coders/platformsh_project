@@ -3,12 +3,13 @@
 namespace Drupal\platformsh_project\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\Core\Entity\EntityDescriptionInterface;
 
 /**
  * Defines the Metric type configuration entity.
  *
- * I have REMOVED the usual annotaions that define links and handlers
- * as this is functinoality that I don't need.
+ * I have REMOVED the usual annotations that define links and handlers
+ * as this is functionality that I don't need.
  * I have SHIFTED that functionality into platformsh_project_ui instead.
  * and re-injected the annotation stuff from there.
  *
@@ -23,6 +24,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *
  * @ConfigEntityType(
  *   id = "metric_type",
+ *   description = @Translation("A measure of some aspect of a project"),
  *   label = @Translation("Metric type"),
  *   label_collection = @Translation("Metric types"),
  *   label_singular = @Translation("metric type"),
@@ -54,7 +56,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class MetricType extends ConfigEntityBundleBase {
+class MetricType extends ConfigEntityBundleBase implements EntityDescriptionInterface{
 
   /**
    * The machine name of this metric type.
@@ -69,5 +71,30 @@ class MetricType extends ConfigEntityBundleBase {
    * @var string
    */
   protected $label;
+
+  /**
+   * @inheritDoc
+   */
+  public function getDescription() {
+    // Get the class annotation object where the description info is.
+    /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_info */
+    $entity_info = \Drupal::entityTypeManager()->getDefinition($this->id, false);
+    if ($entity_info) {
+      $description = $entity_info->get('description');
+    }
+    else {
+      $entity_info = \Drupal::entityTypeManager()->getDefinition('metric');
+      $description = $entity_info->get('description');
+    }
+    return $description;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setDescription($description) {
+    // TODO: Implement setDescription() method.
+  }
+
 
 }

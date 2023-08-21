@@ -78,4 +78,8 @@ class Project extends ApiResource {
     return $raw_data;
   }
 
+  public function getUrl() {
+    return "https://example.com/";
+  }
+
 }

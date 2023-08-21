@@ -9,6 +9,18 @@ use Drupal\Core\Entity\EntityChangedInterface;
 /**
  * A metric entity that performs no special action,
  * it just exists as a repository for notes entered manually.
+ *
+ * @inheritDoc
+ *
+ * @ContentEntityType(
+ *   id = "note",
+ *   description = @Translation("An arbitrary user-added note"),
+ *   label = @Translation("Note"),
+ *   entity_keys = {
+ *     "id" = "id",
+ *     "bundle" = "bundle"
+ *   },
+ * )
  */
 class NoteMetric extends Metric {
 

@@ -36,20 +36,6 @@ metric.add_unknown_metric_to_project:
         type: entity:node
 
 
-metric.add_unknown_metric_to_project_xx:
-  path: '/node/{project}/metric/add'
-  defaults:
-    _title: Add Metric
-    _form: \Drupal\platformsh_project\Form\MetricForm
-    _controller: 'controller.entity_form:getContentResult'
-    _entity_form: metric.add
-  requirements:
-    _permission: 'administer metrics'
-  options:
-    parameters:
-      project:
-        type: entity:node
-
 metric.add_known_metric_to_project:
   path: '/node/{project}/metric/add/{metric_type}'
   defaults:

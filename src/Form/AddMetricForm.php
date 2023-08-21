@@ -63,7 +63,7 @@ class AddMetricForm extends FormBase {
                             MetricType $metric_type = NULL
   ) {
 
-    $form['#title'] = $this->t('Add Metric');
+    $form['#title'] = $this->t('Add a Metric');
 
     // This form may be called with an owning entity (a project node)
     // already chosen. This info should be retained and used to populate the data.

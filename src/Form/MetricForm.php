@@ -57,7 +57,13 @@ class MetricForm extends ContentEntityForm {
     // Pre-fill that selection.
     if ($metric_type) {
       $form['metric_type']['#default_value'] = $metric_type->id();
+      if (!empty($project)) {
+        $form['#title'] = $this->t('Add a @label metric to @project project', ['@label' => $metric_type->get('label'),'@project' => $project->getTitle()]);
+      } else {
+        $form['#title'] = $this->t('Add a @label metric', ['@label' => $metric_type->get('label')]);
+      }
     }
+
     return $form;
   }
 
