@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_severity
+    - paragraphs.paragraphs_type.requirement
+  module:
+    - options
+id: paragraph.requirement.field_severity
+field_name: field_severity
+entity_type: paragraph
+bundle: requirement
+label: Severity
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: REQUIREMENT_INFO
+default_value_callback: ''
+settings: {  }
+field_type: list_string
