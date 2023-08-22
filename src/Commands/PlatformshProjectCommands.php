@@ -20,34 +20,14 @@ use Drush\Commands\DrushCommands;
 class PlatformshProjectCommands extends DrushCommands {
 
   /**
-   * Command description here.
-   *
-   * @param $arg1
-   *   Argument description.
-   * @param array $options
-   *   An associative array of options whose values come from cli, aliases, config, etc.
-   * @option option-name
-   *   Description
-   * @usage platformsh-commandName foo
-   *   Usage description
-   *
-   * @command platformsh:commandName
-   * @aliases foo
-   */
-  public function commandName($arg1, $options = ['option-name' => 'default']) {
-    $this->logger()->success(dt('Achievement unlocked.'));
-  }
-
-  /**
    * Create a project from ProjectID.
    *
    * @command platformsh:create-project
-   * @param $project_id Argument Project ID to look up
+   * @param $project_id Project ID (Platformsh hash) to look up
    * @aliases psh:create-project
-   * @usage platformsh_project-commandName create-project
-   *   Create a project from ProjectID.
+   * @usage platformsh_project:create-project abcdefgh
    */
-  public function createProject($project_id = 'abcdefg', $options = []) {
+  public function createProject($project_id, $options = []) {
     $field_values = [
       'type' => 'project',
       'title' => $project_id,
@@ -86,14 +66,15 @@ class PlatformshProjectCommands extends DrushCommands {
   }
 
   /**
+   * Add a new metric to the given project.
+   *
    * @command platformsh:create-metric
    * @aliases psh:create-metric
-   * @usage platformsh_project-commandName create-metric $project_id $metric_type
-   *   Add a new metric to the given project.
-   *   $projectid is the platformsh project hash, not the drupal node ID.
-   *   $metrictype is one of 'ping', 'cachestatus' etc.
+   * @param $project_id Project ID (platformsh hash) to attach metric to (must exist)
+   * @param $metric_type Machine name of metric type ['ping', 'note', ...]
+   * @usage drush platformsh_project:create-metric abcdefg ping
    */
-  public function createMetric($project_id = 'abcdefg', $metric_type = 'ping', $options = []) {
+  public function createMetric($project_id, $metric_type, $options = []) {
     $this->output()->writeln(sprintf("Creating metric for project"));
     $field_values = [
       'bundle' => $metric_type,
