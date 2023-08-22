@@ -6,6 +6,9 @@ dependencies:
     - paragraphs.paragraphs_type.requirement
   module:
     - options
+  enforced:
+    module:
+      - platformsh_project
 id: paragraph.requirement.field_severity
 field_name: field_severity
 entity_type: paragraph

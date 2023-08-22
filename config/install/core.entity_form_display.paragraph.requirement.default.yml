@@ -7,6 +7,9 @@ dependencies:
     - field.field.paragraph.requirement.field_title
     - field.field.paragraph.requirement.field_value
     - paragraphs.paragraphs_type.requirement
+  enforced:
+    module:
+      - platformsh_project
 id: paragraph.requirement.default
 targetEntityType: paragraph
 bundle: requirement

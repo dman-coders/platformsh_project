@@ -3,6 +3,10 @@ status: true
 dependencies:
   module:
     - paragraphs
+  enforced:
+    module:
+      - platformsh_project
+
 id: paragraph.field_value
 field_name: field_value
 entity_type: paragraph

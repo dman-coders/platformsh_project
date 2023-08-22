@@ -9,6 +9,9 @@ dependencies:
     - paragraphs.paragraphs_type.requirement
   module:
     - options
+  enforced:
+    module:
+      - platformsh_project
 id: paragraph.requirement.default
 targetEntityType: paragraph
 bundle: requirement

@@ -1,6 +1,9 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  enforced:
+    module:
+      - platformsh_project
 id: requirement
 label: Requirement
 icon_uuid: null

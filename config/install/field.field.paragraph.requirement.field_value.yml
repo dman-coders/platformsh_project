@@ -4,6 +4,9 @@ dependencies:
   config:
     - field.storage.paragraph.field_value
     - paragraphs.paragraphs_type.requirement
+  enforced:
+    module:
+      - platformsh_project
 id: paragraph.requirement.field_value
 field_name: field_value
 entity_type: paragraph

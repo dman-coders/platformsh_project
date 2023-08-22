@@ -3,6 +3,9 @@ status: true
 dependencies:
   module:
     - paragraphs
+  enforced:
+    module:
+      - platformsh_project
 id: paragraph.field_description
 field_name: field_description
 entity_type: paragraph
