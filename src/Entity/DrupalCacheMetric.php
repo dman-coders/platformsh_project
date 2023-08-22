@@ -27,6 +27,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   links = {
  *     "canonical" = "/metric/{metric}",
  *   },
+ *   base_table = "metric",
  *   entity_keys = {
  *     "id" = "id",
  *     "bundle" = "bundle"

@@ -16,6 +16,7 @@ use Drupal\Core\Entity\EntityChangedInterface;
  *   id = "note",
  *   description = @Translation("An arbitrary user-added note"),
  *   label = @Translation("Note"),
+ *   base_table = "metric",
  *   entity_keys = {
  *     "id" = "id",
  *     "bundle" = "bundle"

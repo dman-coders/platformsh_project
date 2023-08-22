@@ -20,6 +20,7 @@ use Drupal\Core\Entity\EntityChangedInterface;
  *   id = "ping",
  *   description = @Translation("Pings the site URL to check it responds"),
  *   label = @Translation("Ping"),
+ *   base_table = "metric",
  *   entity_keys = {
  *     "id" = "id",
  *     "bundle" = "bundle"
