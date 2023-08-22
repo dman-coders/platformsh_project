@@ -249,6 +249,10 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     $fields['requirement'] = BaseFieldDefinition::create('entity_reference_revisions')
       ->setLabel(t('Requirements'))
       ->setSetting('target_type', 'paragraph')
+      ->setSetting('handler', 'default:paragraph')
+      ->setSetting('handler_settings', [
+        'target_bundles' => ['requirement' => 'requirement'],
+      ])
       ->setCardinality(-1)
       ->setTargetBundle(null)
       ->setRequired(false)
