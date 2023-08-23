@@ -239,13 +239,20 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     ;
 
     /**
+     * I want to add the entity_reference_revisions field called `requirement`
+     * here, but it seems it's not fully supported enough to be attached as a
+     * baseFieldDefinition.
+     * It needs to be instantiated and attached to all metrics using hooks or install
+     * processes. This is probably better anyway, as base Fields are not editable
+     * via the fuildUI at all, and it would be prefereable if they were.
+     */
+    /**
      * The actual paragraph definition and structure is done with yamls.
      * Here we define and attach a field
      * that uses that paragraph definition to all
      * metric bundles.
-     * Can't attach to all bundles generiacally without a lot of yamls,
+     * Can't attach to all bundles generically without a lot of yamls,
      * so here in the abstract class is better.
-     */
     $fields['requirement'] = BaseFieldDefinition::create('entity_reference_revisions')
       ->setLabel(t('Requirements'))
       ->setSetting('target_type', 'paragraph')
@@ -269,6 +276,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
 
         ],
       ]);
+     */
 
 
 

@@ -5,6 +5,8 @@
  * Primary module hooks for platformsh_project module.
  */
 
+use Drupal\Core\Field\BaseFieldDefinition;
+
 /**
  * hook_entity_bundle_info_alter is how we attach a custom Class
  * to handle our entity definition.
@@ -124,3 +126,58 @@ function platformsh_project_help($route_name, \Drupal\Core\Routing\RouteMatchInt
   return 'DEV: ' .  $route_name;
 }
 
+function platformsh_project_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+  return null;
+
+  // Add a property to all metric entities.
+  if ($entity_type->id() == 'metric') {
+    $fields = array();
+    $fields['requirement'] =
+    BaseFieldDefinition::create('entity_reference_revisions')
+      ->setLabel(t('Requirements'))
+      ->setSetting('target_type', 'paragraph')
+      ->setSetting('handler', 'default:paragraph')
+      ->setSetting('handler_settings', [
+        'target_bundles' => ['requirement' => 'requirement'],
+      ])
+      ->setCardinality(-1)
+      ->setTargetBundle(null)
+      ->setRequired(false)
+      ->setDisplayOptions('view', [
+        'type' => 'paragraphs_table_formatter',
+        'label' => 'above',
+        'weight' => 5,
+        'region' => 'content',
+        'settings' => [
+          'view_mode' => 'default',
+          'vertical' => false,
+          'caption' => '',
+          'mode' => '',
+
+        ],
+      ]);
+
+    return $fields;
+  }
+}
+
+/**
+ * Utility function for finding projects.
+ *
+ * @param $project_id
+ *
+ * @return null | \Drupal\node\Entity\Node
+ */
+function platformsh_project_get_project_by_project_id($project_id){
+  $nodes = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->loadByProperties([
+      'field_id' => $project_id,
+    ]);
+  if ($node = reset($nodes)) {
+    return $node;
+  }
+  \Drupal::messenger()->addStatus(__FUNCTION__ . " failed to find a project with the ID " . $project_id);
+  return null;
+
+}
