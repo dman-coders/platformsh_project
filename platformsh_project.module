@@ -5,15 +5,27 @@
  * Primary module hooks for platformsh_project module.
  */
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeInterface as EntityTypeInterfaceAlias;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\platformsh_project\Entity\DrupalCacheMetric;
+use Drupal\platformsh_project\Entity\NoteMetric;
+use Drupal\platformsh_project\Entity\Organization;
+use Drupal\platformsh_project\Entity\PingMetric;
+use Drupal\platformsh_project\Entity\Project;
+use Drupal\platformsh_project\Entity\User;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * hook_entity_bundle_info_alter is how we attach a custom Class
  * to handle our entity definition.
  * That would otherwise be just a vanilla system-managed object.
  *
- * We still allow most of that methods and properties of a core ContentEntityBase,
- * as our classes inherit from that.
+ * We still allow most of that methods and properties of a core
+ * ContentEntityBase, as our classes inherit from that.
  *
  * @param array $bundles
  *
@@ -22,22 +34,22 @@ use Drupal\Core\Field\BaseFieldDefinition;
 function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
   if (isset($bundles['node']['project'])) {
     // Possible since 9.3 https://www.drupal.org/project/drupal/issues/2570593
-    $bundles['node']['project']['class'] = \Drupal\platformsh_project\Entity\Project::class;
+    $bundles['node']['project']['class'] = Project::class;
   }
   if (isset($bundles['node']['user'])) {
-    $bundles['node']['user']['class'] = \Drupal\platformsh_project\Entity\User::class;
+    $bundles['node']['user']['class'] = User::class;
   }
   if (isset($bundles['node']['organization'])) {
-    $bundles['node']['organization']['class'] = \Drupal\platformsh_project\Entity\Organization::class;
+    $bundles['node']['organization']['class'] = Organization::class;
   }
   if (isset($bundles['metric']['note'])) {
-    $bundles['metric']['note']['class'] = \Drupal\platformsh_project\Entity\NoteMetric::class;
+    $bundles['metric']['note']['class'] = NoteMetric::class;
   }
   if (isset($bundles['metric']['ping'])) {
-    $bundles['metric']['ping']['class'] = \Drupal\platformsh_project\Entity\PingMetric::class;
+    $bundles['metric']['ping']['class'] = PingMetric::class;
   }
   if (isset($bundles['metric']['drupalcache'])) {
-    $bundles['metric']['drupalcache']['class'] = \Drupal\platformsh_project\Entity\DrupalCacheMetric::class;
+    $bundles['metric']['drupalcache']['class'] = DrupalCacheMetric::class;
   }
 }
 
@@ -51,8 +63,8 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
 function platformsh_project_node_presave(Drupal\Node\Entity\Node $entity) {
   // Update from API if brand new
   if ($entity->getType() == 'project' && $entity->isNew()) {
-    \Drupal::logger('platformsh_project')->notice("Creating a new project");
-    $action = \Drupal::entityTypeManager()
+    Drupal::logger('platformsh_project')->notice("Creating a new project");
+    $action = Drupal::entityTypeManager()
       ->getStorage('action')
       ->load('platformsh_project_refresh_from_api_action');
     if ($action) {
@@ -60,7 +72,7 @@ function platformsh_project_node_presave(Drupal\Node\Entity\Node $entity) {
     }
   }
   // Ensure target entities exist if references to org or owner are set.
-  $api_service = \Drupal::service('platformsh_api.fetcher');
+  $api_service = Drupal::service('platformsh_api.fetcher');
   $referrees = [];
 }
 
@@ -75,20 +87,22 @@ function platformsh_project_node_presave(Drupal\Node\Entity\Node $entity) {
  * cannot be placed in the {module}.install file.
  * It is .. uncertain when this gets invoked in practice.
  *
- * Arg! This gets called any time ANYTHING is uninstalled!
- * Danger. Maybe this is not the right place to be invoking this.
- * maybe it's hook_uninstall after all.
  */
 function platformsh_project_module_preuninstall($module): void {
+  // This gets called any time ANYTHING is uninstalled!
+  // Danger. Maybe this is not the right place to be invoking this.
+  // maybe it's hook_uninstall after all.
   if ('platformsh_project' !== $module) {
     return;
   }
-  $content_type_names = ['project','user','organization'];
 
-  \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all content associated with its content types: " . implode(', ', $content_type_names));
+  $content_type_names = ['project', 'user', 'organization'];
+
+  Drupal::messenger()
+    ->addStatus(__FUNCTION__ . " is deleting all content associated with its content types: " . implode(', ', $content_type_names));
 
   foreach ($content_type_names as $content_type_name) {
-    $storage_handler = \Drupal::entityTypeManager()
+    $storage_handler = Drupal::entityTypeManager()
       ->getStorage('node');
     $nodes = $storage_handler->loadByProperties(['type' => $content_type_name]);
     $storage_handler->delete($nodes);
@@ -100,11 +114,11 @@ function platformsh_project_module_preuninstall($module): void {
   // Otherwise they will remain behind as orphaned fields,
   // and conflict if you try to re-install this module.
 
-  \Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all metrics.");
+  Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all metrics.");
 
   $entity_type_names = ['metric'];
   foreach ($entity_type_names as $entity_type) {
-    $storage_handler = \Drupal::entityTypeManager()
+    $storage_handler = Drupal::entityTypeManager()
       ->getStorage($entity_type);
     $entities = $storage_handler->loadByProperties([]);
     $storage_handler->delete($entities);
@@ -115,7 +129,7 @@ function platformsh_project_module_preuninstall($module): void {
 /**
  * Implements hook_help().
  */
-function platformsh_project_help($route_name, \Drupal\Core\Routing\RouteMatchInterface $route_match) {
+function platformsh_project_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     // Drop some dev notes in here
     case 'metric.add_unknown_metric_to_project':
@@ -123,43 +137,9 @@ function platformsh_project_help($route_name, \Drupal\Core\Routing\RouteMatchInt
     case 'metric.add_known_metric_to_project':
       return 'DEV: add_known_metric_to_project';
   }
-  return 'DEV: ' .  $route_name;
+  return 'DEV: ' . $route_name;
 }
 
-function platformsh_project_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
-  return null;
-
-  // Add a property to all metric entities.
-  if ($entity_type->id() == 'metric') {
-    $fields = array();
-    $fields['requirement'] =
-    BaseFieldDefinition::create('entity_reference_revisions')
-      ->setLabel(t('Requirements'))
-      ->setSetting('target_type', 'paragraph')
-      ->setSetting('handler', 'default:paragraph')
-      ->setSetting('handler_settings', [
-        'target_bundles' => ['requirement' => 'requirement'],
-      ])
-      ->setCardinality(-1)
-      ->setTargetBundle(null)
-      ->setRequired(false)
-      ->setDisplayOptions('view', [
-        'type' => 'paragraphs_table_formatter',
-        'label' => 'above',
-        'weight' => 5,
-        'region' => 'content',
-        'settings' => [
-          'view_mode' => 'default',
-          'vertical' => false,
-          'caption' => '',
-          'mode' => '',
-
-        ],
-      ]);
-
-    return $fields;
-  }
-}
 
 /**
  * Utility function for finding projects.
@@ -168,8 +148,8 @@ function platformsh_project_entity_bundle_field_info(\Drupal\Core\Entity\EntityT
  *
  * @return null | \Drupal\node\Entity\Node
  */
-function platformsh_project_get_project_by_project_id($project_id){
-  $nodes = \Drupal::entityTypeManager()
+function platformsh_project_get_project_by_project_id($project_id) {
+  $nodes = Drupal::entityTypeManager()
     ->getStorage('node')
     ->loadByProperties([
       'field_id' => $project_id,
@@ -177,7 +157,96 @@ function platformsh_project_get_project_by_project_id($project_id){
   if ($node = reset($nodes)) {
     return $node;
   }
-  \Drupal::messenger()->addStatus(__FUNCTION__ . " failed to find a project with the ID " . $project_id);
-  return null;
+  Drupal::messenger()
+    ->addStatus(__FUNCTION__ . " failed to find a project with the ID " . $project_id);
+  return NULL;
 
 }
+
+
+/**
+ * Update the fields that are attached to metrics
+ *
+ * It seems near impossible to manually and confidently
+ * create and attach fields via code using FieldStorageConfig::create()
+ * and the rest.
+ * It seems that setting up our content types with baseFieldDefinitions()
+ * is problematic, and base fields don't play well with FieldUI fields.
+ *
+ * Trying to add fields with
+ * hook_entity_field_storage_info(), hook_entity_bundle_field_info()
+ * May have been correct, but triggered a lot of site-killer errors
+ * if mysterious things don't align correctly.
+ * Incredibly fragile, opaque and broken.
+ *
+ * ALL the tutorials say to just export and use yamls for this, but this
+ * doesn't scale well because we have to keep adding and maintaining yamls
+ * for each metric bundle.
+ *
+ * So this is a hybrid.
+ * Define the fields in yamls, but don't just install them.
+ * Load the yamls as templates.
+ * Tweak the template, then import the config.
+ * Allow the field UI to work with them while it all gets set up.
+ * Allow re-importing of these yamls to reset them
+ *
+ * We selectively grab yamls out of the /config/preinstall/
+ * folder, then config-import them.
+ */
+function platformsh_project_update_fields() {
+  return;
+  // Obtain configuration from yaml files
+  $config_folder = Drupal::service('extension.list.module')
+      ->getPath('platformsh_project') . '/config/preinstall/';
+
+  // 'REQUIREMENT' definition.
+  // A paragraph field collection.
+  // The paragraph entity definition itself is already defined wiith normal install yamls.
+
+  // Field storage
+  $config_id = 'field.storage.metric.requirement';
+  $data = Yaml::parseFile($config_folder . $config_id . '.yml');
+  Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+
+  // Field bundle instance
+  $config_id = 'field.field.metric.bundle.requirement';
+  $data = Yaml::parseFile($config_folder . $config_id . '.yml');
+  $metric_types = ['note', 'ping'];
+  foreach ($metric_types as $bundle) {
+    $local_config_id = 'field.field.metric.' . $bundle . '.requirement';
+    $data['id'] = 'metric.' . $bundle . '.requirement';
+    $data['bundle'] = $bundle;
+    Drupal::configFactory()
+      ->getEditable($local_config_id)
+      ->setData($data)
+      ->save(TRUE);
+
+    // Also have to define the view and form layouts,
+    // or the field won't show up.
+    // core.entity_form_display.metric.bundle.default.yml
+    // core.entity_view_display.metric.bundle.default.yml
+    foreach (['entity_form_display', 'entity_view_display'] as $display_mode) {
+      $local_config_id = 'core.' . $display_mode . '.metric.' . $bundle . '.default';
+      $data['id'] = 'metric.' . $bundle . '.default';
+      $data['bundle'] = $bundle;
+      $data['dependencies']['config'] = [
+        'field.field.metric.' . $bundle . '.requirement',
+        'platformsh_project.metric_type.' . $bundle,
+      ];
+      Drupal::configFactory()
+        ->getEditable($local_config_id)
+        ->setData($data)
+        ->save(TRUE);
+      // TODO
+      // maybe adjust this yaml import so that is just patches the config
+      // with the field display settings, not override the whole thing.
+    }
+
+
+
+    \Drupal::messenger()
+      ->addStatus(__FUNCTION__ . " Added a requirement field to the " . $bundle . " metric.");
+  }
+
+}
+

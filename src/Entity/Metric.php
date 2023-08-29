@@ -13,7 +13,9 @@ use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Defines the Metric entity.
@@ -53,8 +55,8 @@ use Drupal\Core\Url;
  * the target project that a node is attached to
  * - if it is called in a special context,
  * that refers to the project node,
- * so that we can be directed to an 'add metric' form with the target pre-filled.
- * see routes.yaml.
+ * so that we can be directed to an 'add metric' form with the target
+ * pre-filled. see routes.yaml.
  *
  * Although it's declared, we do not use the list_builder
  * to create the tab that is seen at /admin/content/metric
@@ -67,13 +69,12 @@ use Drupal\Core\Url;
  * @ContentEntityType(
  *   id = "metric",
  *   label = @Translation("Metric"),
- *   description = @Translation("Generic Abstract Metric description should get overridden"),
- *   label_collection = @Translation("Platformsh metrics"),
- *   label_singular = @Translation("platformsh metric"),
- *   label_plural = @Translation("platformsh metrics"),
- *   label_count = @PluralTranslation(
- *     singular = "@count platformsh metrics",
- *     plural = "@count platformsh metrics",
+ *   description = @Translation("Generic Abstract Metric description should get
+ *   overridden"), label_collection = @Translation("Platformsh metrics"),
+ *   label_singular = @Translation("platformsh metric"), label_plural =
+ *   @Translation("platformsh metrics"), label_count = @PluralTranslation(
+ *   singular = "@count platformsh metrics", plural = "@count platformsh
+ *   metrics",
  *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\Core\Entity\EntityListBuilder",
@@ -112,6 +113,14 @@ use Drupal\Core\Url;
 class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 
   use EntityChangedTrait;
+
+  const REQUIREMENT_INFO = -1;
+
+  const REQUIREMENT_OK = 0;
+
+  const REQUIREMENT_WARNING = 1;
+
+  const REQUIREMENT_ERROR = 2;
 
   /**
    * {@inheritdoc}
@@ -154,8 +163,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
         'label' => 'hidden',
         'type' => 'timestamp',
         'weight' => 0,
-      ])
-    ;
+      ]);
 
 
     // The simple status field.
@@ -164,10 +172,10 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDescription(t('The last known summary of this metric.'))
       ->setSettings([
         'allowed_values' => [
-          'OK' => 'REQUIREMENT_OK',
-          'Error' => 'REQUIREMENT_ERROR',
-          'Warning' => 'REQUIREMENT_WARNING',
-          'Info' => 'REQUIREMENT_INFO',
+          self::REQUIREMENT_INFO => 'Info',
+          self::REQUIREMENT_OK => 'OK',
+          self::REQUIREMENT_WARNING => 'Warning',
+          self::REQUIREMENT_ERROR => 'Error',
         ],
       ])
       ->setRequired(TRUE)
@@ -175,8 +183,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', ['weight' => 10])
-      ->setDisplayOptions('view', ['weight' => 0])
-      ;
+      ->setDisplayOptions('view', ['weight' => 0]);
 
     // The data field.
     $fields['data'] = BaseFieldDefinition::create('string_long')
@@ -189,8 +196,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayOptions('view', ['weight' => 0,])
-    ;
+      ->setDisplayOptions('view', ['weight' => 0,]);
 
     // The date field.
     // Default widget is datetime_timestamp but that's annoying.
@@ -216,27 +222,25 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
         'settings' => [
           'date_format' => 'medium',
         ],
-      ])
-    ;
+      ]);
 
     // The target entity reference field.
     $fields['target'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Target'))
       ->setDescription(t('The linked resource the Metric applies to.'))
-      ->setRequired(False) # make required later
+      ->setRequired(FALSE) # make required later
       ->setSetting('target_type', 'node')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
-        'weight' => 10
+        'weight' => 10,
       ])
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'entity_reference_label',
         'weight' => 0,
-        'settings' => [ 'link' => true ]
-      ])
-    ;
+        'settings' => ['link' => TRUE],
+      ]);
 
     /**
      * I want to add the entity_reference_revisions field called `requirement`
@@ -248,37 +252,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
      */
     /**
      * The actual paragraph definition and structure is done with yamls.
-     * Here we define and attach a field
-     * that uses that paragraph definition to all
-     * metric bundles.
-     * Can't attach to all bundles generically without a lot of yamls,
-     * so here in the abstract class is better.
-    $fields['requirement'] = BaseFieldDefinition::create('entity_reference_revisions')
-      ->setLabel(t('Requirements'))
-      ->setSetting('target_type', 'paragraph')
-      ->setSetting('handler', 'default:paragraph')
-      ->setSetting('handler_settings', [
-        'target_bundles' => ['requirement' => 'requirement'],
-      ])
-      ->setCardinality(-1)
-      ->setTargetBundle(null)
-      ->setRequired(false)
-      ->setDisplayOptions('view', [
-        'type' => 'paragraphs_table_formatter',
-        'label' => 'above',
-        'weight' => 5,
-        'region' => 'content',
-        'settings' => [
-          'view_mode' => 'default',
-          'vertical' => false,
-          'caption' => '',
-          'mode' => '',
-
-        ],
-      ]);
      */
-
-
 
 
     return $fields;
@@ -315,4 +289,5 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ?->getTarget()
       ?->getValue();
   }
+
 }

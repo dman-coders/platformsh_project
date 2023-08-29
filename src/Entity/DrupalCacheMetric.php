@@ -2,6 +2,8 @@
 
 
 namespace Drupal\platformsh_project\Entity;
+
+use Drupal;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
@@ -51,6 +53,7 @@ class DrupalCacheMetric extends Metric {
     // like most other UI-added fields would do.
 
     $fields = parent::baseFieldDefinitions($entity_type);
+    return $fields;
 
     // The data field.
     $fields['response_header'] = BaseFieldDefinition::create('string_long')
@@ -67,7 +70,7 @@ class DrupalCacheMetric extends Metric {
     return $fields;
   }
 
-    /**
+  /**
    * Probe the project and check the cache settings
    *
    * @return void
@@ -144,7 +147,7 @@ class DrupalCacheMetric extends Metric {
   private function getResponseHeaders($url) {
     /** @var \GuzzleHttp\Client $client */
     /** @var \Psr\Http\Message\ResponseInterface $response */
-    $response =  \Drupal::httpClient()->request('GET', $url );
+    $response = Drupal::httpClient()->request('GET', $url);
     $statusCode = $response->getStatusCode();
     return $response->getHeaders();
   }

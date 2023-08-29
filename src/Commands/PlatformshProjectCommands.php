@@ -104,4 +104,15 @@ class PlatformshProjectCommands extends DrushCommands {
 
   }
 
+  /**
+   * @command platformsh:reset-fields
+   * @aliases psh:reset-fields
+   * @usage platformsh:reset-fields
+   *   Reset the fields attached to metric entites to factory settings.
+   *   Apply schema updates to the fields if they already exist.
+   */
+  public function resetFields() {
+    platformsh_project_update_fields();
+  }
+
 }

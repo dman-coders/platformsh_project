@@ -20,7 +20,7 @@ content:
     weight: 2
     region: content
     settings:
-      rows: 5
+      rows: 1
       placeholder: ''
     third_party_settings: {  }
   field_severity:
@@ -42,7 +42,7 @@ content:
     weight: 1
     region: content
     settings:
-      rows: 5
+      rows: 1
       placeholder: ''
     third_party_settings: {  }
 hidden:
