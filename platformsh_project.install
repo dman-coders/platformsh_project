@@ -81,54 +81,7 @@ function platformsh_project_install() {
   }
   \Drupal::messenger()->addStatus(__FUNCTION__ . " placed actions blocks on some entity pages for admin purposes.");
 
-  // Another hybrid yaml import.
-  // It seems near impossible to find instructions for how to define
-  // normal editable fields from code. Entity BaseFields are not normal.
-  // So load up the yaml definitions for the fields that we want on entities
-  // and import them.
-
-  // Field storage
-  $config_id = 'field.storage.metric.requirement';
-  $data = \Symfony\Component\Yaml\Yaml::parseFile($config_folder . $config_id .'.yml');
-  \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
-  // Field bundle instance
-  $config_id = 'field.field.metric.bundle.requirement';
-  $data = \Symfony\Component\Yaml\Yaml::parseFile($config_folder . $config_id .'.yml');
-  $metric_types = ['note'];
-  foreach ($metric_types as $bundle) {
-    $local_config_id = 'field.field.metric.' . $bundle . '.requirement';
-    $data['id'] = 'metric.' . $bundle . '.requirement';
-    $data['bundle'] = $bundle;
-    \Drupal::configFactory()->getEditable($local_config_id)->setData($data)->save(TRUE);
-    \Drupal::messenger()->addStatus(__FUNCTION__ . " Added a requirement field to the " . $bundle . " metric.");
-  }
-
-  platformsh_project_update_fields();
-}
-
-// deprecated notes
-function install_extra() {
-  // Define field storage by code.
-  // Can also be done with yamls, but see if doing it with code is more manageable.
-  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
-  $field_manager = \Drupal::service('entity_field.manager');
-  /** @var \Drupal\Core\Field\FieldStorageDefinitionListener $field_storage_manager */
-  $field_storage_manager = \Drupal::service('field_storage_definition.listener');
-
-  $field_info = [
-    'type' => 'entity_reference_revisions',
-    'entity_type' => 'metric',
-    'field_name' => 'requirement',
-    'bundle' => 'note',
-    'label' => t('Requirements')
-  ];
-  $field_storage = platformsh_project_createEntityFieldStorage($field_info);
-  $fields['requirement'] = FieldConfig::create($field_info);
-
-  $entity_definition = $field_manager->getFieldStorageDefinitions('metric')['drupalcache'];
-  // Make sure these are all saved and configured,
-  // Ensure there is a storage schema for all our fields.
-  $field_storage_manager->onFieldStorageDefinitionCreate($entity_definition);
+  # platformsh_project_update_fields();
 }
 
 /**

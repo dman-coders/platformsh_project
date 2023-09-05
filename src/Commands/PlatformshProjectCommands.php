@@ -62,12 +62,23 @@ class PlatformshProjectCommands extends DrushCommands {
    */
   public function createTestContent() {
     $sample_ids = [
+      'zgetjqqk5u626' => "dunno",
+      'aytf4iaebr2xy' => "another",
       'k5lc5wez3aso2' => "hello world",
       'log5ehrvf6tjg' => "D7",
+      '46pkp4iz4jvbi' => "msfsydney",
+    ];
+    $sample_metrics = [
+      'note',
+      'ping',
+      'drupalcache',
     ];
     $this->logger()->info(sprintf("Creating sample projects"));
     foreach ($sample_ids as $project_id => $label) {
       $this->createProject($project_id);
+      foreach($sample_metrics as $metric_id) {
+        $this->createMetric($project_id, $metric_id);
+      }
     }
   }
 
@@ -129,6 +140,18 @@ class PlatformshProjectCommands extends DrushCommands {
   public function resetFields() {
     platformsh_project_update_fields();
     $this->logger()->success("Reset the fields");
+  }
+
+  /**
+   * Delete all metrics, so the module can be uninstalled.
+   *
+   * @command platformsh:delete-metrics
+   * @aliases psh:delete-metrics
+   *
+   * @usage drush platformsh_project:delete-metrics
+   */
+  public function deleteMetrics($options = []) {
+    platformsh_project_delete_all_metrics();
   }
 
 }

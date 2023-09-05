@@ -114,8 +114,12 @@ function platformsh_project_module_preuninstall($module): void {
   // Otherwise they will remain behind as orphaned fields,
   // and conflict if you try to re-install this module.
 
-  Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all metrics.");
+  platformsh_project_delete_all_metrics();
 
+}
+
+function platformsh_project_delete_all_metrics() {
+  Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all metrics.");
   $entity_type_names = ['metric'];
   foreach ($entity_type_names as $entity_type) {
     $storage_handler = Drupal::entityTypeManager()
@@ -123,6 +127,15 @@ function platformsh_project_module_preuninstall($module): void {
     $entities = $storage_handler->loadByProperties([]);
     $storage_handler->delete($entities);
   }
+  /*
+  $entity_type_names = ['paragraph'];
+  foreach ($entity_type_names as $entity_type) {
+    $storage_handler = Drupal::entityTypeManager()
+      ->getStorage($entity_type);
+    $entities = $storage_handler->loadByProperties([]);
+    $storage_handler->delete($entities);
+  }
+  */
 
 }
 
@@ -194,7 +207,7 @@ function platformsh_project_get_project_by_project_id($project_id) {
  * folder, then config-import them.
  */
 function platformsh_project_update_fields() {
-  return;
+
   // Obtain configuration from yaml files
   $config_folder = Drupal::service('extension.list.module')
       ->getPath('platformsh_project') . '/config/preinstall/';
@@ -211,7 +224,7 @@ function platformsh_project_update_fields() {
   // Field bundle instance
   $config_id = 'field.field.metric.bundle.requirement';
   $data = Yaml::parseFile($config_folder . $config_id . '.yml');
-  $metric_types = ['note', 'ping'];
+  $metric_types = ['note', 'ping', 'drupalcache'];
   foreach ($metric_types as $bundle) {
     $local_config_id = 'field.field.metric.' . $bundle . '.requirement';
     $data['id'] = 'metric.' . $bundle . '.requirement';
@@ -240,10 +253,12 @@ function platformsh_project_update_fields() {
       // TODO
       // maybe adjust this yaml import so that is just patches the config
       // with the field display settings, not override the whole thing.
+      $confirm_config = Drupal::configFactory()
+        ->getEditable($local_config_id);
+
     }
 
-
-
+    \Drupal::logger('platformsh_project')->info("%provenance: Added a requirement field to the %metric_type metric.", ['%provenance' => __FUNCTION__ ,'%metric_type' => $bundle] );
     \Drupal::messenger()
       ->addStatus(__FUNCTION__ . " Added a requirement field to the " . $bundle . " metric.");
   }

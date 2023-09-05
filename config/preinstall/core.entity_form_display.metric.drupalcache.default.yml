@@ -1,17 +1,15 @@
+uuid: 958293ae-8286-46d4-b106-1418e03204cb
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.metric.bundle.requirement
-    - platformsh_project.metric_type.bundle
+    - field.field.metric.drupalcache.requirement
+    - platformsh_project.metric_type.drupalcache
   module:
     - paragraphs_table
-  enforced: # makes this go away on uninstall
-    module:
-      - platformsh_project
-id: metric.bundle.default
+id: metric.drupalcache.default
 targetEntityType: metric
-bundle: bundle
+bundle: drupalcache
 mode: default
 content:
   data:
