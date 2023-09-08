@@ -1,5 +1,9 @@
 langcode: en
 status: true
-dependencies: {  }
+
 id: "drupalcache"
 label: "Drupal Cache"
+dependencies:
+  enforced:
+    module:
+      - platformsh_project

@@ -3,13 +3,10 @@
 namespace Drupal\platformsh_project\Entity;
 
 use Drupal\aggregator\ItemInterface;
-use Drupal\Core\Entity\Annotation\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Entity\EntityDescriptionInterface;
-use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -69,12 +66,13 @@ use Drupal\field\Entity\FieldConfig;
  * @ContentEntityType(
  *   id = "metric",
  *   label = @Translation("Metric"),
- *   description = @Translation("Generic Abstract Metric description should get
- *   overridden"), label_collection = @Translation("Platformsh metrics"),
- *   label_singular = @Translation("platformsh metric"), label_plural =
- *   @Translation("platformsh metrics"), label_count = @PluralTranslation(
- *   singular = "@count platformsh metrics", plural = "@count platformsh
- *   metrics",
+ *   description = @Translation("Generic Abstract Metric description should get overridden"),
+ *   label_collection = @Translation("Platformsh metrics"),
+ *   label_singular = @Translation("platformsh metric"),
+ *   label_plural = @Translation("platformsh metrics"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count platformsh metrics",
+ *     plural = "@count platformsh metrics",
  *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\Core\Entity\EntityListBuilder",
@@ -256,6 +254,61 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
 
 
     return $fields;
+  }
+
+  /**
+   * Provides field definitions for a specific bundle.
+   *
+   * This function can return definitions both for bundle fields (fields that
+   * are not defined in $base_field_definitions, and therefore might not exist
+   * on some bundles) as well as bundle-specific overrides of base fields
+   * (fields that are defined in $base_field_definitions, and therefore exist
+   * for all bundles). However, bundle-specific base field overrides can also
+   * be provided by 'base_field_override' configuration entities, and that is
+   * the recommended approach except in cases where an entity type needs to
+   * provide a bundle-specific base field override that is decoupled from
+   * configuration. Note that for most entity types, the bundles themselves are
+   * derived from configuration (e.g., 'node' bundles are managed via
+   * 'node_type' configuration entities), so decoupling bundle-specific base
+   * field overrides from configuration only makes sense for entity types that
+   * also decouple their bundles from configuration. In cases where both this
+   * function returns a bundle-specific override of a base field and a
+   * 'base_field_override' configuration entity exists, the latter takes
+   * precedence.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition. Useful when a single class is used for multiple,
+   *   possibly dynamic entity types.
+   * @param string $bundle
+   *   The bundle.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface[] $base_field_definitions
+   *   The list of base field definitions.
+   *
+   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+   *   An array of bundle field definitions, keyed by field name.
+   *
+   * @see \Drupal\Core\Entity\EntityFieldManagerInterface::getFieldDefinitions()
+   * @see \Drupal\Core\Entity\FieldableEntityInterface::baseFieldDefinitions()
+   *
+   * @see https://www.drupal.org/docs/create-custom-content-types-with-bundle-classe
+   *
+   */
+  public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+    // Fields to be shared by all bundles go here.
+    $definitions = [];
+
+    // Then add fields from the bundle in the current instance.
+    $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('my_content_entity');
+    foreach ($bundles as $key => $values) {
+      if ($bundle == $key) {
+        // Get a string we can call bundleFieldDefinitions() on that Drupal will
+        // be able to find, like
+        // "\Drupal\my_module\Entity\Bundle\MyBundleClass"
+        $qualified_class = '\\' . $values['class'];
+        $definitions = $qualified_class::bundleFieldDefinitions($entity_type, $bundle, []);
+      }
+    }
+    return $definitions;
   }
 
   /**

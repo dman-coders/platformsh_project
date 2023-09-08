@@ -2,12 +2,9 @@
 
 
 namespace Drupal\platformsh_project\Entity;
-use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityChangedInterface;
 
 /**
- * A metric entity that saves the result of a ping test.
+ * A metric entity that checks if Nodeping HighSLA monitoring is enabled for this project
  *
  * Every metric bundle type also needs to be published at
  * `platformsh_project.metric_type.note.yml`
@@ -17,9 +14,9 @@ use Drupal\Core\Entity\EntityChangedInterface;
  * @inheritDoc
  *
  * @ContentEntityType(
- *   id = "ping",
- *   description = @Translation("Pings the site URL to check it responds"),
- *   label = @Translation("Ping"),
+ *   id = "highsla",
+ *   description = @Translation("Checks if HighSLA monitoring is active"),
+ *   label = @Translation("HighSLA"),
  *   base_table = "metric",
  *   bundle_entity_type = "metric_type",
  *   entity_keys = {
@@ -29,10 +26,10 @@ use Drupal\Core\Entity\EntityChangedInterface;
  * )
 
  */
-class PingMetric extends Metric {
+class HighSlaMetric extends Metric {
 
   public function label() {
-    return "A ping";
+    return "HighSLA Check";
   }
 
   public function refresh() {

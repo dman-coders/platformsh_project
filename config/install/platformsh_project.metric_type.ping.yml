@@ -1,5 +1,9 @@
 langcode: en
 status: true
-dependencies: {  }
+
 id: "ping"
 label: "Ping"
+dependencies:
+  enforced:
+    module:
+      - platformsh_project

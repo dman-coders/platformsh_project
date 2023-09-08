@@ -20,6 +20,37 @@ use Drupal\platformsh_project\Entity\User;
 use Symfony\Component\Yaml\Yaml;
 
 /**
+ * hook_entity_bundle_info()
+ *
+ * https://www.drupal.org/node/3191609
+ * An alternative to declaring everything in yaml files.
+ *
+ * @param array $bundles
+ *
+ * @return array
+
+ */
+function platformsh_project_entity_bundle_info(): array {
+  $bundles['metric']['pong']['label'] = t('A Pong!');
+  $bundles['metric']['pong']['class'] = PingMetric::class;
+
+  $bundles['metric']['fastly'] = [
+    'label' => t('Check Fastly status'),
+    'class' =>  Drupal\platformsh_project\Entity\FastlyMetric::class
+  ];
+
+  return $bundles;
+}
+
+/**
+ * @implements hook_entity_type_alter()
+ * @return void
+ */
+function platformsh_project_entity_type_alter(&$entity_info): void {
+  // Adjust the bundle definitions after the annotatiuons have been read.
+}
+
+/**
  * hook_entity_bundle_info_alter is how we attach a custom Class
  * to handle our entity definition.
  * That would otherwise be just a vanilla system-managed object.
@@ -42,6 +73,7 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
   if (isset($bundles['node']['organization'])) {
     $bundles['node']['organization']['class'] = Organization::class;
   }
+  /*
   if (isset($bundles['metric']['note'])) {
     $bundles['metric']['note']['class'] = NoteMetric::class;
   }
@@ -51,8 +83,39 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
   if (isset($bundles['metric']['drupalcache'])) {
     $bundles['metric']['drupalcache']['class'] = DrupalCacheMetric::class;
   }
+  */
+  // Find all metric bundle classes, and make sure they are registered as expected.
+  $entities = Drupal::entityTypeManager()->getDefinitions();
+  foreach ($entities as $entity_definition) {
+    if ($entity_definition->getBundleEntityType() == 'metric_type') {
+      $bundles['metric'][$entity_definition->id()]['class'] = $entity_definition->getClass();
+      $bundles['metric'][$entity_definition->id()]['label'] = $entity_definition->getLabel();
+    }
+  }
 }
 
+/**
+ * Implements hook_entity_field_storage_info()
+ *
+ * Defines storage for all bundle fields that were defined in
+ * bundle-specific bundleFieldDefinitions()
+ */
+function platformsh_project_entity_field_storage_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() == 'metric') {
+    $definitions = [];
+    $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('metric');
+    foreach ($bundles as $bundle_id=>$bundle_info) {
+      if (isset($bundle_info['class'])) {
+        $class = '\\'.$bundle_info['class'];
+        if (class_exists($class)) {
+          $bundle_defs = $class::bundleFieldDefinitions($entity_type, $bundle_id, []);
+          array_merge($definitions, $bundle_defs);
+        }
+      }
+    }
+    return $definitions;
+  }
+}
 
 /**
  * Implements hook_ENTITY_TYPE_presave() for node entities.
@@ -225,10 +288,10 @@ function platformsh_project_update_fields() {
   $config_id = 'field.field.metric.bundle.requirement';
   $data = Yaml::parseFile($config_folder . $config_id . '.yml');
   $metric_types = ['note', 'ping', 'drupalcache'];
-  foreach ($metric_types as $bundle) {
-    $local_config_id = 'field.field.metric.' . $bundle . '.requirement';
-    $data['id'] = 'metric.' . $bundle . '.requirement';
-    $data['bundle'] = $bundle;
+  foreach ($metric_types as $bundle_id) {
+    $local_config_id = 'field.field.metric.' . $bundle_id . '.requirement';
+    $data['id'] = 'metric.' . $bundle_id . '.requirement';
+    $data['bundle'] = $bundle_id;
     Drupal::configFactory()
       ->getEditable($local_config_id)
       ->setData($data)
@@ -239,12 +302,12 @@ function platformsh_project_update_fields() {
     // core.entity_form_display.metric.bundle.default.yml
     // core.entity_view_display.metric.bundle.default.yml
     foreach (['entity_form_display', 'entity_view_display'] as $display_mode) {
-      $local_config_id = 'core.' . $display_mode . '.metric.' . $bundle . '.default';
-      $data['id'] = 'metric.' . $bundle . '.default';
-      $data['bundle'] = $bundle;
+      $local_config_id = 'core.' . $display_mode . '.metric.' . $bundle_id . '.default';
+      $data['id'] = 'metric.' . $bundle_id . '.default';
+      $data['bundle'] = $bundle_id;
       $data['dependencies']['config'] = [
-        'field.field.metric.' . $bundle . '.requirement',
-        'platformsh_project.metric_type.' . $bundle,
+        'field.field.metric.' . $bundle_id . '.requirement',
+        'platformsh_project.metric_type.' . $bundle_id,
       ];
       Drupal::configFactory()
         ->getEditable($local_config_id)
@@ -258,10 +321,29 @@ function platformsh_project_update_fields() {
 
     }
 
-    \Drupal::logger('platformsh_project')->info("%provenance: Added a requirement field to the %metric_type metric.", ['%provenance' => __FUNCTION__ ,'%metric_type' => $bundle] );
+    \Drupal::logger('platformsh_project')->info("%provenance: Added a requirement field to the %metric_type metric.", ['%provenance' => __FUNCTION__ ,'%metric_type' => $bundle_id] );
     \Drupal::messenger()
-      ->addStatus(__FUNCTION__ . " Added a requirement field to the " . $bundle . " metric.");
+      ->addStatus(__FUNCTION__ . " Added a requirement field to the " . $bundle_id . " metric.");
   }
+
+  // Yamls are a silly way to manage fields that should be getting declared by code in the classes.
+  // So check the bundle classes and declare their fields.
+  // https://www.drupal.org/docs/create-custom-content-types-with-bundle-classes
+
+  $efm = \Drupal::service('entity_field.manager');
+  $entity_type = 'metric';
+  $bundle_id = 'fastly';
+  $base_fields = $efm->getFieldStorageDefinitions($entity_type, $bundle_id);
+  // This gets all fields defined for the bundle, including base fields.
+  $type_fields = $efm->getFieldDefinitions($entity_type, $bundle_id);
+  // This gets us the list of fields defined by the bundle.
+  $bundle_fields = array_diff(array_keys($type_fields), array_keys($base_fields));
+  foreach ($bundle_fields as $id => $field_name) {
+    \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition($field_name, 'my_content_entity', 'my_module', $type_fields[$field_name]);
+    \Drupal::messenger()
+      ->addStatus(__FUNCTION__ . " Added custom field " . $field_name . " to the " . $bundle_id . " metric.");
+  }
+
 
 }
 

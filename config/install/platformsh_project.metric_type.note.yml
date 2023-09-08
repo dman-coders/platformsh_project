@@ -1,5 +1,9 @@
 langcode: en
 status: true
-dependencies: {  }
+
 id: "note"
 label: "Note"
+dependencies:
+  enforced:
+    module:
+      - platformsh_project

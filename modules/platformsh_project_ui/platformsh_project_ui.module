@@ -13,7 +13,7 @@
  * @implements hook_entity_type_alter()
  * @return void
  */
-function platformsh_project_ui_entity_type_alter(&$entity_info) {
+function platformsh_project_ui_entity_type_alter(&$entity_info): void {
 
   if (!empty($entity_info['metric_type'])) {
     // Add the crud pages for managing metric types.
