@@ -37,7 +37,7 @@ class FastlyMetric extends Metric {
   public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
     $definitions = [];
     if ($bundle == 'fastly') {
-      // Shoud be bundleFieldDefinition?
+      // Should be bundleFieldDefinition?
       // But that's not actually available
       $definitions['account_id'] = FieldDefinition::create('string')
         // These three attributes must be set for each field.

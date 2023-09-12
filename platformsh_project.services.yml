@@ -1,10 +1,4 @@
 services:
-  platformsh_project.event_subscriber:
-    class: Drupal\platformsh_project\EventSubscriber\PlatformshProjectSubscriber
-    arguments: ['@messenger']
-    tags:
-      - { name: event_subscriber }
-
 
   drush_create_project.commands:
     class: \Drupal\platformsh_project\Commands\PlatformshProjectCommands
