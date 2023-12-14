@@ -40,16 +40,11 @@ class FastlyMetric extends Metric {
       // Should be bundleFieldDefinition?
       // But that's not actually available
       $definitions['account_id'] = FieldDefinition::create('string')
-        // These three attributes must be set for each field.
-        // They are what associate the field with the bundle.
-#        ->setName('account')
-#        ->setTargetEntityTypeId($entity_type->id())
         ->setTargetBundle($bundle)
-
-        // and on to regular field definition stuff.
         ->setLabel(t('Fastly Account ID)'))
         ->setRequired(FALSE)
         ->setSetting('max_length', 255)
+        ->setSetting('cardinality',1 ) # non-standard
         ->setDisplayOptions('form', [
           'type' => 'string_textfield',
           'weight' => -5,

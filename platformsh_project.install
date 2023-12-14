@@ -81,7 +81,7 @@ function platformsh_project_install() {
   }
   \Drupal::messenger()->addStatus(__FUNCTION__ . " placed actions blocks on some entity pages for admin purposes.");
 
-  platformsh_project_update_fields();
+  #platformsh_project_update_fields();
 }
 
 /**

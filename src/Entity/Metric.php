@@ -324,6 +324,8 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   /**
    * Utility to return the referenced project entity.
    *
+   * Commonly used by several metrics.
+   *
    * @return \Drupal\platformsh_project\Entity\Project
    * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */

@@ -138,6 +138,7 @@ class PlatformshProjectCommands extends DrushCommands {
    *   Apply schema updates to the fields if they already exist.
    */
   public function resetFields() {
+    platformsh_project_update_bundles();
     platformsh_project_update_fields();
     $this->logger()->success("Reset the fields");
   }
