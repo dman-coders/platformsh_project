@@ -34,9 +34,10 @@ use Drupal\Core\Entity\EntityDescriptionInterface;
  *     plural = "@count metrics types",
  *   ),
  *   handlers = {
-*     "route_provider" = {
+ *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *     }
+ *    },
+ *     "list_builder" = "ConfigEntityListBuilder",
  *   },
  *   admin_permission = "administer metric types",
  *   bundle_of = "metric",

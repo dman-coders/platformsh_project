@@ -81,6 +81,14 @@ function platformsh_project_install() {
   }
   \Drupal::messenger()->addStatus(__FUNCTION__ . " placed actions blocks on some entity pages for admin purposes.");
 
+  # Admin_actions module auto-installed its sample block. Disable it.
+  # @see admin_actions_install()
+  /** @var Drupal\block\Entity\Block $block */
+  $block = Block::load('admin_actions');
+  if ($block) {
+    $block->delete();
+  }
+
   #platformsh_project_update_fields();
 }
 

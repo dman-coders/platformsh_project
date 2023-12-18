@@ -21,11 +21,22 @@ use Drupal\Core\Form\FormStateInterface;
 class MetricForm extends ContentEntityForm {
 
 
-  public function buildForm(array              $form,
-                            FormStateInterface $form_state,
-                            \Drupal\node\NodeInterface  $project = null,
-                            \Drupal\platformsh_project\Entity\MetricType  $metric_type = null
-  ) {
+  /**
+   * @param array $form
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param \Drupal\node\NodeInterface|NULL $project
+   * @param \Drupal\platformsh_project\Entity\MetricType|NULL $metric_type
+   *
+   * @return array
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \exception
+   */
+  public function buildForm(array                                        $form,
+                               FormStateInterface                           $form_state,
+                               \Drupal\node\NodeInterface                   $project = null,
+                               \Drupal\platformsh_project\Entity\MetricType $metric_type = null
+  ): array {
     # Need to create a dummy entity if it's not already done.
     # When we 'add metric' through the usual forms, magic happens to prepare that.
     # If this form is being called from a custom context,
@@ -69,8 +80,12 @@ class MetricForm extends ContentEntityForm {
 
   /**
    * {@inheritdoc}
+   *
+   * @return int
+   *    Either SAVED_NEW or SAVED_UPDATED, depending on the operation performed.
+   * @throws \Drupal\Core\Entity\EntityMalformedException
    */
-  public function save(array $form, FormStateInterface $form_state) {
+  public function save(array $form, FormStateInterface $form_state): int {
     $result = parent::save($form, $form_state);
 
     $entity = $this->getEntity();
