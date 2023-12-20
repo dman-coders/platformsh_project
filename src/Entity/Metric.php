@@ -108,7 +108,7 @@ use Drupal\field\Entity\FieldConfig;
  * )
  *
  */
-class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
+abstract class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 
   use EntityChangedTrait;
 

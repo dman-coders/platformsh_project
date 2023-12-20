@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\Tests\platformsh_project\Functional;
 
-use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\platformsh_project\Entity\NoteMetric;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\platformsh_project\Entity\Metric;
 
@@ -29,7 +29,7 @@ class MetricTest extends BrowserTestBase {
    */
   public function testMetric() {
     // Create a new Metric entity.
-    $metric = Metric::create([
+    $metric = NoteMetric::create([
       'type' => 'note',
       'data' => 'bar',
       'timestamp' => strtotime('2022-03-01'),
