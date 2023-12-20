@@ -9,7 +9,7 @@ use Drupal\Core\Url;
 /**
  * Defines a class to build a listing of metric type entities.
  *
- * TODO: remove this
+ * @todo remove this
  * This seems to add no extra value, can we do without it?
  * SHows up on /admin/structure/metric_types
  * Thanks to being defined as a `collection` link in MetricType annotations.

@@ -2,19 +2,10 @@
 
 namespace Drupal\platformsh_project\Form;
 
-use Drupal;
-use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormBase;
-use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Session\SessionManagerInterface;
 use Drupal\node\NodeInterface;
 use Drupal\platformsh_project\Entity\MetricType;
-use Drupal\user\Entity\User;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Routing\RouteBuilderInterface;
-use Drupal\Core\TempStore\PrivateTempStoreFactory;
 
 /**
  * AddMetricActionForm.
@@ -53,7 +44,6 @@ class AddMetricForm extends FormBase {
     $return_verify = $this->updateFields();
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -72,9 +62,8 @@ class AddMetricForm extends FormBase {
 
     // This form may be called with The desired metric type already defined.
     // Pre-fill that selection.
-
     // List all available metric types.
-    $bundleInfo = Drupal::service('entity_type.bundle.info')
+    $bundleInfo = \Drupal::service('entity_type.bundle.info')
       ->getBundleInfo('metric');
     // Extract the bundle IDs and labels into a flat array.
     $bundleOptions = array_map(function ($bundle) {
@@ -91,8 +80,7 @@ class AddMetricForm extends FormBase {
       $form['metric_type']['#default_value'] = $metric_type->id();
     }
 
-#    return $form;
-
+    // Return $form;.
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $submit_label,
@@ -100,6 +88,5 @@ class AddMetricForm extends FormBase {
     ];
     return $form;
   }
-
 
 }

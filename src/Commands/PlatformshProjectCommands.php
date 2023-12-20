@@ -2,9 +2,6 @@
 
 namespace Drupal\platformsh_project\Commands;
 
-use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
-use Drupal;
-use Drush\Attributes\Argument;
 use Drush\Commands\DrushCommands;
 
 /**
@@ -25,7 +22,8 @@ class PlatformshProjectCommands extends DrushCommands {
    *
    * @command platformsh:create-project
    *
-   * @param $project_id string Project ID (Platformsh hash) to look up
+   * @param $project_id
+   *   string Project ID (Platformsh hash) to look up
    *
    * @aliases psh:create-project
    * @usage platformsh_project:create-project abcdefgh
@@ -38,7 +36,7 @@ class PlatformshProjectCommands extends DrushCommands {
     ];
     $entity_type_id = 'node';
     $this->logger()->info(sprintf("Creating a project %s", $project_id));
-    $project = Drupal::entityTypeManager()
+    $project = \Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($field_values);
     // hook_entity_presave() will do a lookup to prepopulate new project info.
@@ -76,7 +74,7 @@ class PlatformshProjectCommands extends DrushCommands {
     $this->logger()->info(sprintf("Creating sample projects"));
     foreach ($sample_ids as $project_id => $label) {
       $this->createProject($project_id);
-      foreach($sample_metrics as $metric_id) {
+      foreach ($sample_metrics as $metric_id) {
         $this->createMetric($project_id, $metric_id);
       }
     }
@@ -88,9 +86,11 @@ class PlatformshProjectCommands extends DrushCommands {
    * @command platformsh:create-metric
    * @aliases psh:create-metric
    *
-   * @param $project_id Project ID (platformsh hash) to attach metric to (must
+   * @param $project_id
+   *   Project ID (platformsh hash) to attach metric to (must
    *   exist)
-   * @param $metric_type Machine name of metric type ['ping', 'note', ...]
+   * @param $metric_type
+   *   Machine name of metric type ['ping', 'note', ...]
    *
    * @usage drush platformsh_project:create-metric abcdefg ping
    */
@@ -113,7 +113,7 @@ class PlatformshProjectCommands extends DrushCommands {
       ->info(sprintf("Creating a %s metric for %s", $metric_type, $project_id));
 
     /** @var \Drupal\platformsh_project\Entity\Metric $metric */
-    $metric = Drupal::entityTypeManager()
+    $metric = \Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($field_values);
     $metric->save();

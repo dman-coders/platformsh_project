@@ -2,8 +2,6 @@
 
 namespace Drupal\platformsh_project\Entity;
 
-use Platformsh\Client\Model\ApiResourceBase;
-
 /**
  * Defines the Organization node entity.
  */
@@ -20,9 +18,9 @@ class Organization extends ApiResource {
    */
   public function getResource($remoteEntityID): bool {
     return FALSE;
-    # Platformsh\Client does not yet (2023) have a way to retrieve org info.
-    # Not yet available?
-    #$this->getApiClient()->getOrganization($remoteEntityID);
+    // Platformsh\Client does not yet (2023) have a way to retrieve org info.
+    // Not yet available?
+    // $this->getApiClient()->getOrganization($remoteEntityID);
   }
 
 }

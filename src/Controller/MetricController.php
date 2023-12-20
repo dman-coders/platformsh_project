@@ -1,9 +1,10 @@
 <?php
+
 namespace Drupal\platformsh_project\Controller;
 
 use Drupal\Core\Entity\Controller\EntityController;
 use Drupal\Core\Link;
-
+use Drupal\node\NodeInterface;
 
 /**
  * Provides the add-page callback for a Metric add form.
@@ -11,7 +12,7 @@ use Drupal\Core\Link;
  * Can handle the request to "Add Metric" if
  * the type of metric is not given (falls back to a metric type selection list)
  * the project the metric is for is not given.
- *   If defined, it will be auto-filled, if not, it becomes a required field in the UI
+ *   If defined, it will be auto-filled, if not, it becomes a required field in the UI.
  *
  * It provides:
  * - An override to the add-page callback (the list page where you choose a bundle)
@@ -46,12 +47,12 @@ class MetricController extends EntityController {
     $bundle_entity_type_id = $entity_type->getBundleEntityType();
 
     // Find the current target project - what was the `project` ID in
-    //  path: '/node/{project}/metric/add'
+    //  path: '/node/{project}/metric/add'.
     /** @var \Drupal\Core\Routing\RouteMatchInterface $route_match  */
     $route_match = \Drupal::routeMatch();
     /** @var \Drupal\node\NodeInterface $node */
     $node = $route_match->getParameter('project');
-    if (! $node instanceof \Drupal\node\NodeInterface) {
+    if (!$node instanceof NodeInterface) {
       // Problem.
     }
     $project_id = $node->id();
@@ -89,8 +90,8 @@ class MetricController extends EntityController {
       $bundle_argument = $bundle_key;
     }
 
-    # Our own alternative to 'entity.' . $entity_type_id . '.add_form'
-    # is '/node/{project}/metric/add/{metric_type}'
+    // Our own alternative to 'entity.' . $entity_type_id . '.add_form'
+    // is '/node/{project}/metric/add/{metric_type}'.
     $form_route_name = 'metric.add_known_metric_to_project';
 
     // Redirect if there's only one bundle available. (redundant)
@@ -113,4 +114,3 @@ class MetricController extends EntityController {
   }
 
 }
-

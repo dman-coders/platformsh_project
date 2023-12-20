@@ -4,6 +4,8 @@ namespace Drupal\platformsh_project\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
+use Drupal\platformsh_project\Entity\MetricType;
 
 /**
  * Form controller for the platformsh metric entity edit forms.
@@ -20,35 +22,35 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class MetricForm extends ContentEntityForm {
 
-
   /**
    * @param array $form
    * @param \Drupal\Core\Form\FormStateInterface $form_state
-   * @param \Drupal\node\NodeInterface|NULL $project
-   * @param \Drupal\platformsh_project\Entity\MetricType|NULL $metric_type
+   * @param \Drupal\node\NodeInterface|null $project
+   * @param \Drupal\platformsh_project\Entity\MetricType|null $metric_type
    *
    * @return array
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    * @throws \exception
    */
-  public function buildForm(array                                        $form,
-                               FormStateInterface                           $form_state,
-                               \Drupal\node\NodeInterface                   $project = null,
-                               \Drupal\platformsh_project\Entity\MetricType $metric_type = null
+  public function buildForm(array $form,
+                               FormStateInterface $form_state,
+                               NodeInterface $project = NULL,
+                               MetricType $metric_type = NULL
   ): array {
-    # Need to create a dummy entity if it's not already done.
-    # When we 'add metric' through the usual forms, magic happens to prepare that.
-    # If this form is being called from a custom context,
-    # I need to fill in some context for contentEntityForm requirements.
+    // Need to create a dummy entity if it's not already done.
+    // When we 'add metric' through the usual forms, magic happens to prepare that.
+    // If this form is being called from a custom context,
+    // I need to fill in some context for contentEntityForm requirements.
     if (empty($this->entity)) {
       throw new \exception('Pretty sure we should no longer hit the case where an entity form is being built without a placeholder entity being instantiated. If this logic is never hit, then this chunk should be removed.');
-      # Emulate:
-      # $entity = $this->getEntityFromRouteMatch($route_match, $metric_type->id());
-      # Instantiate a new metric entity of the requested type.
+      // Emulate:
+      // $entity = $this->getEntityFromRouteMatch($route_match, $metric_type->id());
+      // Instantiate a new metric entity of the requested type.
       $entity_type_id = 'metric';
       $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-      $bundle_key = $entity_type->getKey('bundle'); # 'bundle'
+      // 'bundle'
+      $bundle_key = $entity_type->getKey('bundle');
       $values = [];
       $values[$bundle_key] = $metric_type->id();
       $entity = $this->entityTypeManager->getStorage($entity_type_id)->create($values);
@@ -69,8 +71,9 @@ class MetricForm extends ContentEntityForm {
     if ($metric_type) {
       $form['metric_type']['#default_value'] = $metric_type->id();
       if (!empty($project)) {
-        $form['#title'] = $this->t('Add a @label metric to @project project', ['@label' => $metric_type->get('label'),'@project' => $project->getTitle()]);
-      } else {
+        $form['#title'] = $this->t('Add a @label metric to @project project', ['@label' => $metric_type->get('label'), '@project' => $project->getTitle()]);
+      }
+      else {
         $form['#title'] = $this->t('Add a @label metric', ['@label' => $metric_type->get('label')]);
       }
     }
@@ -82,7 +85,8 @@ class MetricForm extends ContentEntityForm {
    * {@inheritdoc}
    *
    * @return int
-   *    Either SAVED_NEW or SAVED_UPDATED, depending on the operation performed.
+   *   Either SAVED_NEW or SAVED_UPDATED, depending on the operation performed.
+   *
    * @throws \Drupal\Core\Entity\EntityMalformedException
    */
   public function save(array $form, FormStateInterface $form_state): int {

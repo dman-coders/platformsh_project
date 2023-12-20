@@ -1,25 +1,25 @@
 <?php
 
-
 namespace Drupal\platformsh_project\Entity;
 
-use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 
 /**
  * A metric entity that saves the result of a fastly test.
- *
- *
  */
 class FastlyMetric extends Metric {
 
+  /**
+   *
+   */
   public function label(): string {
     return "Fastly check";
   }
 
+  /**
+   *
+   */
   public function refresh() {
     $this->set('data', 'pinged ' . date("Y-m-d H:i:s"))
       ->save();
@@ -28,7 +28,7 @@ class FastlyMetric extends Metric {
   /**
    * Fields that only exist on this bundle.
    *
-   * @param EntityTypeInterface $entity_type
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    * @param string $bundle
    * @param array $base_field_definitions
    *
@@ -38,13 +38,14 @@ class FastlyMetric extends Metric {
     $definitions = [];
     if ($bundle == 'fastly') {
       // Should be bundleFieldDefinition?
-      // But that's not actually available
+      // But that's not actually available.
       $definitions['account_id'] = FieldDefinition::create('string')
         ->setTargetBundle($bundle)
         ->setLabel(t('Fastly Account ID)'))
         ->setRequired(FALSE)
         ->setSetting('max_length', 255)
-        ->setSetting('cardinality',1 ) # non-standard
+      // non-standard.
+        ->setSetting('cardinality', 1)
         ->setDisplayOptions('form', [
           'type' => 'string_textfield',
           'weight' => -5,

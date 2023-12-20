@@ -6,8 +6,6 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\node\Entity\Node;
 use Drupal\platformsh_api\ApiService;
-use Exception;
-use InvalidArgumentException;
 use Platformsh\Client\Model\ApiResourceBase;
 use Platformsh\Client\PlatformClient;
 
@@ -15,7 +13,6 @@ use Platformsh\Client\PlatformClient;
  * Defines the generic resource that may be returned by an API lookup.
  *
  * @see \Platformsh\Client\Model\ApiResourceBase
- *
  */
 abstract class ApiResource extends Node {
 
@@ -44,19 +41,21 @@ abstract class ApiResource extends Node {
    */
   protected array $reference_keys = [];
 
-  /** @var string
+  /**
+   * @var string
    * What is the key that should be used as the title of this object?
    */
   protected string $title_key = 'title';
 
 
-  // Active properties.
+  /**
+   * Active properties.
+   */
   protected ApiService $api_service;
 
   protected PlatformClient $api_client;
 
   protected string $remoteEntityID;
-
 
   /**
    * Fetch the actual data using the PHP API.
@@ -64,7 +63,8 @@ abstract class ApiResource extends Node {
    * This is expected to be overridden by the subclass to match the
    * \Platformsh\Client methods.
    *
-   * @return ApiResourceBase|false
+   * @return \Platformsh\Client\Model\ApiResourceBase|false
+   *
    * @see \Platformsh\Client\Model\ApiResourceBase::get()
    */
   abstract public function getResource($remoteEntityID): bool|ApiResourceBase;
@@ -84,7 +84,7 @@ abstract class ApiResource extends Node {
   }
 
   /**
-   * Utility
+   * Utility.
    *
    * @return \Platformsh\Client\PlatformClient
    */
@@ -93,7 +93,6 @@ abstract class ApiResource extends Node {
     $this->api_client = $this->api_service->getApiClient();
     return $this->api_client;
   }
-
 
   /**
    * Generic resource fetcher.
@@ -124,7 +123,8 @@ abstract class ApiResource extends Node {
           ->addError("API call returned empty. Probably an invalid entity ID. Update failed.");
         return FALSE;
       }
-    } catch (Exception $e) {
+    }
+    catch (\Exception $e) {
       $this->messenger()->addError("API call failed: " . $e->getMessage());
       return FALSE;
     }
@@ -145,9 +145,10 @@ abstract class ApiResource extends Node {
     try {
       if ($this->getTitle() != $resource->getProperty($this->title_key)) {
         $this->setTitle($resource->getProperty($this->title_key));
-        $updated['title'] = true;
+        $updated['title'] = TRUE;
       }
-    } catch (Exception $e) {
+    }
+    catch (\Exception $e) {
       // This should never happen, but it did, so...
       $this->messenger()
         ->addError("Resource doesn't have a " . $this->title_key . " property");
@@ -158,7 +159,7 @@ abstract class ApiResource extends Node {
     if (in_array('field_data', array_keys($viable_fields))) {
       if ($this->get('field_data') != $json_dump) {
         $this->set('field_data', $json_dump);
-        $updated['field_data'] = true;
+        $updated['field_data'] = TRUE;
       }
     }
 
@@ -178,24 +179,24 @@ abstract class ApiResource extends Node {
         ($this->get($field_name) != $resource->getData()[$key_name])
       ) {
         $this->set($field_name, $resource->getData()[$key_name]);
-        $updated[$field_name] = true;
+        $updated[$field_name] = TRUE;
       }
       else {
-        # field miss-match. Either our the expected data did not come back,
-        # or our content type doesn't have a place to store it.
-        # This may happen as API and content model evolves.
+        // Field miss-match. Either our the expected data did not come back,
+        // or our content type doesn't have a place to store it.
+        // This may happen as API and content model evolves.
       }
     }
 
     $updated += $this->autocreateTargetEntities($raw_dump);
 
-    #$node->set('field_' . 'updated_at' , $response->getData()['updated_at']);
-
+    // $node->set('field_' . 'updated_at' , $response->getData()['updated_at']);
     // Take care, as this action may be called on hook_entity_presave. Avoid a loop.
     if (!empty($updated) && !$this->isNew()) {
       try {
         $this->save();
-      } catch (EntityStorageException $e) {
+      }
+      catch (EntityStorageException $e) {
         $this->messenger()->addError("Failed to save node " . $e->getMessage());
       }
     }
@@ -219,24 +220,28 @@ abstract class ApiResource extends Node {
    * @param array $raw_data
    *
    * @return array A list of what, if anything, was updated.
+   *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  function autocreateTargetEntities(array $raw_data): array {
+  public function autocreateTargetEntities(array $raw_data): array {
     $updated = [];
     // References need extra help.
     foreach ($this->reference_keys as $key_type => $key_name) {
       /** @var \Drupal\Core\Field\FieldItemListInterface $value */
       $target_guid = $raw_data[$key_name];
-      if (empty($target_guid)) { continue;  }
+      if (empty($target_guid)) {
+        continue;
+      }
 
-      // Fetch or create the target first
+      // Fetch or create the target first.
       $target = $this->api_service::getEntityById($target_guid);
 
       if (empty($target)) {
         // Attempt auto create.
         $entity_type_id = 'node';
         $target_data = [
-          'bundle' => $key_type, # it's aliased as 'type'. yay.
+        // it's aliased as 'type'. yay.
+          'bundle' => $key_type,
           'type' => $key_type,
           'title' => $target_guid,
           'field_id' => $target_guid,
@@ -247,13 +252,13 @@ abstract class ApiResource extends Node {
       if (!empty($target)) {
         $target_info = ['target_id' => $target->id()];
         if ($this->get('field_' . $key_name) != $target->id()) {
-          $updated['field_' . $key_name] = true;
-          // TODO: check this logic
+          $updated['field_' . $key_name] = TRUE;
+          // @todo check this logic
         }
         $this->set('field_' . $key_name, $target_info);
       }
       else {
-        throw new InvalidArgumentException("Could not find or auto create target entity " . $target_guid->getString());
+        throw new \InvalidArgumentException("Could not find or auto create target entity " . $target_guid->getString());
       }
     }
     return $updated;
@@ -266,6 +271,7 @@ abstract class ApiResource extends Node {
    * @param array $values
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   private function autocreateTargetEntity(string $entity_type_id, array $values) {
@@ -277,6 +283,5 @@ abstract class ApiResource extends Node {
     $entity->save();
     return $entity;
   }
-
 
 }

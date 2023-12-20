@@ -8,7 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Configuration form for a metric entity type.
  *
- * TODO: I don't need this, maybe remove.
+ * @todo I don't need this, maybe remove.
  * Also remove
  *  `entity.metric.settings`
  * from

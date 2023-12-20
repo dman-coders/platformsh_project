@@ -9,10 +9,7 @@ use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Url;
-use Drupal\field\Entity\FieldConfig;
 
 /**
  * Defines the Metric entity.
@@ -62,7 +59,6 @@ use Drupal\field\Entity\FieldConfig;
  *   /admin/structure/views/view/metrics
  *   views.view.metrics.yml
  *
- *
  * @ContentEntityType(
  *   id = "metric",
  *   label = @Translation("Metric"),
@@ -106,7 +102,6 @@ use Drupal\field\Entity\FieldConfig;
  *   bundle_label = @Translation("Metric type"),
  *   field_ui_base_route = "entity.metric_type.edit_form"
  * )
- *
  */
 abstract class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 
@@ -128,7 +123,6 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
     // as additional columns, like a traditional db schema
     // Base fields are not referred to as `field_data` style lookups
     // like most other UI-added fields would do.
-
     // Base fields - ID etc - are provided by the system if we ask for them
     // in the annotation by defining entity_keys.
     // This must be done explicitly for every subclass.
@@ -142,14 +136,11 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
     // * severity
     // And these mini-reports get collated into a larger report on the system status report page.
     // Our metric checks will be a very similar shape.
-
-
     // The 'changed' field is a special thing.
     // Internal tooling (EntityChangedTrait)  helps it work the same as other entities.
     // `changed` will only get updated if some value actually changed.
     // Setting a value and running save() will NOT touch `changed` unless appropriate.
     // This seems to be provided by the EntityChangedInterface that we use.
-
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the metric was last updated.'))
@@ -162,7 +153,6 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
         'type' => 'timestamp',
         'weight' => 0,
       ]);
-
 
     // The simple status field.
     $fields['status'] = BaseFieldDefinition::create('list_string')
@@ -194,7 +184,7 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayOptions('view', ['weight' => 0,]);
+      ->setDisplayOptions('view', ['weight' => 0]);
 
     // The date field.
     // Default widget is datetime_timestamp but that's annoying.
@@ -226,7 +216,8 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
     $fields['target'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Target'))
       ->setDescription(t('The linked resource the Metric applies to.'))
-      ->setRequired(FALSE) # make required later
+    // Make required later.
+      ->setRequired(FALSE)
       ->setSetting('target_type', 'node')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
@@ -251,7 +242,6 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
     /**
      * The actual paragraph definition and structure is done with yamls.
      */
-
 
     return $fields;
   }
@@ -291,7 +281,6 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
    * @see \Drupal\Core\Entity\FieldableEntityInterface::baseFieldDefinitions()
    *
    * @see https://www.drupal.org/docs/create-custom-content-types-with-bundle-classe
-   *
    */
   public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
     // Fields to be shared by all bundles go here.
@@ -303,7 +292,7 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
       if ($bundle == $key) {
         // Get a string we can call bundleFieldDefinitions() on that Drupal will
         // be able to find, like
-        // "\Drupal\my_module\Entity\Bundle\MyBundleClass"
+        // "\Drupal\my_module\Entity\Bundle\MyBundleClass".
         $qualified_class = '\\' . $values['class'];
         $definitions = $qualified_class::bundleFieldDefinitions($entity_type, $bundle, []);
       }
@@ -315,7 +304,7 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
    * Entity URI callback.
    *
    * For some reason this wasn't being autodetected from the bundle.
-   * I'd expected it to be deduced from the annotation links:canonic
+   * I'd expected it to be deduced from the annotation links:canonic.
    */
   public static function buildUri(ItemInterface $item) {
     return Url::fromUri($item->getLink());
@@ -327,6 +316,7 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
    * Commonly used by several metrics.
    *
    * @return \Drupal\platformsh_project\Entity\Project
+   *
    * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   protected function getProject() {

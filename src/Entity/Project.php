@@ -12,7 +12,9 @@ class Project extends ApiResource {
   // These array list the mappings between the fields in the
   // API response, and the local content model.
   // It would be good if they match closely.
-  // BUT the API changed schema remotely, so we have to translate sometimes.
+  /**
+   * BUT the API changed schema remotely, so we have to translate sometimes.
+   */
   protected array $field_keys = [
     'plan',
     'default_domain',
@@ -69,7 +71,7 @@ class Project extends ApiResource {
         // This slightly changes our schema def.
         // The 'owner' is of type 'organization',
         // there is no ref to a 'user',
-        // and there is no `organization_id`
+        // and there is no `organization_id`.
         $this->reference_keys = [
           'organization' => 'owner',
         ];
@@ -78,6 +80,9 @@ class Project extends ApiResource {
     return $raw_data;
   }
 
+  /**
+   *
+   */
   public function getUrl() {
     return "https://example.com/";
   }

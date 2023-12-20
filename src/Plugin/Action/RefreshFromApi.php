@@ -10,7 +10,7 @@ use Drupal\platformsh_api\ApiService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * notes-to-self about how actions work, ignore.
+ * Notes-to-self about how actions work, ignore.
  *
  * When adding actions to a module,
  * the declaration of the action gets saved into the `cache_config` database as
@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * The actual work is done by the objects themselves,
  * IF they implement their own refreshFromAPI() method.
+ *
  * @see \Drupal\platformsh_project\Entity\ApiResource
  *
  * This will initiate an API request to the remote service,
@@ -42,7 +43,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   type = "node",
  *   category = @Translation("Custom")
  * )
- *
  */
 class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterface {
 
@@ -55,7 +55,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param ApiService $api_service
+   * @param \Drupal\platformsh_api\ApiService $api_service
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);

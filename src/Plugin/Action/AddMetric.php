@@ -5,18 +5,18 @@ namespace Drupal\platformsh_project\Plugin\Action;
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
- *
  * Provides an Add Metric action.
  *
  * 'Add Metric' is an action performed upon a project node.
  * It creates a metric (a placeholder to record the last measurement)
  * of a selected type,
  * associates the metric with the source node,
- * and starts monitoring it
+ * and starts monitoring it.
  *
  * The source project node remains untouched,
  * as metrics reference the projects.
@@ -44,10 +44,8 @@ use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
  *   type = "node",
  *   category = @Translation("Custom"),
  * )
- *
  */
-class AddMetric extends ActionBase implements ContainerFactoryPluginInterface{
-
+class AddMetric extends ActionBase implements ContainerFactoryPluginInterface {
 
   /**
    * @param array $configuration
@@ -92,9 +90,9 @@ class AddMetric extends ActionBase implements ContainerFactoryPluginInterface{
 
     // Do it.
     $this->messenger()->addMessage($this->t('Open the add metric form'));
-    $this->context['results']['redirect_url'] = \Drupal\Core\Url::fromRoute('metric.add_unknown_metric_to_project', ['project' => $object->id()]);
-    $url = \Drupal\Core\Url::fromRoute('metric.add_unknown_metric_to_project', ['project' => $object->id()]);
-    $redirect = new \Symfony\Component\HttpFoundation\RedirectResponse($url->toString());
+    $this->context['results']['redirect_url'] = Url::fromRoute('metric.add_unknown_metric_to_project', ['project' => $object->id()]);
+    $url = Url::fromRoute('metric.add_unknown_metric_to_project', ['project' => $object->id()]);
+    $redirect = new RedirectResponse($url->toString());
     // Immediately sending here is ill-advised.
     $redirect->send();
   }

@@ -47,7 +47,7 @@ class RefreshMetric extends ActionBase {
       ->set('data', 'New title ' . date("Y-m-d H:i:s"))
       ->save();
 
-    if( method_exists($metric, 'refresh')) {
+    if (method_exists($metric, 'refresh')) {
       $metric->refresh();
     }
   }

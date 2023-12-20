@@ -3,7 +3,6 @@
 namespace Drupal\Tests\platformsh_project\Functional;
 
 use Drupal\Tests\platformsh_api\Functional\PlatformshBrowserTestBase;
-use Drupal\user\Entity\User;
 
 /**
  * Default test case for the action_example module.
@@ -27,8 +26,6 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
    * and my yaml syntax is valid.
    *
    * Luckily, this is apparently possible to disable?
-   *
-   *
    */
   protected $strictConfigSchema = FALSE;
 
@@ -37,7 +34,7 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'platformsh_project'
+    'platformsh_project',
   ];
 
   /**
@@ -51,15 +48,17 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
   protected $profile = 'minimal';
 
   /**
-   * Use the UI to create a project via front-end
+   * Use the UI to create a project via front-end.
    */
   public function testActionCreateFromApi() {
     // Create an administrative user.
     $admin_user = $this->drupalCreateUser([
       'administer nodes',
-      'access content overview', # for admin/content page
+    // For admin/content page.
+      'access content overview',
 
-      'create project content', # to Create project
+    // To Create project.
+      'create project content',
       'edit own project content',
       'delete own project content',
 
@@ -76,7 +75,7 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
     $this->assertSession()->pageTextContains('Project');
     $this->clickLink('Project');
     $this->assertSession()->addressEquals('/node/add/project');
-    // Create a new project via the form
+    // Create a new project via the form.
     $page = $this->getSession()->getPage();
     $page->fillField('edit-title-0-value', $this->TestProjectId);
     $page->fillField('edit-field-id-0-value', $this->TestProjectId);
@@ -86,10 +85,10 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
     // Try again. Use a different syntax for the form interaction.
     $this->drupalGet('/node/add/project');
     $this->submitForm([
-      'title[0][value]' => $this->TestProjectId,
-      'field_id[0][value]' => $this->TestProjectId,
+    'title[0][value]' => $this->TestProjectId,
+    'field_id[0][value]' => $this->TestProjectId,
     ], 'Save' );
-    */
+     */
 
     // Check the new item was created as expected.
     // If the node title was updated correctly,
@@ -100,8 +99,7 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
     $this->drupalGet('/admin/content');
     $this->assertSession()->pageTextContains($this->TestProjectName);
 
-    #$this->assertSession()->pageTextContains('now fail');
-
+    // $this->assertSession()->pageTextContains('now fail');
   }
 
   /**

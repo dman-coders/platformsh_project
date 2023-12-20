@@ -1,9 +1,10 @@
 <?php
+
 namespace Drupal\Tests\platformsh_project\Functional;
 
+use Drupal\platformsh_project\Entity\Metric;
 use Drupal\platformsh_project\Entity\NoteMetric;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\platformsh_project\Entity\Metric;
 
 /**
  * Tests the Metric entity.
@@ -51,8 +52,7 @@ class MetricTest extends BrowserTestBase {
   }
 
   /**
-   * Tests UI buttons and routes around metric management
-   *
+   * Tests UI buttons and routes around metric management.
    */
   public function testMetricUI() {
     // Add a metric using the UI form.
@@ -68,10 +68,8 @@ class MetricTest extends BrowserTestBase {
     $this->drupalGet('metric/add/' . $edit['type']);
     $this->submitForm($edit, 'Save');
 
-
     // Verify that visiting the metric cannonic view page shows a
     // "refresh" button in the UI.
-
   }
 
 }

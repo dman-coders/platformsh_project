@@ -1,14 +1,23 @@
 <?php
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
-use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ *
+ */
 class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
+
+  /**
+   *
+   */
   public function getFormId() {
     return 'metric_type_select';
   }
 
+  /**
+   *
+   */
   public function buildForm(array $form, FormStateInterface $form_state, $node_id = NULL) {
 
     $form['#title'] = $this->t('Choose the type of metric');
@@ -33,6 +42,9 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
     return $form;
   }
 
+  /**
+   *
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Get the node ID from the form's state.
     $node_id = $form_state->get('node_id');
@@ -44,6 +56,7 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
     // For example, create a new entity of the selected bundle type.
     // ...
   }
+
   /**
    * {@inheritdoc}
    */
@@ -65,6 +78,5 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
       return $entity->toUrl();
     }
   }
-
 
 }
