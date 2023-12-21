@@ -41,7 +41,7 @@ class RefreshMetric extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function execute($metric = NULL) {
+  public function execute($metric = NULL): void {
     /** @var \Drupal\platformsh_project\Entity\Metric $metric */
     $metric
       ->set('data', 'New title ' . date("Y-m-d H:i:s"))

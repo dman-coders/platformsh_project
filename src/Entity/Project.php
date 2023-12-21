@@ -83,7 +83,7 @@ class Project extends ApiResource {
   /**
    *
    */
-  public function getUrl() {
+  public function getUrl(): string {
     return "https://example.com/";
   }
 
