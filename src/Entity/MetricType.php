@@ -80,14 +80,10 @@ class MetricType extends ConfigEntityBundleBase implements EntityDescriptionInte
     // Get the class annotation object where the description info is.
     /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_info */
     $entity_info = \Drupal::entityTypeManager()->getDefinition($this->id, FALSE);
-    if ($entity_info) {
-      $description = $entity_info->get('description');
-    }
-    else {
+    if (!$entity_info) {
       $entity_info = \Drupal::entityTypeManager()->getDefinition('metric');
-      $description = $entity_info->get('description');
     }
-    return $description;
+    return $entity_info->get('description');
   }
 
   /**

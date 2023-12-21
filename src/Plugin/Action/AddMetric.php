@@ -47,19 +47,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class AddMetric extends ActionBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
-    $this->configuration = $configuration;
-    $this->pluginId = $plugin_id;
-    $this->pluginDefinition = $plugin_definition;
-  }
 
   /**
    * {@inheritdoc}

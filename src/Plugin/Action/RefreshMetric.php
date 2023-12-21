@@ -3,6 +3,7 @@
 namespace Drupal\platformsh_project\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
+use Drupal\Core\Annotation\Action;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -32,9 +33,9 @@ class RefreshMetric extends ActionBase {
   /**
    *
    */
-  public function access($metric, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var \Drupal\platformsh_project\Entity\Metric $metric */
-    $access = $metric->access('update', $account, TRUE);
+  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
+    /** @var \Drupal\platformsh_project\Entity\Metric $object */
+    $access = $object->access('update', $account, TRUE);
     return $return_as_object ? $access : $access->isAllowed();
   }
 

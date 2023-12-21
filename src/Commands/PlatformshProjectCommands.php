@@ -71,7 +71,7 @@ class PlatformshProjectCommands extends DrushCommands {
       'ping',
       'drupalcache',
     ];
-    $this->logger()->info(sprintf("Creating sample projects"));
+    $this->logger()->info("Creating sample projects");
     foreach ($sample_ids as $project_id => $label) {
       $this->createProject($project_id);
       foreach ($sample_metrics as $metric_id) {
@@ -95,7 +95,7 @@ class PlatformshProjectCommands extends DrushCommands {
    * @usage drush platformsh_project:create-metric abcdefg ping
    */
   public function createMetric($project_id, $metric_type, $options = []) {
-    $this->output()->writeln(sprintf("Creating metric for project"));
+    $this->output()->writeln("Creating metric for project");
     // Find the project object that the project_id refers to.
     $project = platformsh_project_get_project_by_project_id($project_id);
     if (!$project) {

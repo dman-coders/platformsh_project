@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpUnreachableStatementInspection */
+
+/** @noinspection PhpUnreachableStatementInspection */
 
 namespace Drupal\platformsh_project\Entity;
 

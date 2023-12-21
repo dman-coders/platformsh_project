@@ -55,7 +55,7 @@ function platformsh_project_entity_type_alter(&$entity_info): void {
   /**
    * @var  $entity_definition Drupal\Core\Entity\ContentEntityTypeInterface
    */
-  foreach ($entity_info as $entity_id => &$entity_definition) {
+  foreach ($entity_info as $entity_id => $entity_definition) {
     if ($entity_definition->getBundleEntityType() == 'metric_type') {
       // Clone all the useful values from the abstract `metric` class into the bundle.
       // Seems that programmatically defining bundle classes missed some settings.
@@ -123,20 +123,20 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
  * bundle-specific bundleFieldDefinitions()
  */
 function platformsh_project_entity_field_storage_info(EntityTypeInterface $entity_type) {
+  $definitions = [];
   if ($entity_type->id() == 'metric') {
-    $definitions = [];
     $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('metric');
     foreach ($bundles as $bundle_id=>$bundle_info) {
       if (isset($bundle_info['class'])) {
         $class = '\\'.$bundle_info['class'];
         if (class_exists($class)) {
           $bundle_defs = $class::bundleFieldDefinitions($entity_type, $bundle_id, []);
-          array_merge($definitions, $bundle_defs);
+          $definitions = array_merge($definitions, $bundle_defs);
         }
       }
     }
-    return $definitions;
   }
+  return $definitions;
 }
 
 /**
