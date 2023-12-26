@@ -28,6 +28,12 @@ class FastlyMetric extends Metric {
   /**
    * Fields that only exist on this bundle.
    *
+   *
+   * All bundle fields require an associated storage
+   *  definition. A storage definition may be manually provided via
+   *  hook_entity_field_storage_info().
+   * Seems that a bundle cannot provide the storage definition?
+   *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    * @param string $bundle
    * @param array $base_field_definitions

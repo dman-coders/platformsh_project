@@ -120,7 +120,15 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
  * Implements hook_entity_field_storage_info()
  *
  * Defines storage for all bundle fields that were defined in
- * bundle-specific bundleFieldDefinitions()
+ * bundle-specific bundleFieldDefinitions().
+ *
+ * The bundles themselves cannot actually define bundle storage?
+ * But I want to arbitrarily add bundle types as I grow, and their field defs
+ * should be self-contained to their classes.
+ * So iterate over the bundles to find the field instances that they expect,
+ * and make sure bundle storage for that exists. Seems a bit arse-about-face.
+ *
+ * Need to run platformsh_project_update_fields to make this happen each time.
  */
 function platformsh_project_entity_field_storage_info(EntityTypeInterface $entity_type) {
   $definitions = [];
@@ -136,6 +144,13 @@ function platformsh_project_entity_field_storage_info(EntityTypeInterface $entit
       }
     }
   }
+  // These definitions are Drupal\Core\Field\FieldDefinition
+  // but not Drupal\Core\Field\BaseFieldDefinition .
+  // They should have all the same properties and things though, it seems.
+  // This hook is called by buildFieldStorageDefinitions()
+  // which caches the schema info,
+  // but doesn't seem to actually set up a storage schema for us?
+  // When does the storage layer actually get built?
   return $definitions;
 }
 

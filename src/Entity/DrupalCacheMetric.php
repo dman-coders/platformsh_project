@@ -54,7 +54,7 @@ class DrupalCacheMetric extends Metric {
     // Base fields are not referred to as `field_data` style lookups
     // like most other UI-added fields would do.
     $fields = parent::baseFieldDefinitions($entity_type);
-    return $fields;
+    #return $fields;
 
     // The data field.
     $fields['response_header'] = BaseFieldDefinition::create('string_long')

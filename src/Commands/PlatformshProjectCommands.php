@@ -96,11 +96,20 @@ class PlatformshProjectCommands extends DrushCommands {
    */
   public function createMetric($project_id, $metric_type, $options = []) {
     $this->output()->writeln("Creating metric for project");
+
     // Find the project object that the project_id refers to.
     $project = platformsh_project_get_project_by_project_id($project_id);
     if (!$project) {
       $this->logger()
         ->error(sprintf("Failed to find a project with ID %s. aborting.", $project_id));
+      return;
+    }
+
+    // Validate the metric type.
+    $bundle_info = \Drupal::service('entity_type.bundle.info')->getBundleInfo('metric');
+    if (!isset($bundle_info[$metric_type])) {
+      $this->logger()
+        ->error(sprintf("Invalid metric type '%s'. Available types are: %s", $metric_type, implode(', ', array_keys($bundle_info))));
       return;
     }
 
@@ -110,7 +119,7 @@ class PlatformshProjectCommands extends DrushCommands {
     ];
     $entity_type_id = 'metric';
     $this->logger()
-      ->info(sprintf("Creating a %s metric for %s", $metric_type, $project_id));
+      ->info(sprintf("Creating a '%s' metric for project:'%s'", $metric_type, $project->getTitle()));
 
     /** @var \Drupal\platformsh_project\Entity\Metric $metric */
     $metric = \Drupal::entityTypeManager()
