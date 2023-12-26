@@ -45,20 +45,4 @@ class PingMetric extends Metric {
       ->save();
   }
 
-  /**
-   * Defines the field definitions for the Metric entity bundles.
-   */
-  public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
-    // Define bundle-specific fields here.
-    $fields = [];
-
-    if ($bundle == 'ping_metric') {
-      $fields['field_ping_data'] = BaseFieldDefinition::create('text')
-        ->setLabel(t('Ping Data'))
-        ->setDescription(t('Field to store ping data for Ping Metric.'));
-    }
-    // Add more bundle-specific fields as needed.
-    return $fields;
-  }
-
 }
