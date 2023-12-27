@@ -11,8 +11,6 @@
     ],
     "require": {
         "dman-coders/platformsh_api": "dev-master",
-        "drupal/paragraphs": "^1.15",
-        "drupal/paragraphs_table": "^1.20",
         "drupal/double_field": "^4.2",
 
         "ext-curl": "*"

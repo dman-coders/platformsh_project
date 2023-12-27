@@ -2,6 +2,8 @@
 
 namespace Drupal\platformsh_project\Entity;
 
+use Drupal\Core\Entity\Annotation\ContentEntityType;
+
 /**
  * A metric entity that performs no special action,
  * it just exists as a repository for notes entered manually.

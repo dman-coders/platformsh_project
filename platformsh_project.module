@@ -275,56 +275,12 @@ function platformsh_project_update_fields() {
   $config_folder = Drupal::service('extension.list.module')
       ->getPath('platformsh_project') . '/config/preinstall/';
 
-  // 'REQUIREMENT' definition.
-  // A paragraph field collection.
-  // The paragraph entity definition itself is already defined wiith normal install yamls.
-
-  // Field storage
-  $config_id = 'field.storage.metric.requirement';
-  $data = Yaml::parseFile($config_folder . $config_id . '.yml');
-  Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
-
-  // Field bundle instance
-  $config_id = 'field.field.metric.bundle.requirement';
-  $data = Yaml::parseFile($config_folder . $config_id . '.yml');
-  $metric_types = ['note', 'ping', 'drupalcache'];
-  foreach ($metric_types as $bundle_id) {
-    $local_config_id = 'field.field.metric.' . $bundle_id . '.requirement';
-    $data['id'] = 'metric.' . $bundle_id . '.requirement';
-    $data['bundle'] = $bundle_id;
-    Drupal::configFactory()
-      ->getEditable($local_config_id)
-      ->setData($data)
-      ->save(TRUE);
-
-    // Also have to define the view and form layouts,
-    // or the field won't show up.
-    // core.entity_form_display.metric.bundle.default.yml
-    // core.entity_view_display.metric.bundle.default.yml
-    foreach (['entity_form_display', 'entity_view_display'] as $display_mode) {
-      $local_config_id = 'core.' . $display_mode . '.metric.' . $bundle_id . '.default';
-      $data['id'] = 'metric.' . $bundle_id . '.default';
-      $data['bundle'] = $bundle_id;
-      $data['dependencies']['config'] = [
-        'field.field.metric.' . $bundle_id . '.requirement',
-        'platformsh_project.metric_type.' . $bundle_id,
-      ];
+  /*
       Drupal::configFactory()
         ->getEditable($local_config_id)
         ->setData($data)
         ->save(TRUE);
-      // TODO
-      // maybe adjust this yaml import so that is just patches the config
-      // with the field display settings, not override the whole thing.
-      $confirm_config = Drupal::configFactory()
-        ->getEditable($local_config_id);
-
-    }
-
-    \Drupal::logger('platformsh_project')->info("%provenance: Added a requirement field to the %metric_type metric.", ['%provenance' => __FUNCTION__ ,'%metric_type' => $bundle_id] );
-    \Drupal::messenger()
-      ->addStatus(__FUNCTION__ . " Added a requirement field to the " . $bundle_id . " metric.");
-  }
+  */
 
   // Establish field storage for the per-bundle fields.
 

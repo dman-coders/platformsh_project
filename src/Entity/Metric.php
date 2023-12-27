@@ -103,7 +103,7 @@ use Drupal\Core\Url;
  *   field_ui_base_route = "entity.metric_type.edit_form"
  * )
  */
-abstract class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
+class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 
   use EntityChangedTrait;
 
@@ -230,18 +230,6 @@ abstract class Metric extends ContentEntityBase implements ContentEntityInterfac
         'weight' => 0,
         'settings' => ['link' => TRUE],
       ]);
-
-    /**
-     * I want to add the entity_reference_revisions field called `requirement`
-     * here, but it seems it's not fully supported enough to be attached as a
-     * baseFieldDefinition.
-     * It needs to be instantiated and attached to all metrics using hooks or install
-     * processes. This is probably better anyway, as base Fields are not editable
-     * via the fuildUI at all, and it would be prefereable if they were.
-     */
-    /**
-     * The actual paragraph definition and structure is done with yamls.
-     */
 
     return $fields;
   }

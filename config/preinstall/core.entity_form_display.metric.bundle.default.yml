@@ -2,7 +2,6 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.metric.bundle.requirement
     - platformsh_project.metric_type.bundle
   module:
     - paragraphs_table

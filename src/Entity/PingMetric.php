@@ -26,7 +26,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "id" = "id",
  *     "bundle" = "bundle"
  *   },
- * ) *
+ * )
  */
 class PingMetric extends Metric {
 

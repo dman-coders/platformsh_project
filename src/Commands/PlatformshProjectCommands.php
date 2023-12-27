@@ -2,6 +2,7 @@
 
 namespace Drupal\platformsh_project\Commands;
 
+use Drupal;
 use Drush\Commands\DrushCommands;
 
 /**
@@ -20,15 +21,17 @@ class PlatformshProjectCommands extends DrushCommands {
   /**
    * Create a project from ProjectID.
    *
+   * @param string $project_id
+   *   Project ID (Platformsh hash) to look up.
+   *
+   * @return string
+   *   The summary message.
+   *
    * @command platformsh:create-project
-   *
-   * @param $project_id
-   *   string Project ID (Platformsh hash) to look up
-   *
    * @aliases psh:create-project
    * @usage platformsh_project:create-project abcdefgh
    */
-  public function createProject(string $project_id, $options = []) {
+  public function createProject(string $project_id): string {
     $field_values = [
       'type' => 'project',
       'title' => $project_id,
@@ -36,29 +39,33 @@ class PlatformshProjectCommands extends DrushCommands {
     ];
     $entity_type_id = 'node';
     $this->logger()->info(sprintf("Creating a project %s", $project_id));
-    $project = \Drupal::entityTypeManager()
+    /** @var \Drupal\node\Entity\Node $project */
+    $project = Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($field_values);
     // hook_entity_presave() will do a lookup to prepopulate new project info.
     $project->save();
     if ($project->id()) {
-      $this->logger()
-        ->success(sprintf("Created a project %s", $project->getTitle()));
+      $message = sprintf("Created a project %s", $project->getTitle());
+      $this->logger()->success($message);
     }
     else {
-      $this->logger()
-        ->error(sprintf("Failed to create a project %s", $project->getTitle()));
+      $message = sprintf("Failed to create a project %s", $project->getTitle());
+      $this->logger()->error($message);
     }
+    return $message;
   }
 
   /**
+   * Prepopulate project with some test IDs.
+   *
    * @command platformsh:create-test-content
    * @aliases psh:create-test-content
    * @usage platformsh_project-commandName create-test-content
    *   Pre-load some sample projects for experimentation.
    *   Requires admin-level access if these projects are not yours.
    */
-  public function createTestContent() {
+  public function createTestContent(): void {
     $sample_ids = [
       'zgetjqqk5u626' => "dunno",
       'aytf4iaebr2xy' => "another",
@@ -83,34 +90,34 @@ class PlatformshProjectCommands extends DrushCommands {
   /**
    * Add a new metric to the given project.
    *
-   * @command platformsh:create-metric
-   * @aliases psh:create-metric
-   *
-   * @param $project_id
+   * @param string $project_id
    *   Project ID (platformsh hash) to attach metric to (must
    *   exist)
-   * @param $metric_type
-   *   Machine name of metric type ['ping', 'note', ...]
+   * @param string $metric_type
+   *   Machine name of metric type ['ping', 'note', ...].
    *
-   * @usage drush platformsh_project:create-metric abcdefg ping
+   *  @command platformsh:create-metric
+   *  @aliases psh:create-metric
+   *  @usage drush platformsh_project:create-metric abcdefg ping
    */
-  public function createMetric($project_id, $metric_type, $options = []) {
+  public function createMetric(string $project_id, string $metric_type): string {
     $this->output()->writeln("Creating metric for project");
 
     // Find the project object that the project_id refers to.
     $project = platformsh_project_get_project_by_project_id($project_id);
     if (!$project) {
-      $this->logger()
-        ->error(sprintf("Failed to find a project with ID %s. aborting.", $project_id));
-      return;
+      $message = sprintf("Failed to find a project with ID %s. aborting.", $project_id);
+      $this->logger()->error($message);
+      return $message;
     }
 
     // Validate the metric type.
-    $bundle_info = \Drupal::service('entity_type.bundle.info')->getBundleInfo('metric');
+    /** @var array $bundle_info */
+    $bundle_info = Drupal::service('entity_type.bundle.info')->getBundleInfo('metric');
     if (!isset($bundle_info[$metric_type])) {
-      $this->logger()
-        ->error(sprintf("Invalid metric type '%s'. Available types are: %s", $metric_type, implode(', ', array_keys($bundle_info))));
-      return;
+      $message = sprintf("Invalid metric type '%s'. Available types are: %s", $metric_type, implode(', ', array_keys($bundle_info)));
+      $this->logger()->error($message);
+      return $message;
     }
 
     $field_values = [
@@ -122,23 +129,35 @@ class PlatformshProjectCommands extends DrushCommands {
       ->info(sprintf("Creating a '%s' metric for project:'%s'", $metric_type, $project->getTitle()));
 
     /** @var \Drupal\platformsh_project\Entity\Metric $metric */
-    $metric = \Drupal::entityTypeManager()
+    $metric = Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($field_values);
     $metric->save();
-    $bundle_label = $metric->bundle->entity->label();
+    /** @var \Drupal\platformsh_project\Entity\MetricType $metrictype_entity */
+    $metrictype_entity = $metric->bundle->entity;
+    // ? Should not be possible, but sometimes we can create a Metric
+    // with an invalid $metric_type
+    if (empty($metrictype_entity)) {
+      throw new \InvalidArgumentException(sprintf("Created a metric of type %s, but this is apparently an invalid MetricType. This happens if there is not a required config/install/platformsh_project.metric_type.{%s}.yml file.", $metric_type, $metric_type));
+    }
+    /** @var string $bundle_label */
+    $bundle_label = $metrictype_entity->label();
     if ($metric->id()) {
-      $this->logger()->success(sprintf("Created a metric %s", $bundle_label));
+      $message = sprintf("Created a metric %s", $bundle_label);
+      $this->logger()->success($message);
       $this->logger()->info(print_r($metric->get('target')->getValue(), TRUE));
     }
     else {
-      $this->logger()
-        ->error(sprintf("Failed to create a metric %s", $bundle_label));
+      $message = sprintf("Failed to create a metric %s", $bundle_label);
+      $this->logger()->error($message);
     }
-
+    return $message;
   }
 
   /**
+   * Attempt to reset the entity fields to factory settings.
+   * Scaffolding function.
+   *
    * @command platformsh:reset-fields
    * @aliases psh:reset-fields
    * @bootstrap full
@@ -146,7 +165,7 @@ class PlatformshProjectCommands extends DrushCommands {
    *   Reset the fields attached to metric entites to factory settings.
    *   Apply schema updates to the fields if they already exist.
    */
-  public function resetFields() {
+  public function resetFields(): void {
     platformsh_project_update_bundles();
     platformsh_project_update_fields();
     $this->logger()->success("Reset the fields");
@@ -160,7 +179,7 @@ class PlatformshProjectCommands extends DrushCommands {
    *
    * @usage drush platformsh_project:delete-metrics
    */
-  public function deleteMetrics($options = []) {
+  public function deleteMetrics(): void {
     platformsh_project_delete_all_metrics();
   }
 

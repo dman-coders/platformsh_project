@@ -4,6 +4,7 @@
 
 namespace Drupal\platformsh_project\Entity;
 
+use Drupal\Core\Entity\Annotation\ContentEntityType;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
@@ -43,32 +44,6 @@ class DrupalCacheMetric extends Metric {
    */
   public function label() {
     return "Cache review";
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    // Base fields are attached directly to the main entity table
-    // as additional columns, like a traditional db schema
-    // Base fields are not referred to as `field_data` style lookups
-    // like most other UI-added fields would do.
-    $fields = parent::baseFieldDefinitions($entity_type);
-    #return $fields;
-
-    // The data field.
-    $fields['response_header'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Header Response'))
-      ->setDescription(t('HTTP server response'))
-      ->setRequired(FALSE)
-      ->setDisplayOptions('form', [
-        'type' => 'text_textarea',
-        'weight' => 10,
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayOptions('view', ['weight' => 0]);
-    return $fields;
   }
 
   /**

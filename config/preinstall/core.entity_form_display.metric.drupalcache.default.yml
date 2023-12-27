@@ -3,7 +3,6 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.metric.drupalcache.requirement
     - platformsh_project.metric_type.drupalcache
   module:
     - paragraphs_table

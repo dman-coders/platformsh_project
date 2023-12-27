@@ -2,6 +2,8 @@
 
 namespace Drupal\platformsh_project\Entity;
 
+use Drupal\Core\Entity\Annotation\ContentEntityType;
+
 /**
  * A metric entity that checks if Nodeping HighSLA monitoring is enabled for this project.
  *
