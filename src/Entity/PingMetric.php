@@ -20,7 +20,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   id = "ping",
  *   description = @Translation("Pings the site URL to check it responds"),
  *   label = @Translation("Ping"),
- *   base_table = "metric",
  *   bundle_entity_type = "metric_type",
  *   entity_keys = {
  *     "id" = "id",

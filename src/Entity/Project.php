@@ -29,9 +29,7 @@ class Project extends ApiResource {
   protected string $title_key = 'title';
 
   /**
-   * @param $remoteEntityID
-   *
-   * @return false|\Platformsh\Client\Model\Project
+   * Get the Platformsh API project.
    */
   public function getResource($remoteEntityID): bool|ApiResourceBase {
     return $this->getApiClient()->getProject($remoteEntityID);
@@ -51,7 +49,8 @@ class Project extends ApiResource {
    * "organization": "01GSXM6C326HKKNCV8Z0C0Z7WY"
    *
    * version newer:
-   * "owner": "94d2a9e5-c20c-45fc-bffd-50f738c13459", # <- owner is now an org GUID
+   * "owner": "94d2a9e5-c20c-45fc-bffd-50f738c13459",
+   * # ^- owner is now an org GUID
    * "owner_info": {"type": "organization"},
    * "organization_id": "01FF4NDBVSTHNZSTTWQVPBMMD8" # <- visible org slug
    *

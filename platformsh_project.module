@@ -34,12 +34,12 @@ use Symfony\Component\Yaml\Yaml;
  */
 function platformsh_project_entity_bundle_info(): array {
   $bundles['metric']['pong']['label'] = t('A Pong!');
-  $bundles['metric']['pong']['class'] = PingMetric::class;
+  $bundles['metric']['pong']['class'] = Drupal\platformsh_project\Entity\PingMetric::class;
 
-  $bundles['metric']['fastly'] = [
-    'label' => t('Check Fastly status'),
-    'class' =>  Drupal\platformsh_project\Entity\FastlyMetric::class,
-  ];
+#  $bundles['metric']['fastly'] = [
+#    'label' => t('Check Fastly status'),
+#    'class' =>  Drupal\platformsh_project\Entity\FastlyMetric::class,
+#  ];
 
   return $bundles;
 }
@@ -288,9 +288,12 @@ function platformsh_project_update_fields() {
   // So check the bundle classes and declare their fields via config code instead.
   // https://www.drupal.org/docs/create-custom-content-types-with-bundle-classes
 
+  /**
+   * @var Drupal\Core\Entity\EntityFieldManager $efm
+   */
   $efm = \Drupal::service('entity_field.manager');
   $entity_type_id = 'metric';
-  $bundle_id = 'fastly';
+  $bundle_id = 'metric';
   $base_fields = $efm->getFieldStorageDefinitions($entity_type_id, $bundle_id);
   // All fields defined for the bundle, including base fields.
   $type_fields = $efm->getFieldDefinitions($entity_type_id, $bundle_id);
@@ -334,10 +337,10 @@ function platformsh_project_update_fields() {
  * This function checks our list of registered bundles
  * that was lightly populated by hook_bundle_entity_info()
  * and ingests them as first class configuration entities
- * defining the variaous metric bundles.
+ * defining the various metric bundles.
  *
  * Internally-only, it's maybe possible for the system to
- * survice with only the hook_bundle_entity_info definitions,
+ * survive with only the hook_bundle_entity_info definitions,
  * as they go to the same places, but it seems that other
  * internal systems - the @links route generation specifically
  * relies on the entity type configuration info to be present.
@@ -362,17 +365,55 @@ function platformsh_project_update_bundles() {
         $existing_bundle->set('description', $bundle_config['description']);
       }
       $existing_bundle->save();
-    } else {
+    }
+    else {
       // Create a new bundle.
       $bundle = MetricType::create([
         'id' => $bundle_id,
         'label' => $bundle_config['label'],
-        'description' => $bundle_config['description'],
         'entity_type' => $entity_type_id,
       ]);
+      if (isset($bundle_config['description'])) {
+        $existing_bundle->set('description', $bundle_config['description']);
+      }
       $bundle->save();
+      // This save() will have the effect of creating the expected
+      // platformsh.project.metric_type.{type}.yaml
+      // config settings.
+      \Drupal::messenger()
+        ->addStatus(__FUNCTION__ . " Updated bundle definition for $bundle_id metric.");
+
     }
 
+
+    if (true) {
+    // Need to invent the expected config entries.
+    // Normally these are published as
+    // platformsh.project.metric_type.{type}.yaml
+    // but it's better to do it programatically.
+    $local_config_id = 'platformsh_project.metric_type.' . $bundle_id;
+    $config = Drupal::configFactory()->getEditable($local_config_id);
+    $data = array_replace_recursive(
+      $config->getRawData(),
+      [
+        'id' => $bundle_id,
+        'label' => $bundle_id,
+        'dependencies' => [
+          'enforced' => [
+            'module' => [
+              'platformsh_project',
+            ],
+          ],
+        ]
+      ]
+    );
+
+    $config
+      ->setData($data)
+      ->save(TRUE);
+      \Drupal::messenger()
+        ->addStatus(__FUNCTION__ . " Updated bundle yaml  $local_config_id .");
+  }
   }
 
 }

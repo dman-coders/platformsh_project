@@ -47,7 +47,7 @@ class PlatformshProjectCommands extends DrushCommands {
     $project->save();
     if ($project->id()) {
       $message = sprintf("Created a project %s", $project->getTitle());
-      $this->logger()->success($message);
+      // $this->logger()->success($message);
     }
     else {
       $message = sprintf("Failed to create a project %s", $project->getTitle());

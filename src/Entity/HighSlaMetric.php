@@ -18,7 +18,6 @@ use Drupal\Core\Entity\Annotation\ContentEntityType;
  *   id = "highsla",
  *   description = @Translation("Checks if HighSLA monitoring is active"),
  *   label = @Translation("HighSLA"),
- *   base_table = "metric",
  *   bundle_entity_type = "metric_type",
  *   entity_keys = {
  *     "id" = "id",

@@ -96,11 +96,17 @@ abstract class ApiResource extends Node {
 
   /**
    * Generic resource fetcher.
+   *
+   * This will update and save the entity data directly,
+   * if any change is required.
+   *
    * Should be able to fetch any model from the API.
    * Anything that is common to most models can be implemented here.
-   * Anything that is unique to a model can be in its own corresponding class.
+   * Anything that is unique to a model can be in its own
+   * corresponding class.
    *
    * @return bool success
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function refreshFromAPI(): bool {
 
@@ -112,12 +118,22 @@ abstract class ApiResource extends Node {
     }
 
     /** @var \Platformsh\Client\Model\ApiResourceBase $resource
-     *   either a project or a user or whatever.
+     *   Either a project or a user or whatever.
      */
     try {
       // Calling the API may fail for many reasons. Stay paranoid.
+      // Network timeout is also possible, and I can't seem to catch it.
+      // Avoid infinite hanging on CLI if I can,
+      // by enforcing a max execution time.
+      // This is fatal, but better than infinite hang.
+      $max_execution_time = ini_get('max_execution_time');
+      ini_set('max_execution_time', 10);
+      \Drupal::logger('platformsh_project')->info(sprintf("Making a request to the API for resource `%s`. (May timeout if network issues)", $remoteEntityID));
       $resource = $this->getResource($remoteEntityID);
-      // The API may return without error, but still not have data - if project is invalid.
+      ini_set('max_execution_time', $max_execution_time);
+
+      // The API may return without error, but still not have data
+      // - if project is invalid.
       if (empty($resource)) {
         $this->messenger()
           ->addError("API call returned empty. Probably an invalid entity ID. Update failed.");
