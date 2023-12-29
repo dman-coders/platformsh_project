@@ -9,23 +9,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
 /**
  * A metric entity that saves the result of a ping test.
  *
- * Every metric bundle type also needs to be published at
- * `platformsh_project.metric_type.note.yml`
- * and referred to by
- * platformsh_project_entity_bundle_info_alter.
- *
- * @inheritDoc
- *
- * @ContentEntityType(
- *   id = "ping",
- *   description = @Translation("Pings the site URL to check it responds"),
- *   label = @Translation("Ping"),
- *   bundle_entity_type = "metric_type",
- *   entity_keys = {
- *     "id" = "id",
- *     "bundle" = "bundle"
- *   },
- * )
+ *  Each bundle definition needs to be declared in the
+ *  platformsh_project_entity_bundle_info() also.
+ *  Cannot use annotations without things getting snarled up.
  */
 class PingMetric extends Metric {
 

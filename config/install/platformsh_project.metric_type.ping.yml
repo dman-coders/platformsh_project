@@ -1,9 +1,0 @@
-langcode: en
-status: true
-
-id: "ping"
-label: "Ping"
-dependencies:
-  enforced:
-    module:
-      - platformsh_project

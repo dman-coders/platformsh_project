@@ -73,6 +73,7 @@ use Drupal\Core\Url;
  *   handlers = {
  *     "list_builder" = "Drupal\Core\Entity\EntityListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "access" = "Drupal\Core\Entity\EntityAccessControlHandler",
  *     "form" = {
  *       "default" = "Drupal\platformsh_project\Form\MetricForm",
  *       "add" = "Drupal\platformsh_project\Form\MetricForm",

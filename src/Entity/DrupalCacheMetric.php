@@ -11,30 +11,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
 /**
  * A metric entity that checks the state of Drupal page cache and TTL.
  *
- * Every metric bundle type also needs to be published at
- * `config/install/platformsh_project.metric_type.{id}.yml`
- * and referred to by
- * platformsh_project_entity_bundle_info_alter.
- *
- * @inheritDoc
- *
- * Inheriting annotations doesn't seem to work well.
- * The canonical link ended up unavailable on subclasses.
- * Do I have to replicate all the same annotation here
- * to make sure the entity bundle metadata is available to the system?
- *
- * @ContentEntityType(
- *   id = "drupalcache",
- *   description = @Translation("Reviews the Drupal cache settings"),
- *   label = @Translation("Drupal Cache"),
- *   links = {
- *     "canonical" = "/metric/{metric}",
- *   },
- *   entity_keys = {
- *     "id" = "id",
- *     "bundle" = "bundle"
- *   },
- * )
  */
 class DrupalCacheMetric extends Metric {
 

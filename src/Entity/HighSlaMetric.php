@@ -7,23 +7,9 @@ use Drupal\Core\Entity\Annotation\ContentEntityType;
 /**
  * A metric entity that checks if Nodeping HighSLA monitoring is enabled for this project.
  *
- * Every metric bundle type also needs to be published at
- * `platformsh_project.metric_type.note.yml`
- * and referred to by
- * platformsh_project_entity_bundle_info_alter.
- *
- * @inheritDoc
- *
- * @ContentEntityType(
- *   id = "highsla",
- *   description = @Translation("Checks if HighSLA monitoring is active"),
- *   label = @Translation("HighSLA"),
- *   bundle_entity_type = "metric_type",
- *   entity_keys = {
- *     "id" = "id",
- *     "bundle" = "bundle"
- *   },
- * ) *
+ *  Each bundle definition beeds to be declared in the
+ *  platformsh_project_entity_bundle_info() also.
+ *  Cannot use annotations without things getting snarled up.
  */
 class HighSlaMetric extends Metric {
 
