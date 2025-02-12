@@ -82,8 +82,7 @@ display:
           clear_on_exposed: false
           force_selection_info: false
           selected_actions:
-            -
-              action_id: platformsh_project_refresh_metric_action
+            - action_id: platformsh_project_refresh_metric_action
               preconfiguration:
                 add_confirmation: false
       pager:
@@ -107,9 +106,9 @@ display:
           perm: 'administer nodes'
       cache:
         type: tag
-        options: {  }
-      empty: {  }
-      sorts: {  }
+        options: { }
+      empty: { }
+      sorts: { }
       arguments:
         id:
           id: id
@@ -146,14 +145,14 @@ display:
           validate:
             type: none
             fail: 'not found'
-          validate_options: {  }
+          validate_options: { }
           break_phrase: false
           not: false
-      filters: {  }
+      filters: { }
       style:
         type: default
         options:
-          grouping: {  }
+          grouping: { }
           row_class: ''
           default_row_class: true
       row:
@@ -165,18 +164,18 @@ display:
           disable_sql_rewrite: false
           distinct: false
           replica: false
-          query_tags: {  }
-      relationships: {  }
-      header: {  }
-      footer: {  }
-      display_extenders: {  }
+          query_tags: { }
+      relationships: { }
+      header: { }
+      footer: { }
+      display_extenders: { }
     cache_metadata:
       max-age: 0
       contexts:
         - 'languages:language_interface'
         - url
         - user.permissions
-      tags: {  }
+      tags: { }
   platformsh_metrics_actions_block:
     id: platformsh_metrics_actions_block
     display_title: 'Metrics Actions'
@@ -185,7 +184,7 @@ display:
     display_options:
       display_description: 'Contextual actions that may be shown and triggered from a metrics page'
       display_comment: 'Contextual actions to expose alongside Platform.sh "Metric" entities.'
-      display_extenders: {  }
+      display_extenders: { }
       block_description: 'Platformsh Metrics Actions'
       block_category: 'Admin Actions'
       allow:
@@ -196,4 +195,4 @@ display:
         - 'languages:language_interface'
         - url
         - user.permissions
-      tags: {  }
+      tags: { }

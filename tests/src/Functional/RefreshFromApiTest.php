@@ -9,7 +9,8 @@ use Drupal\Tests\platformsh_api\Functional\PlatformshBrowserTestBase;
  *
  * @group platformsh
  */
-class RefreshFromApiTest extends PlatformshBrowserTestBase {
+class RefreshFromApiTest extends PlatformshBrowserTestBase
+{
 
   /**
    * @var bool
@@ -50,14 +51,15 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
   /**
    * Use the UI to create a project via front-end.
    */
-  public function testActionCreateFromApi() {
+  public function testActionCreateFromApi()
+  {
     // Create an administrative user.
     $admin_user = $this->drupalCreateUser([
       'administer nodes',
-    // For admin/content page.
+      // For admin/content page.
       'access content overview',
 
-    // To Create project.
+      // To Create project.
       'create project content',
       'edit own project content',
       'delete own project content',
@@ -105,7 +107,8 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
   /**
    * Use the UI to run a refresh.
    */
-  public function testActionRefreshFromApi() {
+  public function testActionRefreshFromApi()
+  {
     // Create an administrative user.
     $admin_user = $this->drupalCreateUser(['administer actions']);
     $this->drupalLogin($admin_user);

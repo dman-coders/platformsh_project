@@ -16,19 +16,22 @@ use Drupal\Core\Form\FormStateInterface;
  *  `{module}.links.menu.yaml`
  *  `{module}.links.task.yaml`
  */
-class MetricSettingsForm extends FormBase {
+class MetricSettingsForm extends FormBase
+{
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId()
+  {
     return 'metric_settings';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state)
+  {
 
     $form['settings'] = [
       '#markup' => $this->t('Settings form for a "Metric" entity type.'),
@@ -49,7 +52,8 @@ class MetricSettingsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state)
+  {
     $this->messenger()->addStatus($this->t('The configuration has been updated.'));
   }
 

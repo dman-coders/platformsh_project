@@ -2,9 +2,12 @@
 
 namespace Drupal\platformsh_project\Controller;
 
+use Drupal;
 use Drupal\Core\Entity\Controller\EntityController;
 use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\NodeInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Provides the add-page callback for a Metric add form.
@@ -23,7 +26,8 @@ use Drupal\node\NodeInterface;
  * But we need to ensure that a `/node/23/metric/add` page will redirect to a
  * `/node/23/metric/add/ping` route.
  */
-class MetricController extends EntityController {
+class MetricController extends EntityController
+{
 
   /**
    * Displays add links for the available bundles.
@@ -33,11 +37,12 @@ class MetricController extends EntityController {
    * @param string $entity_type_id
    *   The entity type ID.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse|array
+   * @return RedirectResponse|array
    *   If there's only one available bundle, a redirect response.
    *   Otherwise, a render array with the add links for each bundle.
    */
-  public function addPage($entity_type_id) {
+  public function addPage($entity_type_id)
+  {
     // Generic entity parameters setup copied from parent method.
     // We will always be $bundle_entity_type_id=metric
     // and won't have to worry about cases where no bundle exists.
@@ -48,9 +53,9 @@ class MetricController extends EntityController {
 
     // Find the current target project - what was the `project` ID in
     //  path: '/node/{project}/metric/add'.
-    /** @var \Drupal\Core\Routing\RouteMatchInterface $route_match  */
-    $route_match = \Drupal::routeMatch();
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var RouteMatchInterface $route_match */
+    $route_match = Drupal::routeMatch();
+    /** @var NodeInterface $node */
     $node = $route_match->getParameter('project');
     if (!$node instanceof NodeInterface) {
       // Problem.
@@ -85,8 +90,7 @@ class MetricController extends EntityController {
       }
       // Add descriptions from the bundle entities.
       $bundles = $this->loadBundleDescriptions($bundles, $bundle_entity_type);
-    }
-    else {
+    } else {
       $bundle_argument = $bundle_key;
     }
 

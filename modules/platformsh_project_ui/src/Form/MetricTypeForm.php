@@ -9,12 +9,14 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Form handler for metric type forms.
  */
-class MetricTypeForm extends BundleEntityFormBase {
+class MetricTypeForm extends BundleEntityFormBase
+{
 
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $form_state) {
+  public function form(array $form, FormStateInterface $form_state)
+  {
     $form = parent::form($form, $form_state);
 
     $entity_type = $this->entity;
@@ -51,7 +53,8 @@ class MetricTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function actions(array $form, FormStateInterface $form_state) {
+  protected function actions(array $form, FormStateInterface $form_state)
+  {
     $actions = parent::actions($form, $form_state);
     $actions['submit']['#value'] = $this->t('Save metric type');
     $actions['delete']['#value'] = $this->t('Delete metric type');
@@ -61,7 +64,8 @@ class MetricTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $form_state) {
+  public function save(array $form, FormStateInterface $form_state)
+  {
     $entity_type = $this->entity;
 
     $entity_type->set('id', trim($entity_type->id()));
@@ -72,8 +76,7 @@ class MetricTypeForm extends BundleEntityFormBase {
     $t_args = ['%name' => $entity_type->label()];
     if ($status == SAVED_UPDATED) {
       $message = $this->t('The metric type %name has been updated.', $t_args);
-    }
-    elseif ($status == SAVED_NEW) {
+    } elseif ($status == SAVED_NEW) {
       $message = $this->t('The metric type %name has been added.', $t_args);
     }
     $this->messenger()->addStatus($message);

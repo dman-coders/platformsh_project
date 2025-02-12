@@ -1,8 +1,7 @@
-
 entity.metric.settings:
   title: 'metric'
   description: 'Configure a metric entity type.'
-  route_name:  entity.metric.settings
+  route_name: entity.metric.settings
   parent: system.admin_structure
 entity.metric.collection:
   title: 'metrics'

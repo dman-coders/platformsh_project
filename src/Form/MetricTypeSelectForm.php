@@ -6,19 +6,22 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  *
  */
-class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
+class MetricTypeSelectForm extends ContentEntityConfirmFormBase
+{
 
   /**
    *
    */
-  public function getFormId() {
+  public function getFormId()
+  {
     return 'metric_type_select';
   }
 
   /**
    *
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $node_id = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $node_id = NULL)
+  {
 
     $form['#title'] = $this->t('Choose the type of metric');
 
@@ -45,7 +48,8 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
   /**
    *
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state)
+  {
     // Get the node ID from the form's state.
     $node_id = $form_state->get('node_id');
 
@@ -60,20 +64,21 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getQuestion() {
+  public function getQuestion()
+  {
     // No question, just a form selection that is required.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCancelUrl() {
+  public function getCancelUrl()
+  {
     $entity = $this->getEntity();
     if ($entity->hasLinkTemplate('collection')) {
       // If available, return the collection URL.
       return $entity->toUrl('collection');
-    }
-    else {
+    } else {
       // Otherwise fall back to the default link template.
       return $entity->toUrl();
     }

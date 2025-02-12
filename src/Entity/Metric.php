@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\Core\Url;
 
 /**
@@ -104,7 +105,8 @@ use Drupal\Core\Url;
  *   field_ui_base_route = "entity.metric_type.edit_form"
  * )
  */
-class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
+class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface
+{
 
   use EntityChangedTrait;
 
@@ -119,7 +121,8 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
+  {
     // Base fields are attached directly to the main entity table
     // as additional columns, like a traditional db schema
     // Base fields are not referred to as `field_data` style lookups
@@ -217,7 +220,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     $fields['target'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Target'))
       ->setDescription(t('The linked resource the Metric applies to.'))
-    // Make required later.
+      // Make required later.
       ->setRequired(FALSE)
       ->setSetting('target_type', 'node')
       ->setDisplayConfigurable('form', TRUE)
@@ -241,7 +244,8 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    * For some reason this wasn't being autodetected from the bundle.
    * I'd expected it to be deduced from the annotation links:canonic.
    */
-  public static function buildUri(ItemInterface $item) {
+  public static function buildUri(ItemInterface $item)
+  {
     return Url::fromUri($item->getLink());
   }
 
@@ -250,14 +254,15 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    *
    * Commonly used by several metrics.
    *
-   * @return \Drupal\platformsh_project\Entity\Project
+   * @return Project
    *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   * @throws MissingDataException
    */
-  protected function getProject() {
+  protected function getProject()
+  {
     // Dereference the entityreference.
     /**
-     * @var \Drupal\platformsh_project\Entity\Project
+     * @var Project
      */
     static $project;
     if (!empty($project)) {

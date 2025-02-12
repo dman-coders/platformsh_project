@@ -8,7 +8,7 @@ dependencies:
       - platformsh_project
 third_party_settings:
   menu_ui:
-    available_menus: {  }
+    available_menus: { }
     parent: ''
 name: User
 type: user

@@ -7,7 +7,8 @@ use Platformsh\Client\Model\ApiResourceBase;
 /**
  * Defines the Project node entity.
  */
-class User extends ApiResource {
+class User extends ApiResource
+{
 
   /**
    * Custom behavior here.
@@ -23,7 +24,8 @@ class User extends ApiResource {
    *
    * @return false|\Platformsh\Client\Model\user
    */
-  public function getResource($remoteEntityID): bool|ApiResourceBase {
+  public function getResource($remoteEntityID): bool|ApiResourceBase
+  {
     return $this->getApiClient()->getUser($remoteEntityID);
   }
 

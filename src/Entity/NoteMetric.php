@@ -12,19 +12,22 @@ use Drupal\Core\Entity\Annotation\ContentEntityType;
  *  platformsh_project_entity_bundle_info() also.
  *  Cannot use annotations without things getting snarled up.
  */
-class NoteMetric extends Metric {
+class NoteMetric extends Metric
+{
 
   /**
    *
    */
-  public function label() {
+  public function label()
+  {
     return "A note";
   }
 
   /**
    *
    */
-  public function refresh() {
+  public function refresh()
+  {
     $this->set('data', 'Refreshed ' . date("Y-m-d H:i:s"))
       ->save();
   }

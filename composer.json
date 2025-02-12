@@ -2,7 +2,9 @@
     "name": "dman-coders/platformsh_project",
     "description": "Interact with Platform.sh PAAS Services",
     "type": "drupal-module",
-    "keywords": ["Drupal"],
+    "keywords": [
+        "Drupal"
+    ],
     "license": "GPL-2.0-or-later",
     "authors": [
         {
@@ -12,7 +14,6 @@
     "require": {
         "dman-coders/platformsh_api": "dev-master",
         "drupal/double_field": "^4.2",
-
         "ext-curl": "*"
     },
     "extra": {

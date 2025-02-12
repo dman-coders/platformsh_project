@@ -26,12 +26,12 @@ content:
     label: hidden
     settings:
       trim_length: 600
-    third_party_settings: {  }
+    third_party_settings: { }
     weight: 101
     region: content
   links:
-    settings: {  }
-    third_party_settings: {  }
+    settings: { }
+    third_party_settings: { }
     weight: 100
     region: content
 hidden:

@@ -16,8 +16,8 @@ content:
   data:
     type: basic_string
     label: above
-    settings: {  }
-    third_party_settings: {  }
+    settings: { }
+    third_party_settings: { }
     weight: 1
     region: content
   requirement:
@@ -40,14 +40,14 @@ content:
       footer_text: ''
       form_format_table: 0
       sum_fields: ''
-    third_party_settings: {  }
+    third_party_settings: { }
     weight: 4
     region: content
   status:
     type: list_default
     label: above
-    settings: {  }
-    third_party_settings: {  }
+    settings: { }
+    third_party_settings: { }
     weight: 0
     region: content
   target:
@@ -55,7 +55,7 @@ content:
     label: hidden
     settings:
       link: true
-    third_party_settings: {  }
+    third_party_settings: { }
     weight: 3
     region: content
   timestamp:
@@ -65,7 +65,7 @@ content:
       date_format: medium
       custom_date_format: ''
       timezone: ''
-    third_party_settings: {  }
+    third_party_settings: { }
     weight: 2
     region: content
-hidden: {  }
+hidden: { }

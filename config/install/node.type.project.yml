@@ -3,7 +3,7 @@ status: true
 dependencies:
   enforced:
     module:
-    - platformsh_project
+      - platformsh_project
 name: Project
 type: project
 description: 'Reflects a Platform.sh Project data structure'

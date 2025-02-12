@@ -15,8 +15,7 @@ description: 'Plan Labels, as listed at "https://accounts.platform.sh/api/v1/pla
 required: false
 translatable: false
 default_value:
-  -
-    value: Development
+  - value: Development
 default_value_callback: ''
-settings: {  }
+settings: { }
 field_type: list_string

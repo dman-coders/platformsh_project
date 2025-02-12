@@ -4,20 +4,26 @@
 
 namespace Drupal\platformsh_project\Entity;
 
+use Drupal;
 use Drupal\Core\Entity\Annotation\ContentEntityType;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * A metric entity that checks the state of Drupal page cache and TTL.
  *
  */
-class DrupalCacheMetric extends Metric {
+class DrupalCacheMetric extends Metric
+{
 
   /**
    *
    */
-  public function label() {
+  public function label()
+  {
     return "Cache review";
   }
 
@@ -26,9 +32,10 @@ class DrupalCacheMetric extends Metric {
    *
    * @return void
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
-  public function refresh() {
+  public function refresh()
+  {
     $environment_test_url = $this->getProject()->getUrl();
     $response_headers = $this->getResponseHeaders($environment_test_url);
 
@@ -61,8 +68,7 @@ class DrupalCacheMetric extends Metric {
         'message' => "Cache-Control header is set.",
         'data' => print_r($response_headers['Cache-Control'], 1),
       ];
-    }
-    else {
+    } else {
       $report['Cache-Control'] = [
         'status' => 0,
         'message' => "Cache-Control header is not set, no caching is possible ",
@@ -75,8 +81,7 @@ class DrupalCacheMetric extends Metric {
         'message' => "X-Cache header is set. This means there is some caching in the routing.",
         'data' => print_r($response_headers['X-Cache'], 1),
       ];
-    }
-    else {
+    } else {
       $report['X-Cache'] = [
         'status' => 1,
         'message' => "X-Cache header is not set ",
@@ -96,10 +101,11 @@ class DrupalCacheMetric extends Metric {
    *
    * @return array
    */
-  private function getResponseHeaders($url) {
-    /** @var \GuzzleHttp\Client $client */
-    /** @var \Psr\Http\Message\ResponseInterface $response */
-    $response = \Drupal::httpClient()->request('GET', $url);
+  private function getResponseHeaders($url)
+  {
+    /** @var Client $client */
+    /** @var ResponseInterface $response */
+    $response = Drupal::httpClient()->request('GET', $url);
     $statusCode = $response->getStatusCode();
     return $response->getHeaders();
   }

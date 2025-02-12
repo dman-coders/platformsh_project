@@ -16,12 +16,14 @@ use Drupal\Core\Url;
  *
  * @see \Drupal\platformsh_project\Entity\MetricType
  */
-class MetricTypeListBuilder extends ConfigEntityListBuilder {
+class MetricTypeListBuilder extends ConfigEntityListBuilder
+{
 
   /**
    * {@inheritdoc}
    */
-  public function buildHeader() {
+  public function buildHeader()
+  {
     $header['title'] = $this->t('Label');
 
     return $header + parent::buildHeader();
@@ -30,7 +32,8 @@ class MetricTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function buildRow(EntityInterface $entity) {
+  public function buildRow(EntityInterface $entity)
+  {
     $row['title'] = [
       'data' => $entity->label(),
       'class' => ['menu-label'],
@@ -42,7 +45,8 @@ class MetricTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function render() {
+  public function render()
+  {
 
     $build = parent::render();
     $build['disclaimer'] = [

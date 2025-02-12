@@ -1,9 +1,11 @@
 # Adding a metric type
 
 A metric is a data entity that reflects the state of some sort of measurable observation.
-From the simplest "Does the project respond to a ping?" to a more detailed "What recommendations does the Lighthouse performance audit recommend?"
+From the simplest "Does the project respond to a ping?" to a more detailed "What recommendations does the Lighthouse
+performance audit recommend?"
 
-This module is set up with the expectations that many more metric definitions will be added over time, as new questions need to be asked.
+This module is set up with the expectations that many more metric definitions will be added over time, as new questions
+need to be asked.
 
 To define a new metric:
 
@@ -38,7 +40,8 @@ class PingMetric extends Metric {
 }
 ```
 
-The only required method is `refresh()`. This is expected to do whatever it takes to execute its audit, and update the `Metric` Content entity with the latest value(s), and save it.
+The only required method is `refresh()`. This is expected to do whatever it takes to execute its audit, and update
+the `Metric` Content entity with the latest value(s), and save it.
 
 ## Publish the metric type to Drupal
 

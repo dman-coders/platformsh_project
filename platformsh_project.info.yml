@@ -8,8 +8,8 @@ dependencies:
   - drupal:views
   - drupal:string_field_formatter
   - drupal:admin_actions
-# if running tests with minimal install profile, be prolific about the requirements.
-# test_dependencies:
+  # if running tests with minimal install profile, be prolific about the requirements.
+  # test_dependencies:
   - drupal:node
   - drupal:path
 

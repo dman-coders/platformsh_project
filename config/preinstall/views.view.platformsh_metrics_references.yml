@@ -133,7 +133,7 @@ display:
           settings:
             link: false
           group_column: target_id
-          group_columns: {  }
+          group_columns: { }
           group_rows: true
           delta_limit: 0
           delta_offset: 0
@@ -195,9 +195,9 @@ display:
           hide_alter_empty: true
           click_sort_column: value
           type: list_default
-          settings: {  }
+          settings: { }
           group_column: value
-          group_columns: {  }
+          group_columns: { }
           group_rows: true
           delta_limit: 0
           delta_offset: 0
@@ -264,7 +264,7 @@ display:
             custom_date_format: ''
             timezone: ''
           group_column: value
-          group_columns: {  }
+          group_columns: { }
           group_rows: true
           delta_limit: 0
           delta_offset: 0
@@ -331,7 +331,7 @@ display:
             custom_date_format: ''
             timezone: ''
           group_column: value
-          group_columns: {  }
+          group_columns: { }
           group_rows: true
           delta_limit: 0
           delta_offset: 0
@@ -356,12 +356,12 @@ display:
           sort_desc_label: Desc
       access:
         type: none
-        options: {  }
+        options: { }
       cache:
         type: tag
-        options: {  }
-      empty: {  }
-      sorts: {  }
+        options: { }
+      empty: { }
+      sorts: { }
       arguments:
         nid:
           id: nid
@@ -381,7 +381,7 @@ display:
           title_enable: false
           title: ''
           default_argument_type: node
-          default_argument_options: {  }
+          default_argument_options: { }
           default_argument_skip_url: false
           summary_options:
             base_path: ''
@@ -396,14 +396,14 @@ display:
           validate:
             type: none
             fail: 'not found'
-          validate_options: {  }
+          validate_options: { }
           break_phrase: false
           not: false
-      filters: {  }
+      filters: { }
       style:
         type: table
         options:
-          grouping: {  }
+          grouping: { }
           row_class: ''
           default_row_class: true
           columns:
@@ -456,7 +456,7 @@ display:
           disable_sql_rewrite: false
           distinct: false
           replica: false
-          query_tags: {  }
+          query_tags: { }
       relationships:
         target:
           id: target
@@ -469,16 +469,16 @@ display:
           entity_field: target
           plugin_id: standard
           required: true
-      header: {  }
-      footer: {  }
-      display_extenders: {  }
+      header: { }
+      footer: { }
+      display_extenders: { }
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
-      tags: {  }
+      tags: { }
   table_block:
     id: table_block
     display_title: 'Attached Metrics'
@@ -486,11 +486,11 @@ display:
     position: 1
     display_options:
       display_description: 'Metrics that refer to a given project'
-      display_extenders: {  }
+      display_extenders: { }
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
-      tags: {  }
+      tags: { }

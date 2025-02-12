@@ -5,18 +5,20 @@ namespace Drupal\Tests\platformsh_project\Functional;
 use Drupal\platformsh_project\Entity\Metric;
 use Drupal\platformsh_project\Entity\NoteMetric;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\user\Entity\User;
 
 /**
  * Tests the Metric entity.
  *
  * @group platformsh_project
  */
-class MetricTest extends BrowserTestBase {
+class MetricTest extends BrowserTestBase
+{
 
   /**
    * The user to use during the test.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected $user;
   protected static $modules = [
@@ -28,7 +30,8 @@ class MetricTest extends BrowserTestBase {
   /**
    * Tests creating and saving a Metric entity.
    */
-  public function testMetric() {
+  public function testMetric()
+  {
     // Create a new Metric entity.
     $metric = NoteMetric::create([
       'type' => 'note',
@@ -54,7 +57,8 @@ class MetricTest extends BrowserTestBase {
   /**
    * Tests UI buttons and routes around metric management.
    */
-  public function testMetricUI() {
+  public function testMetricUI()
+  {
     // Add a metric using the UI form.
     $web_user = $this->drupalCreateUser(['administer metrics']);
     $this->drupalLogin($web_user);

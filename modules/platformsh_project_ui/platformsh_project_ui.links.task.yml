@@ -1,4 +1,3 @@
-
 entity.metric_type.edit_form:
   title: 'Edit'
   route_name: entity.metric_type.edit_form

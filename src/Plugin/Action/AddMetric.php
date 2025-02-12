@@ -6,6 +6,7 @@ use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -45,21 +46,24 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  *   category = @Translation("Custom"),
  * )
  */
-class AddMetric extends ActionBase implements ContainerFactoryPluginInterface {
+class AddMetric extends ActionBase implements ContainerFactoryPluginInterface
+{
 
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
+  {
     return new static($configuration, $plugin_id, $plugin_definition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var \Drupal\node\NodeInterface $object */
+  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE)
+  {
+    /** @var NodeInterface $object */
     $access = $object->access('update', $account, TRUE)
       ->andIf($object->title->access('edit', $account, TRUE));
     return $return_as_object ? $access : $access->isAllowed();
@@ -68,8 +72,9 @@ class AddMetric extends ActionBase implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute($object = NULL) {
-    /** @var \Drupal\node\NodeInterface $object */
+  public function execute($object = NULL)
+  {
+    /** @var NodeInterface $object */
     if ($object->getType() != 'project') {
       $this->messenger()->addError($this->t('This action cannot be applied to the @bundle bundle.', ['@bundle' => $bundle]));
       return;

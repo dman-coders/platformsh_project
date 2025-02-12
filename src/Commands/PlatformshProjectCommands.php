@@ -3,7 +3,11 @@
 namespace Drupal\platformsh_project\Commands;
 
 use Drupal;
+use Drupal\node\Entity\Node;
+use Drupal\platformsh_project\Entity\Metric;
+use Drupal\platformsh_project\Entity\MetricType;
 use Drush\Commands\DrushCommands;
+use InvalidArgumentException;
 
 /**
  * A Drush commandfile.
@@ -16,7 +20,8 @@ use Drush\Commands\DrushCommands;
  *   - http://cgit.drupalcode.org/devel/tree/src/Commands/DevelCommands.php
  *   - http://cgit.drupalcode.org/devel/tree/drush.services.yml
  */
-class PlatformshProjectCommands extends DrushCommands {
+class PlatformshProjectCommands extends DrushCommands
+{
 
   /**
    * Create a project from ProjectID.
@@ -31,15 +36,28 @@ class PlatformshProjectCommands extends DrushCommands {
    * @aliases psh:create-project
    * @usage platformsh_project:create-project abcdefgh
    */
-  public function createProject(string $project_id): string {
+  public function createProject(string $project_id): string
+  {
     $field_values = [
       'type' => 'project',
       'title' => $project_id,
       'field_id' => $project_id,
     ];
     $entity_type_id = 'node';
+
+    // Look-ahead to avoid creating a dupe.
+    /** @var Node $project */
+    $existing_project = Drupal::entityTypeManager()
+      ->getStorage($entity_type_id)
+      ->loadByProperties(['field_id' => $project_id]);
+    if (!empty($existing_project)) {
+      $message = sprintf("Project %s already exists. Not creating a duplicate", $project_id);
+      $this->logger()->error($message);
+      return $message;
+    }
+
     $this->logger()->info(sprintf("Creating a project %s", $project_id));
-    /** @var \Drupal\node\Entity\Node $project */
+    /** @var Node $project */
     $project = Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($field_values);
@@ -48,8 +66,7 @@ class PlatformshProjectCommands extends DrushCommands {
     if ($project->id()) {
       $message = sprintf("Created a project %s", $project->getTitle());
       // $this->logger()->success($message);
-    }
-    else {
+    } else {
       $message = sprintf("Failed to create a project %s", $project->getTitle());
       $this->logger()->error($message);
     }
@@ -65,7 +82,8 @@ class PlatformshProjectCommands extends DrushCommands {
    *   Pre-load some sample projects for experimentation.
    *   Requires admin-level access if these projects are not yours.
    */
-  public function createTestContent(): void {
+  public function createTestContent(): void
+  {
     $sample_ids = [
       'zgetjqqk5u626' => "dunno",
       'aytf4iaebr2xy' => "another",
@@ -96,11 +114,12 @@ class PlatformshProjectCommands extends DrushCommands {
    * @param string $metric_type
    *   Machine name of metric type ['ping', 'note', ...].
    *
-   *  @command platformsh:create-metric
-   *  @aliases psh:create-metric
-   *  @usage drush platformsh_project:create-metric abcdefg ping
+   * @command platformsh:create-metric
+   * @aliases psh:create-metric
+   * @usage drush platformsh_project:create-metric abcdefg ping
    */
-  public function createMetric(string $project_id, string $metric_type): string {
+  public function createMetric(string $project_id, string $metric_type): string
+  {
     $this->output()->writeln("Creating metric for project");
 
     // Find the project object that the project_id refers to.
@@ -125,20 +144,32 @@ class PlatformshProjectCommands extends DrushCommands {
       'target' => ['target_id' => $project->id()],
     ];
     $entity_type_id = 'metric';
+
+    // Look-ahead to avoid creating a dupe.
+    /** @var \Drupal\node\Entity\Metric $metric */
+    $existing_metric = Drupal::entityTypeManager()
+      ->getStorage($entity_type_id)
+      ->loadByProperties($field_values);
+    if (!empty($existing_metric)) {
+      $message = sprintf("Metric %s already exists on project %s . Not creating a duplicate", $metric_type, $project->getTitle());
+      $this->logger()->error($message);
+      return $message;
+    }
+
     $this->logger()
       ->info(sprintf("Creating a '%s' metric for project:'%s'", $metric_type, $project->getTitle()));
 
-    /** @var \Drupal\platformsh_project\Entity\Metric $metric */
+    /** @var Metric $metric */
     $metric = Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($field_values);
     $metric->save();
-    /** @var \Drupal\platformsh_project\Entity\MetricType $metrictype_entity */
+    /** @var MetricType $metrictype_entity */
     $metrictype_entity = $metric->bundle->entity;
     // ? Should not be possible, but sometimes we can create a Metric
     // with an invalid $metric_type
     if (empty($metrictype_entity)) {
-      throw new \InvalidArgumentException(sprintf("Created a metric of type %s, but this is apparently an invalid MetricType. This happens if there is not a required config/install/platformsh_project.metric_type.{%s}.yml file.", $metric_type, $metric_type));
+      throw new InvalidArgumentException(sprintf("Created a metric of type %s, but this is apparently an invalid MetricType. This happens if there is not a required config/install/platformsh_project.metric_type.{%s}.yml file.", $metric_type, $metric_type));
     }
     /** @var string $bundle_label */
     $bundle_label = $metrictype_entity->label();
@@ -146,8 +177,7 @@ class PlatformshProjectCommands extends DrushCommands {
       $message = sprintf("Created a metric %s", $bundle_label);
       $this->logger()->success($message);
       $this->logger()->info(print_r($metric->get('target')->getValue(), TRUE));
-    }
-    else {
+    } else {
       $message = sprintf("Failed to create a metric %s", $bundle_label);
       $this->logger()->error($message);
     }
@@ -165,7 +195,8 @@ class PlatformshProjectCommands extends DrushCommands {
    *   Reset the fields attached to metric entites to factory settings.
    *   Apply schema updates to the fields if they already exist.
    */
-  public function resetFields(): void {
+  public function resetFields(): void
+  {
     platformsh_project_update_bundles();
     platformsh_project_update_fields();
     $this->logger()->success("Reset the fields");
@@ -179,7 +210,8 @@ class PlatformshProjectCommands extends DrushCommands {
    *
    * @usage drush platformsh_project:delete-metrics
    */
-  public function deleteMetrics(): void {
+  public function deleteMetrics(): void
+  {
     platformsh_project_delete_all_metrics();
   }
 
