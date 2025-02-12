@@ -24,8 +24,7 @@ use exception;
  *
  * I need to use an HtmlEntityFormController, not just an HtmlFormController
  */
-class MetricForm extends ContentEntityForm
-{
+class MetricForm extends ContentEntityForm {
 
   /**
    * @param array $form
@@ -38,12 +37,11 @@ class MetricForm extends ContentEntityForm
    * @throws PluginNotFoundException
    * @throws exception
    */
-  public function buildForm(array              $form,
-                            FormStateInterface $form_state,
-                            NodeInterface      $project = NULL,
-                            MetricType         $metric_type = NULL
-  ): array
-  {
+  public function buildForm(array $form,
+    FormStateInterface $form_state,
+    NodeInterface $project = NULL,
+    MetricType $metric_type = NULL
+  ): array {
     // Need to create a dummy entity if it's not already done.
     // When we 'add metric' through the usual forms, magic happens to prepare that.
     // If this form is being called from a custom context,
@@ -59,7 +57,8 @@ class MetricForm extends ContentEntityForm
       $bundle_key = $entity_type->getKey('bundle');
       $values = [];
       $values[$bundle_key] = $metric_type->id();
-      $entity = $this->entityTypeManager->getStorage($entity_type_id)->create($values);
+      $entity = $this->entityTypeManager->getStorage($entity_type_id)
+        ->create($values);
       $this->setEntity($entity);
     }
     // If this form was called from the context of a project,
@@ -77,8 +76,12 @@ class MetricForm extends ContentEntityForm
     if ($metric_type) {
       $form['metric_type']['#default_value'] = $metric_type->id();
       if (!empty($project)) {
-        $form['#title'] = $this->t('Add a @label metric to @project project', ['@label' => $metric_type->get('label'), '@project' => $project->getTitle()]);
-      } else {
+        $form['#title'] = $this->t('Add a @label metric to @project project', [
+          '@label' => $metric_type->get('label'),
+          '@project' => $project->getTitle(),
+        ]);
+      }
+      else {
         $form['#title'] = $this->t('Add a @label metric', ['@label' => $metric_type->get('label')]);
       }
     }
@@ -94,8 +97,7 @@ class MetricForm extends ContentEntityForm
    *
    * @throws EntityMalformedException
    */
-  public function save(array $form, FormStateInterface $form_state): int
-  {
+  public function save(array $form, FormStateInterface $form_state): int {
     $result = parent::save($form, $form_state);
 
     $entity = $this->getEntity();
@@ -108,13 +110,17 @@ class MetricForm extends ContentEntityForm
 
     switch ($result) {
       case SAVED_NEW:
-        $this->messenger()->addStatus($this->t('New platformsh metric %label has been created.', $message_arguments));
-        $this->logger('platformsh_project')->notice('Created new platformsh metric %label', $logger_arguments);
+        $this->messenger()
+          ->addStatus($this->t('New platformsh metric %label has been created.', $message_arguments));
+        $this->logger('platformsh_project')
+          ->notice('Created new platformsh metric %label', $logger_arguments);
         break;
 
       case SAVED_UPDATED:
-        $this->messenger()->addStatus($this->t('The platformsh metric %label has been updated.', $message_arguments));
-        $this->logger('platformsh_project')->notice('Updated platformsh metric %label.', $logger_arguments);
+        $this->messenger()
+          ->addStatus($this->t('The platformsh metric %label has been updated.', $message_arguments));
+        $this->logger('platformsh_project')
+          ->notice('Updated platformsh metric %label.', $logger_arguments);
         break;
     }
 

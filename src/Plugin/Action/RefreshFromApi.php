@@ -45,8 +45,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   category = @Translation("Custom")
  * )
  */
-class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterface
-{
+class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterface {
 
   private ApiService $api_service;
 
@@ -59,8 +58,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
    *   The plugin implementation definition.
    * @param ApiService $api_service
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service)
-  {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->api_service = $api_service;
   }
@@ -68,8 +66,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): RefreshFromApi|ContainerFactoryPluginInterface|static
-  {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): RefreshFromApi|ContainerFactoryPluginInterface|static {
     return new static(
       $configuration,
       $plugin_id,
@@ -81,8 +78,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface
-  {
+  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
     /** @var NodeInterface $object */
     $access = $object->access('update', $account, TRUE)
       ->andIf($object->get('title')->access('edit', $account, TRUE));
@@ -95,13 +91,13 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
    *
    * {@inheritdoc}
    */
-  public function execute($object = NULL)
-  {
+  public function execute($object = NULL) {
     /** @var NodeInterface $object * */
     if (method_exists($object, 'refreshFromAPI')) {
       return $object->refreshFromAPI();
     }
-    $this->messenger()->addError("This entity does not implement refreshFromAPI()");
+    $this->messenger()
+      ->addError("This entity does not implement refreshFromAPI()");
     return FALSE;
   }
 

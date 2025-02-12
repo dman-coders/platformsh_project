@@ -6,32 +6,29 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  *
  */
-class MetricTypeSelectForm extends ContentEntityConfirmFormBase
-{
+class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
 
   /**
    *
    */
-  public function getFormId()
-  {
+  public function getFormId() {
     return 'metric_type_select';
   }
 
   /**
    *
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $node_id = NULL)
-  {
-
+  public function buildForm(array $form, FormStateInterface $form_state, $node_id = NULL) {
     $form['#title'] = $this->t('Choose the type of metric');
 
     // Store the node ID in the form's state.
     $form_state->set('node_id', $node_id);
 
     // List all available metric types.
-    $bundleInfo = Drupal::service('entity_type.bundle.info')->getBundleInfo('metric');
+    $bundleInfo = Drupal::service('entity_type.bundle.info')
+      ->getBundleInfo('metric');
     // Extract the bundle IDs and labels into a flat array.
-    $bundleOptions = array_map(function ($bundle) {
+    $bundleOptions = array_map(function($bundle) {
       return $bundle['label'];
     }, $bundleInfo);
 
@@ -48,8 +45,7 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase
   /**
    *
    */
-  public function submitForm(array &$form, FormStateInterface $form_state)
-  {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     // Get the node ID from the form's state.
     $node_id = $form_state->get('node_id');
 
@@ -64,21 +60,20 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase
   /**
    * {@inheritdoc}
    */
-  public function getQuestion()
-  {
+  public function getQuestion() {
     // No question, just a form selection that is required.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCancelUrl()
-  {
+  public function getCancelUrl() {
     $entity = $this->getEntity();
     if ($entity->hasLinkTemplate('collection')) {
       // If available, return the collection URL.
       return $entity->toUrl('collection');
-    } else {
+    }
+    else {
       // Otherwise fall back to the default link template.
       return $entity->toUrl();
     }

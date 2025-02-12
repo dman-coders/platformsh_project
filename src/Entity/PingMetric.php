@@ -13,22 +13,19 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *  platformsh_project_entity_bundle_info() also.
  *  Cannot use annotations without things getting snarled up.
  */
-class PingMetric extends Metric
-{
+class PingMetric extends Metric {
 
   /**
    *
    */
-  public function label()
-  {
+  public function label() {
     return "A ping";
   }
 
   /**
    *
    */
-  public function refresh()
-  {
+  public function refresh() {
     $this->set('data', 'pinged ' . date("Y-m-d H:i:s"))
       ->save();
   }

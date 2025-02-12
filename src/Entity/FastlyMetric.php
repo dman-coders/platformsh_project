@@ -13,22 +13,19 @@ use Drupal\Core\Field\FieldDefinition;
  * platformsh_project_entity_bundle_info() also.
  * Cannot use annotations without things getting snarled up.
  */
-class FastlyMetric extends Metric
-{
+class FastlyMetric extends Metric {
 
   /**
    *
    */
-  public function label(): string
-  {
+  public function label(): string {
     return "Fastly check";
   }
 
   /**
    *
    */
-  public function refresh()
-  {
+  public function refresh() {
     $this->set('data', 'pinged ' . date("Y-m-d H:i:s"))
       ->save();
   }

@@ -63,13 +63,12 @@ use Drupal\Core\Url;
  * @ContentEntityType(
  *   id = "metric",
  *   label = @Translation("Metric"),
- *   description = @Translation("Generic Abstract Metric description should get overridden"),
- *   label_collection = @Translation("Platformsh metrics"),
- *   label_singular = @Translation("platformsh metric"),
- *   label_plural = @Translation("platformsh metrics"),
- *   label_count = @PluralTranslation(
- *     singular = "@count platformsh metrics",
- *     plural = "@count platformsh metrics",
+ *   description = @Translation("Generic Abstract Metric description should get
+ *   overridden"), label_collection = @Translation("Platformsh metrics"),
+ *   label_singular = @Translation("platformsh metric"), label_plural =
+ *   @Translation("platformsh metrics"), label_count = @PluralTranslation(
+ *   singular = "@count platformsh metrics", plural = "@count platformsh
+ *   metrics",
  *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\Core\Entity\EntityListBuilder",
@@ -105,8 +104,7 @@ use Drupal\Core\Url;
  *   field_ui_base_route = "entity.metric_type.edit_form"
  * )
  */
-class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface
-{
+class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 
   use EntityChangedTrait;
 
@@ -121,8 +119,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type)
-  {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     // Base fields are attached directly to the main entity table
     // as additional columns, like a traditional db schema
     // Base fields are not referred to as `field_data` style lookups
@@ -244,8 +241,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    * For some reason this wasn't being autodetected from the bundle.
    * I'd expected it to be deduced from the annotation links:canonic.
    */
-  public static function buildUri(ItemInterface $item)
-  {
+  public static function buildUri(ItemInterface $item) {
     return Url::fromUri($item->getLink());
   }
 
@@ -258,8 +254,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    *
    * @throws MissingDataException
    */
-  protected function getProject()
-  {
+  protected function getProject() {
     // Dereference the entityreference.
     /**
      * @var Project

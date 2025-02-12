@@ -32,8 +32,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @return array
  */
-function platformsh_project_entity_bundle_info(): array
-{
+function platformsh_project_entity_bundle_info(): array {
   $bundles['metric']['pong']['label'] = t('A Pong!');
   $bundles['metric']['pong']['class'] = Drupal\platformsh_project\Entity\PingMetric::class;
 
@@ -55,7 +54,6 @@ function platformsh_project_entity_bundle_info(): array
     'class' => Drupal\platformsh_project\Entity\HighSlaMetric::class,
   ];
 
-
   $bundles['metric']['drupalcache'] = [
     'label' => t('Drupal Cache'),
     'description' => t("Reviews the Drupal cache settings"),
@@ -70,7 +68,6 @@ function platformsh_project_entity_bundle_info(): array
   return $bundles;
 }
 
-
 /**
  * hook_entity_bundle_info_alter is how we attach a custom Class
  * to handle our entity definition.
@@ -83,8 +80,7 @@ function platformsh_project_entity_bundle_info(): array
  *
  * @return void
  */
-function platformsh_project_entity_bundle_info_alter(array &$bundles): void
-{
+function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
   if (isset($bundles['node']['project'])) {
     // Possible since 9.3 https://www.drupal.org/project/drupal/issues/2570593
     $bundles['node']['project']['class'] = Project::class;
@@ -100,7 +96,7 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void
   // TODO check if this is still relevant now that this is done in hook_entity_bundle_info()
   // getDefinitions doesn't work on for us if the classes are not annotated.
 
-  if (false) {
+  if (FALSE) {
     $entities = Drupal::entityTypeManager()->getDefinitions();
     foreach ($entities as $entity_id => $entity_definition) {
       if ($entity_definition->getBundleEntityType() == 'metric_type') {
@@ -109,15 +105,14 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void
       }
     }
   }
-
 }
 
 /**
  * Implements hook_entity_type_alter()
+ *
  * @return void
  */
-function xx_platformsh_project_entity_type_alter(&$entity_info): void
-{
+function xx_platformsh_project_entity_type_alter(&$entity_info): void {
   // Adjust the bundle definitions after the annotations have been read.
   $base_entity = $entity_info['metric'];
   /**
@@ -137,7 +132,6 @@ function xx_platformsh_project_entity_type_alter(&$entity_info): void
     }
   }
 }
-
 
 /**
  * Update the fields that are attached to metrics
@@ -168,9 +162,7 @@ function xx_platformsh_project_entity_type_alter(&$entity_info): void
  * We selectively grab yamls out of the /config/preinstall/
  * folder, then config-import them.
  */
-function platformsh_project_update_fields()
-{
-
+function platformsh_project_update_fields() {
   // Obtain configuration from yaml files
   $config_folder = Drupal::service('extension.list.module')
       ->getPath('platformsh_project') . '/config/preinstall/';
@@ -226,8 +218,6 @@ function platformsh_project_update_fields()
     Drupal::messenger()
       ->addStatus(__FUNCTION__ . " Added custom field " . $field_name . " to the " . $bundle_id . " metric.");
   }
-
-
 }
 
 /**
@@ -247,14 +237,14 @@ function platformsh_project_update_fields()
  *
  * @return void
  */
-function platformsh_project_update_bundles()
-{
+function platformsh_project_update_bundles() {
   $entity_type_id = 'metric';
   $bundle_entity_type_id = 'metric_bundle';
 
   // Get the bundles.
   // This only gets already-registered bundles.
-  $bundles = Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type_id);
+  $bundles = Drupal::service('entity_type.bundle.info')
+    ->getBundleInfo($entity_type_id);
 
   foreach ($bundles as $bundle_id => $bundle_config) {
     // Check if the bundle already exists.
@@ -270,7 +260,8 @@ function platformsh_project_update_bundles()
         $existing_bundle->set('description', $bundle_config['description']);
       }
       $existing_bundle->save();
-    } else {
+    }
+    else {
       // Create a new bundle.
       $bundle = MetricType::create([
         'id' => $bundle_id,
@@ -289,7 +280,7 @@ function platformsh_project_update_bundles()
     }
 
     // Surely this would be managed by $bundle->save() already?
-    if (false) {
+    if (FALSE) {
       // Need to invent the expected config entries.
       // Normally these are published as
       // platformsh.project.metric_type.{type}.yaml
@@ -307,7 +298,7 @@ function platformsh_project_update_bundles()
                 'platformsh_project',
               ],
             ],
-          ]
+          ],
         ]
       );
 
@@ -318,9 +309,7 @@ function platformsh_project_update_bundles()
         ->addStatus(__FUNCTION__ . " Updated bundle yaml  $local_config_id .");
     }
   }
-
 }
-
 
 /**
  * Implements hook_ENTITY_TYPE_presave() for node entities.
@@ -328,8 +317,7 @@ function platformsh_project_update_bundles()
  * Synchronises a project entry with API info on first creation.
  * See also hook_ENTITY_TYPE_create - this may be what I mean to use sometimes.
  */
-function platformsh_project_node_presave(Drupal\Node\Entity\Node $entity)
-{
+function platformsh_project_node_presave(Drupal\Node\Entity\Node $entity) {
   // Update from API if brand new
   if ($entity->getType() == 'project' && $entity->isNew()) {
     Drupal::logger('platformsh_project')->notice("Creating a new project");
@@ -357,8 +345,7 @@ function platformsh_project_node_presave(Drupal\Node\Entity\Node $entity)
  * It is .. uncertain when this gets invoked in practice.
  *
  */
-function platformsh_project_module_preuninstall($module): void
-{
+function platformsh_project_module_preuninstall($module): void {
   // This gets called any time ANYTHING is uninstalled!
   // Danger. Maybe this is not the right place to be invoking this.
   // maybe it's hook_uninstall after all.
@@ -385,11 +372,9 @@ function platformsh_project_module_preuninstall($module): void
   // and conflict if you try to re-install this module.
 
   platformsh_project_delete_all_metrics();
-
 }
 
-function platformsh_project_delete_all_metrics()
-{
+function platformsh_project_delete_all_metrics() {
   Drupal::messenger()->addStatus(__FUNCTION__ . " is deleting all metrics.");
   $entity_type_names = ['metric'];
   foreach ($entity_type_names as $entity_type) {
@@ -407,14 +392,12 @@ function platformsh_project_delete_all_metrics()
     $storage_handler->delete($entities);
   }
   */
-
 }
 
 /**
  * Implements hook_help().
  */
-function platformsh_project_help($route_name, RouteMatchInterface $route_match)
-{
+function platformsh_project_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     // Drop some dev notes in here
     case 'metric.add_unknown_metric_to_project':
@@ -425,7 +408,6 @@ function platformsh_project_help($route_name, RouteMatchInterface $route_match)
   return 'DEV: ' . $route_name;
 }
 
-
 /**
  * Utility function for finding projects.
  *
@@ -433,8 +415,7 @@ function platformsh_project_help($route_name, RouteMatchInterface $route_match)
  *
  * @return null | Node
  */
-function platformsh_project_get_project_by_project_id($project_id)
-{
+function platformsh_project_get_project_by_project_id($project_id) {
   $nodes = Drupal::entityTypeManager()
     ->getStorage('node')
     ->loadByProperties([
@@ -446,6 +427,5 @@ function platformsh_project_get_project_by_project_id($project_id)
   Drupal::messenger()
     ->addStatus(__FUNCTION__ . " failed to find a project with the ID " . $project_id);
   return NULL;
-
 }
 

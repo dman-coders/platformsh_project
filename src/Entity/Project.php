@@ -7,8 +7,7 @@ use Platformsh\Client\Model\ApiResourceBase;
 /**
  * Defines the Project node entity.
  */
-class Project extends ApiResource
-{
+class Project extends ApiResource {
 
   // These array list the mappings between the fields in the
   // API response, and the local content model.
@@ -32,8 +31,7 @@ class Project extends ApiResource
   /**
    * Get the Platformsh API project.
    */
-  public function getResource($remoteEntityID): bool|ApiResourceBase
-  {
+  public function getResource($remoteEntityID): bool|ApiResourceBase {
     return $this->getApiClient()->getProject($remoteEntityID);
   }
 
@@ -66,8 +64,7 @@ class Project extends ApiResource
    *
    * @return mixed
    */
-  protected function alterData($raw_data): mixed
-  {
+  protected function alterData($raw_data): mixed {
     if (isset($raw_data['owner_info'])) {
       if ($raw_data['owner_info']['type'] == 'organization') {
         // This slightly changes our schema def.
@@ -85,8 +82,7 @@ class Project extends ApiResource
   /**
    *
    */
-  public function getUrl(): string
-  {
+  public function getUrl(): string {
     return "https://example.com/";
   }
 

@@ -59,8 +59,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   }
  * )
  */
-class MetricType extends ConfigEntityBundleBase implements EntityDescriptionInterface
-{
+class MetricType extends ConfigEntityBundleBase implements EntityDescriptionInterface {
 
   /**
    * The machine name of this metric type.
@@ -79,8 +78,7 @@ class MetricType extends ConfigEntityBundleBase implements EntityDescriptionInte
   /**
    * {@inheritDoc}
    */
-  public function getDescription()
-  {
+  public function getDescription() {
     // Get the class annotation object where the description info is.
     /** @var EntityTypeInterface $entity_info */
     $entity_info = Drupal::entityTypeManager()->getDefinition($this->id, FALSE);
@@ -93,8 +91,7 @@ class MetricType extends ConfigEntityBundleBase implements EntityDescriptionInte
   /**
    * {@inheritDoc}
    */
-  public function setDescription($description)
-  {
+  public function setDescription($description) {
     // @todo Implement setDescription() method.
   }
 

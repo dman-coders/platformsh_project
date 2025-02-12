@@ -20,8 +20,7 @@ use InvalidArgumentException;
  *   - http://cgit.drupalcode.org/devel/tree/src/Commands/DevelCommands.php
  *   - http://cgit.drupalcode.org/devel/tree/drush.services.yml
  */
-class PlatformshProjectCommands extends DrushCommands
-{
+class PlatformshProjectCommands extends DrushCommands {
 
   /**
    * Create a project from ProjectID.
@@ -36,8 +35,7 @@ class PlatformshProjectCommands extends DrushCommands
    * @aliases psh:create-project
    * @usage platformsh_project:create-project abcdefgh
    */
-  public function createProject(string $project_id): string
-  {
+  public function createProject(string $project_id): string {
     $field_values = [
       'type' => 'project',
       'title' => $project_id,
@@ -66,7 +64,8 @@ class PlatformshProjectCommands extends DrushCommands
     if ($project->id()) {
       $message = sprintf("Created a project %s", $project->getTitle());
       // $this->logger()->success($message);
-    } else {
+    }
+    else {
       $message = sprintf("Failed to create a project %s", $project->getTitle());
       $this->logger()->error($message);
     }
@@ -82,8 +81,7 @@ class PlatformshProjectCommands extends DrushCommands
    *   Pre-load some sample projects for experimentation.
    *   Requires admin-level access if these projects are not yours.
    */
-  public function createTestContent(): void
-  {
+  public function createTestContent(): void {
     $sample_ids = [
       'zgetjqqk5u626' => "dunno",
       'aytf4iaebr2xy' => "another",
@@ -118,8 +116,7 @@ class PlatformshProjectCommands extends DrushCommands
    * @aliases psh:create-metric
    * @usage drush platformsh_project:create-metric abcdefg ping
    */
-  public function createMetric(string $project_id, string $metric_type): string
-  {
+  public function createMetric(string $project_id, string $metric_type): string {
     $this->output()->writeln("Creating metric for project");
 
     // Find the project object that the project_id refers to.
@@ -132,7 +129,8 @@ class PlatformshProjectCommands extends DrushCommands
 
     // Validate the metric type.
     /** @var array $bundle_info */
-    $bundle_info = Drupal::service('entity_type.bundle.info')->getBundleInfo('metric');
+    $bundle_info = Drupal::service('entity_type.bundle.info')
+      ->getBundleInfo('metric');
     if (!isset($bundle_info[$metric_type])) {
       $message = sprintf("Invalid metric type '%s'. Available types are: %s", $metric_type, implode(', ', array_keys($bundle_info)));
       $this->logger()->error($message);
@@ -177,7 +175,8 @@ class PlatformshProjectCommands extends DrushCommands
       $message = sprintf("Created a metric %s", $bundle_label);
       $this->logger()->success($message);
       $this->logger()->info(print_r($metric->get('target')->getValue(), TRUE));
-    } else {
+    }
+    else {
       $message = sprintf("Failed to create a metric %s", $bundle_label);
       $this->logger()->error($message);
     }
@@ -195,8 +194,7 @@ class PlatformshProjectCommands extends DrushCommands
    *   Reset the fields attached to metric entites to factory settings.
    *   Apply schema updates to the fields if they already exist.
    */
-  public function resetFields(): void
-  {
+  public function resetFields(): void {
     platformsh_project_update_bundles();
     platformsh_project_update_fields();
     $this->logger()->success("Reset the fields");
@@ -210,8 +208,7 @@ class PlatformshProjectCommands extends DrushCommands
    *
    * @usage drush platformsh_project:delete-metrics
    */
-  public function deleteMetrics(): void
-  {
+  public function deleteMetrics(): void {
     platformsh_project_delete_all_metrics();
   }
 

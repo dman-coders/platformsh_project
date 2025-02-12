@@ -9,8 +9,7 @@ use Drupal\Tests\platformsh_api\Functional\PlatformshBrowserTestBase;
  *
  * @group platformsh
  */
-class RefreshFromApiTest extends PlatformshBrowserTestBase
-{
+class RefreshFromApiTest extends PlatformshBrowserTestBase {
 
   /**
    * @var bool
@@ -21,15 +20,15 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase
    * > core testing base classes add a config schema checker during testing.
    *
    * Normal module installation with normal dependency resolution works fine,
-   * so something about ConfigInstaller inside a test harness context is faulty.
+   * so something about ConfigInstaller inside a test harness context is
+   *   faulty.
    *
-   * I can see the schema for `system.action` config entities in `system.schema.yml`
-   * and my yaml syntax is valid.
+   * I can see the schema for `system.action` config entities in
+   *   `system.schema.yml` and my yaml syntax is valid.
    *
    * Luckily, this is apparently possible to disable?
    */
   protected $strictConfigSchema = FALSE;
-
 
   /**
    * {@inheritdoc}
@@ -51,8 +50,7 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase
   /**
    * Use the UI to create a project via front-end.
    */
-  public function testActionCreateFromApi()
-  {
+  public function testActionCreateFromApi() {
     // Create an administrative user.
     $admin_user = $this->drupalCreateUser([
       'administer nodes',
@@ -100,22 +98,19 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase
     // Revisit the admin page and see the new node there for auditing.
     $this->drupalGet('/admin/content');
     $this->assertSession()->pageTextContains($this->TestProjectName);
-
     // $this->assertSession()->pageTextContains('now fail');
   }
 
   /**
    * Use the UI to run a refresh.
    */
-  public function testActionRefreshFromApi()
-  {
+  public function testActionRefreshFromApi() {
     // Create an administrative user.
     $admin_user = $this->drupalCreateUser(['administer actions']);
     $this->drupalLogin($admin_user);
 
     $this->drupalGet('/admin/config/system/actions');
     $this->assertSession()->pageTextContains('Refresh from API');
-
   }
 
 }

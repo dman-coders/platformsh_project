@@ -15,19 +15,20 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  * Can handle the request to "Add Metric" if
  * the type of metric is not given (falls back to a metric type selection list)
  * the project the metric is for is not given.
- *   If defined, it will be auto-filled, if not, it becomes a required field in the UI.
+ *   If defined, it will be auto-filled, if not, it becomes a required field in
+ * the UI.
  *
  * It provides:
- * - An override to the add-page callback (the list page where you choose a bundle)
- * to embed the pre-chosen entity ID (the related project) as a parameter to the URL.
+ * - An override to the add-page callback (the list page where you choose a
+ * bundle) to embed the pre-chosen entity ID (the related project) as a
+ * parameter to the URL.
  *
  * Natively, when just using the EntityController,
  * a `/metric/add` URL would redirect to the `/metric/add/ping` route.
  * But we need to ensure that a `/node/23/metric/add` page will redirect to a
  * `/node/23/metric/add/ping` route.
  */
-class MetricController extends EntityController
-{
+class MetricController extends EntityController {
 
   /**
    * Displays add links for the available bundles.
@@ -41,8 +42,7 @@ class MetricController extends EntityController
    *   If there's only one available bundle, a redirect response.
    *   Otherwise, a render array with the add links for each bundle.
    */
-  public function addPage($entity_type_id)
-  {
+  public function addPage($entity_type_id) {
     // Generic entity parameters setup copied from parent method.
     // We will always be $bundle_entity_type_id=metric
     // and won't have to worry about cases where no bundle exists.
@@ -77,7 +77,8 @@ class MetricController extends EntityController
       $link_route_name = 'entity.' . $bundle_entity_type->id() . '.add_form';
       $build['#add_bundle_message'] = $this->t('There is no @entity_type yet. @add_link', [
         '@entity_type' => $bundle_entity_type_label,
-        '@add_link' => Link::createFromRoute($link_text, $link_route_name)->toString(),
+        '@add_link' => Link::createFromRoute($link_text, $link_route_name)
+          ->toString(),
       ]);
       // Filter out the bundles the user doesn't have access to.  (redundant)
       $access_control_handler = $this->entityTypeManager->getAccessControlHandler($entity_type_id);
@@ -90,7 +91,8 @@ class MetricController extends EntityController
       }
       // Add descriptions from the bundle entities.
       $bundles = $this->loadBundleDescriptions($bundles, $bundle_entity_type);
-    } else {
+    }
+    else {
       $bundle_argument = $bundle_key;
     }
 
@@ -102,7 +104,10 @@ class MetricController extends EntityController
     if (count($bundles) == 1) {
       $bundle_names = array_keys($bundles);
       $bundle_name = reset($bundle_names);
-      return $this->redirect($form_route_name, ['project' => $project_id, $bundle_argument => $bundle_name]);
+      return $this->redirect($form_route_name, [
+        'project' => $project_id,
+        $bundle_argument => $bundle_name,
+      ]);
     }
     // Prepare the #bundles array for the template.
     // Create our links that embed the project ID in the URL as well.
@@ -110,7 +115,10 @@ class MetricController extends EntityController
       $build['#bundles'][$bundle_name] = [
         'label' => $bundle_info['label'],
         'description' => $bundle_info['description'] ?? '',
-        'add_link' => Link::createFromRoute($bundle_info['label'], $form_route_name, ['project' => $project_id, $bundle_argument => $bundle_name]),
+        'add_link' => Link::createFromRoute($bundle_info['label'], $form_route_name, [
+          'project' => $project_id,
+          $bundle_argument => $bundle_name,
+        ]),
       ];
     }
 

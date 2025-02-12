@@ -13,9 +13,9 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Implements hook_install().
  */
-function platformsh_project_install()
-{
-  Drupal::messenger()->addStatus(__FUNCTION__ . " is installing content definitions from its yaml configs");
+function platformsh_project_install() {
+  Drupal::messenger()
+    ->addStatus(__FUNCTION__ . " is installing content definitions from its yaml configs");
   // The creation of all content types and fields is managed by config/install.
   // Creating content types programatically here is tedious,
   // Yaml definitions are fine, as long as we keep the dependencies aligned
@@ -34,7 +34,8 @@ function platformsh_project_install()
   // let the system import the rest of the normal yamls next.
 
   // Obtain configuration from yaml files
-  $config_folder = Drupal::service('extension.list.module')->getPath('platformsh_project') . '/config/preinstall/';
+  $config_folder = Drupal::service('extension.list.module')
+      ->getPath('platformsh_project') . '/config/preinstall/';
 
   // Install the views, so we can have a views_block, so we can position it.
   $view_config_ids = [
@@ -79,9 +80,13 @@ function platformsh_project_install()
   foreach ($block_config_ids as $config_id) {
     $data = Yaml::parseFile($config_folder . $config_id . '.yml');
     $data['theme'] = $theme_name;
-    Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+    Drupal::configFactory()
+      ->getEditable($config_id)
+      ->setData($data)
+      ->save(TRUE);
   }
-  Drupal::messenger()->addStatus(__FUNCTION__ . " placed actions blocks on some entity pages for admin purposes.");
+  Drupal::messenger()
+    ->addStatus(__FUNCTION__ . " placed actions blocks on some entity pages for admin purposes.");
 
   # Admin_actions module auto-installed its sample block. Disable it.
   # @see admin_actions_install()
@@ -90,7 +95,6 @@ function platformsh_project_install()
   if ($block) {
     $block->delete();
   }
-
   #platformsh_project_update_fields();
 }
 
@@ -98,8 +102,7 @@ function platformsh_project_install()
  * Implements hook_preuninstall().
  *
  */
-function platformsh_project_uninstall()
-{
+function platformsh_project_uninstall() {
   platformsh_project_module_preuninstall('platformsh_project');
 
   // TODO: our custom placed blocks from config/preinstall

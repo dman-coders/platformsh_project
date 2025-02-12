@@ -20,8 +20,7 @@ use Platformsh\Client\PlatformClient;
  *
  * @see ApiResourceBase
  */
-abstract class ApiResource extends Node
-{
+abstract class ApiResource extends Node {
 
   use MessengerTrait;
 
@@ -54,7 +53,6 @@ abstract class ApiResource extends Node
    */
   protected string $title_key = 'title';
 
-
   /**
    * Active properties.
    */
@@ -86,8 +84,7 @@ abstract class ApiResource extends Node
    *
    * @return mixed
    */
-  protected function alterData($raw_data)
-  {
+  protected function alterData($raw_data) {
     return $raw_data;
   }
 
@@ -96,8 +93,7 @@ abstract class ApiResource extends Node
    *
    * @return PlatformClient
    */
-  protected function getApiClient()
-  {
+  protected function getApiClient() {
     $this->api_service = Drupal::service('platformsh_api.fetcher');
     $this->api_client = $this->api_service->getApiClient();
     return $this->api_client;
@@ -117,9 +113,7 @@ abstract class ApiResource extends Node
    * @return bool success
    * @throws EntityStorageException
    */
-  public function refreshFromAPI(): bool
-  {
-
+  public function refreshFromAPI(): bool {
     // Everything hinges on the field_id, which must be set by now.
     $remoteEntityID = $this->get('field_id')->value;
     if (empty($remoteEntityID)) {
@@ -138,7 +132,8 @@ abstract class ApiResource extends Node
       // This is fatal, but better than infinite hang.
       $max_execution_time = ini_get('max_execution_time');
       ini_set('max_execution_time', 10);
-      Drupal::logger('platformsh_project')->info(sprintf("Making a request to the API for resource `%s`. (May timeout if network issues)", $remoteEntityID));
+      Drupal::logger('platformsh_project')
+        ->info(sprintf("Making a request to the API for resource `%s`. (May timeout if network issues)", $remoteEntityID));
       $resource = $this->getResource($remoteEntityID);
       ini_set('max_execution_time', $max_execution_time);
 
@@ -149,7 +144,8 @@ abstract class ApiResource extends Node
           ->addError("API call returned empty. Probably an invalid entity ID. Update failed.");
         return FALSE;
       }
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       $this->messenger()->addError("API call failed: " . $e->getMessage());
       return FALSE;
     }
@@ -172,7 +168,8 @@ abstract class ApiResource extends Node
         $this->setTitle($resource->getProperty($this->title_key));
         $updated['title'] = TRUE;
       }
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // This should never happen, but it did, so...
       $this->messenger()
         ->addError("Resource doesn't have a " . $this->title_key . " property");
@@ -204,7 +201,8 @@ abstract class ApiResource extends Node
       ) {
         $this->set($field_name, $resource->getData()[$key_name]);
         $updated[$field_name] = TRUE;
-      } else {
+      }
+      else {
         // Field miss-match. Either our the expected data did not come back,
         // or our content type doesn't have a place to store it.
         // This may happen as API and content model evolves.
@@ -218,10 +216,12 @@ abstract class ApiResource extends Node
     if (!empty($updated) && !$this->isNew()) {
       try {
         $this->save();
-      } catch (EntityStorageException $e) {
+      }
+      catch (EntityStorageException $e) {
         $this->messenger()->addError("Failed to save node " . $e->getMessage());
       }
-    } else {
+    }
+    else {
       $this->messenger()->addStatus("No extra save necessary");
     }
     return TRUE;
@@ -236,16 +236,15 @@ abstract class ApiResource extends Node
    * We need to see if we already recognise that GUID, and if so, link to it.
    * If not, create a placeholder for it, and link to that.
    *
+   * @var NodeInterface $node
+   *
    * @param array $raw_data
    *
    * @return array A list of what, if anything, was updated.
    *
    * @throws EntityStorageException
-   * @var NodeInterface $node
-   *
    */
-  public function autocreateTargetEntities(array $raw_data): array
-  {
+  public function autocreateTargetEntities(array $raw_data): array {
     $updated = [];
     // References need extra help.
     foreach ($this->reference_keys as $key_type => $key_name) {
@@ -278,7 +277,8 @@ abstract class ApiResource extends Node
           // @todo check this logic
         }
         $this->set('field_' . $key_name, $target_info);
-      } else {
+      }
+      else {
         throw new InvalidArgumentException("Could not find or auto create target entity " . $target_guid->getString());
       }
     }
@@ -295,8 +295,7 @@ abstract class ApiResource extends Node
    *
    * @throws EntityStorageException
    */
-  private function autocreateTargetEntity(string $entity_type_id, array $values)
-  {
+  private function autocreateTargetEntity(string $entity_type_id, array $values) {
     $this->messenger()
       ->addStatus("Auto-creating an ${values['bundle']} called ${values['field_id']}");
     $entity = Drupal::entityTypeManager()

@@ -12,8 +12,7 @@ use Drupal\user\Entity\User;
  *
  * @group platformsh_project
  */
-class MetricTest extends BrowserTestBase
-{
+class MetricTest extends BrowserTestBase {
 
   /**
    * The user to use during the test.
@@ -21,17 +20,19 @@ class MetricTest extends BrowserTestBase
    * @var User
    */
   protected $user;
+
   protected static $modules = [
     'platformsh_project',
   ];
+
   protected $profile = 'minimal';
+
   protected $defaultTheme = 'stark';
 
   /**
    * Tests creating and saving a Metric entity.
    */
-  public function testMetric()
-  {
+  public function testMetric() {
     // Create a new Metric entity.
     $metric = NoteMetric::create([
       'type' => 'note',
@@ -51,14 +52,12 @@ class MetricTest extends BrowserTestBase
     $this->assertEquals('bar', $loaded_metric->get('data')->value);
     $timestamp = $loaded_metric->get('timestamp')->value;
     $this->assertEquals('2022-03-01', date('Y-m-d', $timestamp));
-
   }
 
   /**
    * Tests UI buttons and routes around metric management.
    */
-  public function testMetricUI()
-  {
+  public function testMetricUI() {
     // Add a metric using the UI form.
     $web_user = $this->drupalCreateUser(['administer metrics']);
     $this->drupalLogin($web_user);

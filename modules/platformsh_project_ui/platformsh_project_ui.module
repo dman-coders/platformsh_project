@@ -13,9 +13,7 @@
  * @implements hook_entity_type_alter()
  * @return void
  */
-function platformsh_project_ui_entity_type_alter(&$entity_info): void
-{
-
+function platformsh_project_ui_entity_type_alter(&$entity_info): void {
   if (!empty($entity_info['metric_type'])) {
     // Add the crud pages for managing metric types.
     // This all is stuff that is usually added to the entity annotation,
@@ -32,7 +30,7 @@ function platformsh_project_ui_entity_type_alter(&$entity_info): void
           "edit" => "Drupal\\platformsh_project_ui\\Form\\MetricTypeForm",
           "delete" => "Drupal\\Core\\Entity\\EntityDeleteForm",
         ],
-        "list_builder" => "Drupal\\platformsh_project_ui\\MetricTypeListBuilder"
+        "list_builder" => "Drupal\\platformsh_project_ui\\MetricTypeListBuilder",
       ],
       "links" => [
         "add-form" => "/admin/structure/metric_types/add",

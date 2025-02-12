@@ -37,7 +37,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  * missing schema
  * Not all metrics have parameters, but the presence of confirm_form_route_name
  * implies that they do.
- * And every metric that is parameterized also must have a schema yaml that defines these parameters?
+ * And every metric that is parameterized also must have a schema yaml that
+ * defines these parameters?
  *
  * @Action(
  *   id = "platformsh_project_add_metric_action",
@@ -46,23 +47,19 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  *   category = @Translation("Custom"),
  * )
  */
-class AddMetric extends ActionBase implements ContainerFactoryPluginInterface
-{
-
+class AddMetric extends ActionBase implements ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
-  {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE)
-  {
+  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
     /** @var NodeInterface $object */
     $access = $object->access('update', $account, TRUE)
       ->andIf($object->title->access('edit', $account, TRUE));
@@ -72,11 +69,11 @@ class AddMetric extends ActionBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public function execute($object = NULL)
-  {
+  public function execute($object = NULL) {
     /** @var NodeInterface $object */
     if ($object->getType() != 'project') {
-      $this->messenger()->addError($this->t('This action cannot be applied to the @bundle bundle.', ['@bundle' => $bundle]));
+      $this->messenger()
+        ->addError($this->t('This action cannot be applied to the @bundle bundle.', ['@bundle' => $bundle]));
       return;
     }
 
