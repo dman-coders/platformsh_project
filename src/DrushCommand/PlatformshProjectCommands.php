@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\platformsh_project\Commands;
+namespace Drupal\platformsh_project\DrushCommand;
 
 use Drupal;
 use Drupal\node\Entity\Node;

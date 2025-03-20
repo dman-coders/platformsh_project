@@ -1,5 +1,5 @@
 services:
   platformsh_project.commands:
-    class: Drupal\platformsh_project\Commands\PlatformshProjectCommands
+    class: Drupal\platformsh_project\DrushCommand\PlatformshProjectCommands
     tags:
       - { name: drush.command }
