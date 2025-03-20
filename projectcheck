@@ -1,0 +1,18 @@
+    #!/usr/bin/env php
+    <?php
+    // Run the metric checks directly from CLI without the Drupal harness
+
+    require __DIR__ . '/../../../autoload.php';
+    require __DIR__ . '/../../../../vendor/autoload.php';
+
+    use Symfony\Component\Console\Application;
+    use Drupal\platformsh_project\Commands\PingCheckCommand;
+
+    $application = new Application('Project Check CLI', '1.0.0');
+
+    // Register the available check commands.
+    $command = new PingCheckCommand();
+    $application->add($command);
+
+
+    $application->run();
