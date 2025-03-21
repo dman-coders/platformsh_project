@@ -2,6 +2,9 @@
 
 namespace Drupal\platformsh_project\Check;
 
+use Psr\Log\LoggerInterface;
+
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Defines a generic Check interface
@@ -15,31 +18,36 @@ namespace Drupal\platformsh_project\Check;
  */
 abstract class Check  {
 
-  /**
-   * The check name
-   *
-   * @var string
-   */
-  protected $name;
+  const name = "Check";
+  const description = "This is a check";
+  const OK = 0;
+  const ERROR = 1;
+  const NOTICE = 2;
+  const NA = 3;
 
-  /**
-   * The check description
-   *
-   * @var string
-   */
-  protected $description;
 
-  abstract public static function execute($args): string|object {
-    return "Check $name executed";
+  public function getName(): string {
+    return static::name;
   }
-  public static function execute_as_json($args):string {
-    $raw_result = $this->execute($args);
+
+  /**
+   * @param array $args
+   * @param int|null $status reference to the status.
+   * @param LoggerInterface|null $logger reference to a logger interface.
+   *
+   * @return string|object
+   */
+  abstract public static function execute(array $args, int &$status = null, LoggerInterface &$logger = null): string|object ;
+
+  public static function execute_as_json($args, &$status = null):string {
+    $raw_result = self::execute($args, $status);
     $struct_result=[
-      'check'=>$this->name,
+      'check'=>static::name,
       'args'=>$args,
       'result'=>$raw_result
     ];
     return json_encode($struct_result);
   }
+
 
 }
