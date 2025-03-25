@@ -75,8 +75,10 @@ abstract class ApiResource extends Node {
   abstract public function getResource($remoteEntityID): bool|ApiResourceBase;
 
   /**
-   * Add logic specific to the content types.
+   * Add key mapping logic specific to the content types.
    *
+   * For when the attribute names in the returned object
+   * don't directly match the field names in the entity.
    * This is expected to be overridden by the subclass if extra
    * if/then logic is needed.
    *
@@ -84,7 +86,18 @@ abstract class ApiResource extends Node {
    *
    * @return mixed
    */
-  protected function alterData($raw_data) {
+  protected function alterKeys($raw_data) {
+    return $raw_data;
+  }
+
+  /**
+   * Localised extra data processing to run during refreshFromAPI
+   *
+   * @param ApiResource $resource
+   *
+   * @return mixed
+   */
+  protected function alterData($resource) {
     return $raw_data;
   }
 
@@ -185,7 +198,7 @@ abstract class ApiResource extends Node {
     }
 
     // There may be special cases that the class needs to deal with.
-    $this->alterData($raw_dump);
+    $this->alterKeys($raw_dump);
 
     // Now set the values we extracted.
     // field_keys and reference_keys are the field mapping rules
@@ -206,9 +219,12 @@ abstract class ApiResource extends Node {
         // Field miss-match. Either our the expected data did not come back,
         // or our content type doesn't have a place to store it.
         // This may happen as API and content model evolves.
+        $this->messenger()->addWarning("Missing field. Expected field $key_name was not found in the returned data.");
+
       }
     }
 
+    $updated += $this->alterData($resource);
     $updated += $this->autocreateTargetEntities($raw_dump);
 
     // $node->set('field_' . 'updated_at' , $response->getData()['updated_at']);

@@ -2,18 +2,32 @@
 namespace Drupal\platformsh_project\Commands;
 
 use Drupal\platformsh_project\Check\Check;
-use Drupal\platformsh_project\Check\PingCheck;
+use Robo\Log\RoboLogger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Psr\Log\LoggerInterface;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 
-class CheckCommand extends Command{
+class CheckCommand extends Command {
   protected static $defaultName = 'check';
   protected static $checkClass = Check::class;
 
   protected static $allowedFormatOptions = ['text', 'json', 'html'];
+
+  private $logger;
+
+  public function __construct(){
+    // create a log channel
+    #$this->logger = new Logger('log_to_stderr');
+    # $this->logger->pushHandler(new StreamHandler("php://stderr"));
+
+    parent::__construct();
+
+  }
 
   protected function configure() {
 
@@ -28,7 +42,8 @@ class CheckCommand extends Command{
       $output->writeln('<error>Invalid format option. Allowed options are ' . implode(', ', static::$allowedFormatOptions) . '</error>');
       return Command::INVALID;
     }
-
+    // The logger will automatically respect the `-v,-vv,-vvv` verbosity flags.
+    $this->logger = new RoboLogger($output);
     $args = $this->get_flattened_args($input);
 
     // Process based on the format
@@ -44,11 +59,34 @@ class CheckCommand extends Command{
         break;
     }
     if ($status > 0) {
-      $output->writeln('<error>Check failed</error>');
+      $this->logger->error('Check failed');
     }
     $output->writeln($formatted_result);
 
-    return Command::SUCCESS;
+    // If the check returns OK or NOTICE response, it's a SUCCESS,
+    // ERROR is a FAILURE.
+    // Blindingly obvious, BUT, whether a check returns a false,
+    // and whether the command actually ran is a difference sometimes.
+    // A failed question is different from a question that was answered "no".
+    return static::map_return_codes_to_check_status($status);
+  }
+
+  /**
+   * Map the return codes from the Check class to the Symfony Command status codes.
+   *
+   * These are mostly identical (0,1,2) but the Check class has an additional status code for "Not Applicable".
+   *
+   * @param int $status
+   * @return int
+   */
+  function map_return_codes_to_check_status($status) {
+    $matrix = [
+      Check::OK => Command::SUCCESS,
+      Check::NOTICE => Command::SUCCESS,
+      Check::ERROR => Command::FAILURE,
+      Check::NA => Command::INVALID
+    ];
+    return $matrix[$status];
   }
 
   /**
@@ -70,7 +108,7 @@ class CheckCommand extends Command{
     }
     $status = null;
     // This is expected to return a single, simple value.
-    return $checkClass::execute($args, $status, $log);
+    return $checkClass::execute($args, $status, $this->logger);
 
   }
 
