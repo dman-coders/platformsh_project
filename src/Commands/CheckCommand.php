@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\platformsh_project\Commands;
 
 use Drupal\platformsh_project\Check\Check;
@@ -11,26 +12,25 @@ use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
-
 class CheckCommand extends Command {
+
   protected static $defaultName = 'check';
+
   protected static $checkClass = Check::class;
 
   protected static $allowedFormatOptions = ['text', 'json', 'html'];
 
   private $logger;
 
-  public function __construct(){
+  public function __construct() {
     // create a log channel
     #$this->logger = new Logger('log_to_stderr');
     # $this->logger->pushHandler(new StreamHandler("php://stderr"));
 
     parent::__construct();
-
   }
 
   protected function configure() {
-
     $allowedFormatOptions = static::$allowedFormatOptions;
     $this->setDescription('Checks the status of things')
       ->addOption('format', 'f', InputArgument::OPTIONAL, 'The format of the output. ', 'text', $allowedFormatOptions);
@@ -47,7 +47,7 @@ class CheckCommand extends Command {
     $args = $this->get_flattened_args($input);
 
     // Process based on the format
-    switch($format) {
+    switch ($format) {
       case 'text':
         $formatted_result = $this->execute_text($args, $status);
         break;
@@ -72,11 +72,14 @@ class CheckCommand extends Command {
   }
 
   /**
-   * Map the return codes from the Check class to the Symfony Command status codes.
+   * Map the return codes from the Check class to the Symfony Command status
+   * codes.
    *
-   * These are mostly identical (0,1,2) but the Check class has an additional status code for "Not Applicable".
+   * These are mostly identical (0,1,2) but the Check class has an additional
+   * status code for "Not Applicable".
    *
    * @param int $status
+   *
    * @return int
    */
   function map_return_codes_to_check_status($status) {
@@ -84,13 +87,14 @@ class CheckCommand extends Command {
       Check::OK => Command::SUCCESS,
       Check::NOTICE => Command::SUCCESS,
       Check::ERROR => Command::FAILURE,
-      Check::NA => Command::INVALID
+      Check::NA => Command::INVALID,
     ];
     return $matrix[$status];
   }
 
   /**
-   * @param array $args Keypair of named arguments, as defined in the addArgument setup of the command definition.
+   * @param array $args Keypair of named arguments, as defined in the
+   *   addArgument setup of the command definition.
    * @param int $status
    *
    * @return mixed
@@ -100,24 +104,26 @@ class CheckCommand extends Command {
     $checkClass = static::$checkClass;
     // Ensure the class exists and has the method before trying to call it
     if (class_exists($checkClass)) {
-      if(! method_exists($checkClass,'execute')){
+      if (!method_exists($checkClass, 'execute')) {
         throw new \Exception("Method execute does not exist in class $checkClass");
       }
-    } else {
+    }
+    else {
       throw new \Exception("Class $checkClass does not exist");
     }
-    $status = null;
+    $status = NULL;
     // This is expected to return a single, simple value.
     return $checkClass::execute($args, $status, $this->logger);
-
   }
 
   protected function execute_text($args, &$status) {
     return static::executeCheck($args, $status);
   }
+
   function execute_json($args, &$status) {
     return static::executeCheck($args, $status);
   }
+
   function execute_html($args, &$status) {
     return static::executeCheck($args, $status);
   }
@@ -126,12 +132,13 @@ class CheckCommand extends Command {
    * Retrieve the flattened arguments from the Command definition as an array.
    *
    * @ $input InputInterface The input object with some of the args in it
+   *
    * @return array The flattened arguments.
    */
-  protected function get_flattened_args(InputInterface $input):array{
+  protected function get_flattened_args(InputInterface $input): array {
     $args = [];
     foreach ($this->getDefinition()->getArguments() as $key => $value) {
-        $args[$key] = $input->getArgument($key);
+      $args[$key] = $input->getArgument($key);
     }
     return $args;
   }

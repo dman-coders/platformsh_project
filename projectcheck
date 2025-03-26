@@ -17,5 +17,4 @@ $application->add($command);
 $command = new CheckCommand();
 $application->add($command);
 
-
 $application->run();

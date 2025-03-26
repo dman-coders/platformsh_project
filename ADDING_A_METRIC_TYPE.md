@@ -16,19 +16,12 @@ Refer to `entity_api.php` `Defining an entity type`
 Create a class that inherits from `Drupal\platformsh_project\Entity\Metric`.
 This should go into `{projectname}/src/Entity/theMetric.php`
 
-This class also needs some of its own Annotation, because it seems that `@inheritDoc` isn't composable?.
+To publish this entity as being available for use,
+It seems that annotations are tricky, so alternatively
+add the metadata for this class in the platformsh_project_entity_bundle_info()
 
-```json
- * @ContentEntityType(
- *   id = "ping",
- *   description = @Translation("Pings the site URL to check it responds"),
- *   label = @Translation("Ping"),
- *   base_table = "metric",
- *   entity_keys = {
- *     "id" = "id",
- *     "bundle" = "bundle"
- *   },
- * )
+```php
+/**
  */
 class PingMetric extends Metric {
 
@@ -48,7 +41,7 @@ the `Metric` Content entity with the latest value(s), and save it.
 > There should be a better way for this to happen,
 > We should be able to enumerate the class members, but ...
 
-### Publish the existance of the new metric bundle in the install yamls
+### Publish the existence of the new metric bundle in the install yamls
 
 `platformsh_project/config/install/platformsh_project.metric_type.ping.yml`
 
@@ -68,6 +61,20 @@ Extend the list of `Metric` bundle definitions to point to the new class.
   if (isset($bundles['metric']['ping'])) {
     $bundles['metric']['ping']['class'] = PingMetric::class;
   }
+```
+
+### Publish the entity info
+
+In HOOK_entity_bundle_info(), add information about this bundle and its class.
+
+```php
+function platformsh_project_entity_bundle_info(): array {
+...
+  $bundles['metric']['note'] = [
+    'label' => t('Note'),
+    'description' => t("An arbitrary user-added note"),
+    'class' => Drupal\platformsh_project\Entity\NoteMetric::class,
+  ];
 ```
 
 ### Re-install the module

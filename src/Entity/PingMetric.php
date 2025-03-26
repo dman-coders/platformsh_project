@@ -28,9 +28,9 @@ class PingMetric extends Metric {
    */
   public function refresh() {
     $url = $this->getProject()->getUrl();
-    $status = null;
-    $response = PingCheck::execute(['url' => $url],$status);
-    $this->set('data', "pinged $url " . date("Y-m-d H:i:s"). "\n" . $response)
+    $status = NULL;
+    $response = PingCheck::execute(['url' => $url], $status);
+    $this->set('data', "pinged $url " . date("Y-m-d H:i:s") . "\n" . $response)
       ->set('status', $status)
       ->save();
   }

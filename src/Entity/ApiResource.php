@@ -219,8 +219,8 @@ abstract class ApiResource extends Node {
         // Field miss-match. Either our the expected data did not come back,
         // or our content type doesn't have a place to store it.
         // This may happen as API and content model evolves.
-        $this->messenger()->addWarning("Missing field. Expected field $key_name was not found in the returned data.");
-
+        $this->messenger()
+          ->addWarning("Missing field. Expected field $key_name was not found in the returned data.");
       }
     }
 

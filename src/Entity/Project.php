@@ -90,7 +90,7 @@ class Project extends ApiResource {
    * but I don't want to replicate a whole subscription object.
    * Just extract the value and put it in the field.
    *
-   * @param ApiResourceBase  $resource
+   * @param ApiResourceBase $resource
    *
    * @return mixed
    */
@@ -106,6 +106,7 @@ class Project extends ApiResource {
     }
     return $updated;
   }
+
   /**
    *
    */
