@@ -5,22 +5,14 @@
  * Primary module hooks for platformsh_project module.
  */
 
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeInterface as EntityTypeInterfaceAlias;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
-use Drupal\platformsh_project\Entity\DrupalCacheMetric;
 use Drupal\platformsh_project\Entity\MetricType;
-use Drupal\platformsh_project\Entity\NoteMetric;
 use Drupal\platformsh_project\Entity\Organization;
-use Drupal\platformsh_project\Entity\PingMetric;
 use Drupal\platformsh_project\Entity\Project;
 use Drupal\platformsh_project\Entity\User;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * hook_entity_bundle_info()
@@ -62,10 +54,45 @@ function platformsh_project_entity_bundle_info(): array {
 
   $bundles['metric']['fastly'] = [
     'label' => t('Check Fastly status'),
+    'description' => t("Fastly metric"),
     'class' => Drupal\platformsh_project\Entity\FastlyMetric::class,
   ];
 
   return $bundles;
+}
+
+
+/**
+ * Implements hook_entity_info().
+ */
+function platformsh_project_entity_info() {
+  $entities = [];
+
+  $entities['ping_metric'] = [
+    'label' => t('Ping Metric'),
+    'entity class' => 'Drupal\platformsh_project\Entity\PingMetric',
+    'bundle' => 'metric_type',
+    'fieldable' => TRUE,
+    'entity keys' => [
+      'id' => 'id',
+      'label' => 'label',
+      'uuid' => 'uuid',
+    ],
+  ];
+
+  $entities['fastly_metric'] = [
+    'label' => t('Fastly Metric'),
+    'entity class' => 'Drupal\platformsh_project\Entity\FastlyMetric',
+    'bundle' => 'metric_type',
+    'fieldable' => TRUE,
+    'entity keys' => [
+      'id' => 'id',
+      'label' => 'label',
+      'uuid' => 'uuid',
+    ],
+  ];
+
+  return $entities;
 }
 
 /**
@@ -112,7 +139,7 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
  *
  * @return void
  */
-function xx_platformsh_project_entity_type_alter(&$entity_info): void {
+function platformsh_project_entity_type_alter(&$entity_info): void {
   // Adjust the bundle definitions after the annotations have been read.
   $base_entity = $entity_info['metric'];
   /**
@@ -429,3 +456,20 @@ function platformsh_project_get_project_by_project_id($project_id) {
   return NULL;
 }
 
+/**
+ * Implements hook_theme().
+ */
+function platformsh_project_theme($existing, $type, $theme, $path): array {
+  return [
+    'field__node__field_data__project' => [
+      'render element' => 'elements',
+      'base hook' => 'field',
+      'template' => 'summary-field'
+    ],
+    'field__node__field_raw__metric' => [
+      'render element' => 'elements',
+      'base hook' => 'field',
+      'template' => 'summary-field'
+    ],
+  ];
+}
