@@ -15,6 +15,9 @@ dependencies:
   module:
     - path
     - text
+  enforced:
+    module:
+      - platformsh_project
 id: node.project.default
 targetEntityType: node
 bundle: project

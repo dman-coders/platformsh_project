@@ -16,6 +16,9 @@ dependencies:
   module:
     - text
     - user
+  enforced:
+    module:
+      - platformsh_project
 id: node.project.teaser
 targetEntityType: node
 bundle: project

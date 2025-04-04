@@ -5,6 +5,9 @@ dependencies:
     - field.storage.node.field_organization_id
     - node.type.organization
     - node.type.project
+  enforced:
+    module:
+      - platformsh_project
 id: node.project.field_organization_id
 field_name: field_organization_id
 entity_type: node

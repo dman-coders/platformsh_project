@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - platformsh_project
+  enforced:
+    module:
+      - platformsh_project
+id: metric.field_response_header
+field_name: field_response_header
+entity_type: metric
+type: string
+settings:
+  max_length: 10000
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

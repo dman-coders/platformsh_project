@@ -4,6 +4,9 @@ dependencies:
   config:
     - field.storage.node.field_default_domain
     - node.type.project
+  enforced:
+    module:
+      - platformsh_project
 id: node.project.field_default_domain
 field_name: field_default_domain
 entity_type: node

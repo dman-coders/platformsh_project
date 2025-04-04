@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.metric.field_response_header
+    - platformsh_project.metric_type.drupalcache
+  enforced:
+    module:
+      - platformsh_project
+id: metric.drupalcache.field_response_header
+field_name: field_response_header
+entity_type: metric
+bundle: drupalcache
+label: response_header
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

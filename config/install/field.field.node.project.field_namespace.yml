@@ -6,6 +6,9 @@ dependencies:
     - node.type.project
   module:
     - options
+  enforced:
+    module:
+      - platformsh_project
 id: node.project.field_namespace
 field_name: field_namespace
 entity_type: node

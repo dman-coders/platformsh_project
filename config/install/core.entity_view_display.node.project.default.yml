@@ -17,6 +17,9 @@ dependencies:
     - string_field_formatter
     - text
     - user
+  enforced:
+    module:
+      - platformsh_project
 id: node.project.default
 targetEntityType: node
 bundle: project

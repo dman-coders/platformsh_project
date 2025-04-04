@@ -5,6 +5,9 @@ dependencies:
     - field.storage.node.field_owner
     - node.type.project
     - node.type.user
+  enforced:
+    module:
+      - platformsh_project
 id: node.project.field_owner
 field_name: field_owner
 entity_type: node
