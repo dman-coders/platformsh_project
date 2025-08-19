@@ -9,9 +9,10 @@ use Drupal\Core\Field\FieldDefinition;
 /**
  * A metric entity that saves the result of a fastly test.
  *
- * Each bundle definition beeds to be declared in the
+ * Each bundle definition needs to be declared in the
  * platformsh_project_entity_bundle_info() also.
  * Cannot use annotations without things getting snarled up.
+ *
  */
 class FastlyMetric extends Metric {
 

@@ -313,7 +313,7 @@ abstract class ApiResource extends Node {
    */
   private function autocreateTargetEntity(string $entity_type_id, array $values) {
     $this->messenger()
-      ->addStatus("Auto-creating an ${values['bundle']} called ${values['field_id']}");
+      ->addStatus("Auto-creating an {{values['bundle']} called {$values['field_id']}");
     $entity = Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($values);

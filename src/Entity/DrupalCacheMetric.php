@@ -21,7 +21,7 @@ class DrupalCacheMetric extends Metric {
   /**
    *
    */
-  public function label() {
+  public function label(): string  {
     return "Cache review";
   }
 
@@ -51,7 +51,7 @@ class DrupalCacheMetric extends Metric {
     foreach ($response_headers as $name => $values) {
       $response_headers_string .= $name . ': ' . implode(', ', $values) . "\r\n";
     }
-    $this->set('response_header', $response_headers_string);
+    $this->set('field_response_header', $response_headers_string);
 
     // Summarize.
     $report = [];

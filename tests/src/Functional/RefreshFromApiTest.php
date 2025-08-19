@@ -50,7 +50,7 @@ class RefreshFromApiTest extends PlatformshBrowserTestBase {
   /**
    * Use the UI to create a project via front-end.
    */
-  public function testActionCreateFromApi() {
+  public function testActionCreateFromApi():void {
     // Create an administrative user.
     $admin_user = $this->drupalCreateUser([
       'administer nodes',

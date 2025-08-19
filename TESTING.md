@@ -18,8 +18,9 @@ The Tests will warn if these values are not found.
 ### Testing inside ddev
 
 * First check whether you want xdebug on! tests are MUCH slower with debugging, and may also stall on breakpoints or in
-  non-debuggable places. `php -d xdebug.mode=off ... ` didsn't work, best to fully disable it with `ddev xdebug off`
+  non-debuggable places. `php -d xdebug.mode=off ... ` didn't work, best to fully disable it with `ddev xdebug off`
 
+```
   ddev ssh
   cd web
   # Confirm that Drupal is stable and responsive here
@@ -28,5 +29,20 @@ The Tests will warn if these values are not found.
   --verbose \
   --sqlite /tmp/simpletest.sqlite \
   --module platformsh_project
+```
 
 This runs some Drupal unit tests on some stand-alone test instances - does not interfere with your running site.
+
+# to abstract out what run-tests is doing:
+```shell
+APP_DIR="${PLATFORM_APP_DIR:=/var/www/html}"
+# set these so the tests have something to test against
+export PLATFORM_PROJECT=$(platform --no-interaction project:info id --format=string)
+export PLATFORM_ENVIRONMENT=$(platform --no-interaction environment:info id --format=string)
+
+# Based on ddev commands seen in
+# https://github.com/ddev/ddev-drupal-contrib
+phpunit \
+  --bootstrap ${PLATFORM_APP_DIR:=/var/www/html}/${DDEV_DOCROOT}/core/tests/bootstrap.php \
+  web/modules/contrib/platformsh_project/
+```

@@ -36,6 +36,7 @@ class MetricTest extends BrowserTestBase {
     // Create a new Metric entity.
     $metric = NoteMetric::create([
       'type' => 'note',
+      'status' => '0',
       'data' => 'bar',
       'timestamp' => strtotime('2022-03-01'),
       'target' => NULL,
@@ -48,7 +49,9 @@ class MetricTest extends BrowserTestBase {
     $loaded_metric = Metric::load($metric->id());
 
     // Assert that the loaded entity has the same properties as the original.
-    $this->assertEquals('note', $loaded_metric->get('type')->value);
+    $this->assertEquals('metric', $loaded_metric->getEntityTypeId());
+    $this->assertEquals('metric', $loaded_metric->get('bundle')->value);
+    $this->assertEquals('note', $loaded_metric->get('status')->value);
     $this->assertEquals('bar', $loaded_metric->get('data')->value);
     $timestamp = $loaded_metric->get('timestamp')->value;
     $this->assertEquals('2022-03-01', date('Y-m-d', $timestamp));
@@ -65,11 +68,16 @@ class MetricTest extends BrowserTestBase {
     $edit = [
       'type' => 'note',
       'data' => 'bar',
+      'status' => 1,
       'timestamp' => strtotime('2022-03-01'),
       'target' => NULL,
     ];
     $this->drupalGet('metric/add/' . $edit['type']);
-    $this->submitForm($edit, 'Save');
+    $page = $this->getSession()->getPage();
+    // Can use just the label as a locator.
+    $page->selectFieldOption('Status', $edit['status']);
+    $page->fillField('Data', $edit['data']);
+    $this->submitForm([], 'Save');
 
     // Verify that visiting the metric cannonic view page shows a
     // "refresh" button in the UI.

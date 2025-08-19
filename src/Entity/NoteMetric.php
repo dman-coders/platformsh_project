@@ -17,7 +17,7 @@ class NoteMetric extends Metric {
   /**
    *
    */
-  public function label() {
+  public function label(): string  {
     return "A note";
   }
 

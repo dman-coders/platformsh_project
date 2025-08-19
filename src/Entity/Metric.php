@@ -269,5 +269,10 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ?->getTarget()
       ?->getValue();
   }
-
+  /**
+   *
+   */
+  public function label(): string  {
+    return "Un-named Metric";
+  }
 }
