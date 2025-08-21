@@ -27,7 +27,7 @@ class PingCheck extends Check {
    * @return string
    *   The result of the check
    */
-  public static function execute(array $args, int &$status = NULL, LoggerInterface &$logger = NULL): string|object {
+  public static function execute(array $args, string|object &$result, LoggerInterface &$logger = NULL): int {
     $logger = $logger ?? new NullLogger();
 
     $client = new Client();
@@ -51,7 +51,7 @@ class PingCheck extends Check {
       $result = "Error requesting $url: " . $exception->getMessage() . "";
       $status = static::ERROR;
     }
-    return $result;
+    return $status;
   }
 
 }

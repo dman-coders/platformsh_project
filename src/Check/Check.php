@@ -37,15 +37,16 @@ abstract class Check {
 
   /**
    * @param array $args
-   * @param int|null $status reference to the status.
+   * @param string|object $result reference to the result data.
    * @param LoggerInterface|null $logger reference to a logger interface.
    *
-   * @return string|object
+   * @return int The status code (OK, ERROR, NOTICE, or NA)
    */
-  abstract public static function execute(array $args, int &$status = NULL, LoggerInterface &$logger = NULL): string|object;
+  abstract public static function execute(array $args, string|object &$result, LoggerInterface &$logger = NULL): int;
 
   public static function execute_as_json($args, &$status = NULL): string {
-    $raw_result = self::execute($args, $status);
+    $raw_result = '';
+    $status = self::execute($args, $raw_result);
     $struct_result = [
       'check' => static::name,
       'args' => $args,

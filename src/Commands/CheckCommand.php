@@ -45,23 +45,24 @@ class CheckCommand extends Command {
     // The logger will automatically respect the `-v,-vv,-vvv` verbosity flags.
     $this->logger = new RoboLogger($output);
     $args = $this->get_flattened_args($input);
+    $result = "";
 
     // Process based on the format
     switch ($format) {
       case 'text':
-        $formatted_result = $this->execute_text($args, $status);
+        $status = $this->execute_text($args, $result);
         break;
       case 'json':
-        $formatted_result = $this->execute_json($args, $status);
+        $status = $this->execute_json($args, $result);
         break;
       case 'html':
-        $formatted_result = $this->execute_html($args, $status);
+        $status = $this->execute_html($args, $result);
         break;
     }
     if ($status > 0) {
       $this->logger->error('Check failed');
     }
-    $output->writeln($formatted_result);
+    $output->writeln($result);
 
     // If the check returns OK or NOTICE response, it's a SUCCESS,
     // ERROR is a FAILURE.
@@ -95,11 +96,12 @@ class CheckCommand extends Command {
   /**
    * @param array $args Keypair of named arguments, as defined in the
    *   addArgument setup of the command definition.
-   * @param int $status
+   * @param mixed $result
+   *   Additional info about the check result. Error message or other data.
    *
-   * @return mixed
+   * @return int
    */
-  protected function executeCheck($args, &$status) {
+  protected function executeCheck($args, &$result) {
     // Execute the check provided by the named `Check` class.
     $checkClass = static::$checkClass;
     // Ensure the class exists and has the method before trying to call it
@@ -113,19 +115,27 @@ class CheckCommand extends Command {
     }
     $status = NULL;
     // This is expected to return a single, simple value.
-    return $checkClass::execute($args, $status, $this->logger);
+    return $checkClass::execute($args, $result, $this->logger);
   }
 
-  protected function execute_text($args, &$status) {
-    return static::executeCheck($args, $status);
+  protected function execute_text($args, &$result) {
+    return static::executeCheck($args, $result);
   }
 
-  function execute_json($args, &$status) {
-    return static::executeCheck($args, $status);
+  function execute_json($args, &$result) {
+    $status = static::executeCheck($args, $result);
+    $struct_result = [
+      'check' => static::$checkClass::name,
+      'args' => $args,
+      'result' => $result,
+      'status' => $status,
+    ];
+    $result = json_encode($struct_result);
+    return $status;
   }
 
-  function execute_html($args, &$status) {
-    return static::executeCheck($args, $status);
+  function execute_html($args, &$result) {
+    return static::executeCheck($args, $result);
   }
 
   /**
