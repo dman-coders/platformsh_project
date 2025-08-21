@@ -174,14 +174,27 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDisplayOptions('form', ['weight' => 10])
       ->setDisplayOptions('view', ['weight' => 0]);
 
-    // The data field.
+    // The data field. Used for simple values or structured data
     $fields['data'] = BaseFieldDefinition::create('string_long')
       ->setLabel(t('Data'))
-      ->setDescription(t('The data for the Metric.'))
+      ->setDescription(t('Used for simple values like response codes, or IDs, or structured data like yaml'))
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'text_textarea',
         'weight' => 10,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('view', ['weight' => 0]);
+
+      // The comment field.
+      $fields['note'] = BaseFieldDefinition::create('string_long')
+      ->setLabel(t('Note'))
+      ->setDescription(t('Additional notes. Freetext summary or explanation of warnings.'))
+      ->setRequired(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'text_textarea',
+        'weight' => 11,
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)

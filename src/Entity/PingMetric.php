@@ -30,7 +30,8 @@ class PingMetric extends Metric {
     $url = $this->getProject()->getUrl();
     $status = NULL;
     $response = PingCheck::execute(['url' => $url], $status);
-    $this->set('data', "pinged $url " . date("Y-m-d H:i:s") . "\n" . $response)
+    $this->set('data', $response )
+      ->set('note', "pinged $url " . "\n" . date("Y-m-d H:i:s") . "\n" . $response)
       ->set('status', $status)
       ->save();
   }

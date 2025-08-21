@@ -37,12 +37,13 @@ class PingCheck extends Check {
 
     try {
       $response = $client->request('GET', $url);
-      if ($response->getStatusCode() === 200) {
-        $result = "Response from $url: OK";
+      $result = $response->getStatusCode();
+      if ($result === 200) {
+        $logger->info("Response from $url: OK");
         $status = static::OK;
       }
       else {
-        $result = "Response from $url: Fail";
+        $logger->info("Response from $url: Fail $result");
         $status = static::ERROR;
       }
     }
