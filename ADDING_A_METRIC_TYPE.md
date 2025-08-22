@@ -7,6 +7,11 @@ performance audit recommend?"
 This module is set up with the expectations that many more metric definitions will be added over time, as new questions
 need to be asked.
 
+A Metric is a report, that may contain one or more atomic "Checks".
+A Check is a a test that returns a status. While a Metric includes reporting and analysis of that.
+A Check is stateless and operates as a service.
+A Metric is usually bound to a project, retains data and context.
+
 To define a new metric:
 
 Refer to `entity_api.php` `Defining an entity type`

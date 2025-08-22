@@ -1,0 +1,9 @@
+# Shared header for all checks.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../feedback_functions.lib"
+source "$SCRIPT_DIR/../audit_reporting.lib"
+
+exit_code=0;
+
+check_required_parameters_are_set || exit $?

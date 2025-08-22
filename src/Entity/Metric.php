@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\Core\Url;
+use Psr\Log\LoggerInterface;
 
 /**
  * Defines the Metric entity.
@@ -107,6 +108,7 @@ use Drupal\Core\Url;
 class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 
   use EntityChangedTrait;
+  use LoggerChannelTrait;
 
   const REQUIREMENT_INFO = -1;
 
@@ -115,6 +117,30 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   const REQUIREMENT_WARNING = 1;
 
   const REQUIREMENT_ERROR = 2;
+
+  const REQUIREMENT_INVALID = 3;
+
+  const REQUIREMENT_DICTIONARY =  [
+          self::REQUIREMENT_INFO => 'Info',
+          self::REQUIREMENT_OK => 'OK',
+          self::REQUIREMENT_WARNING => 'Warning',
+          self::REQUIREMENT_ERROR => 'Error',
+          self::REQUIREMENT_INVALID => 'Invalid',
+        ];
+
+  var Project $project;
+  var LoggerInterface $logger;
+
+  /**
+   * Get the human-readable status description.
+   *
+   * @return string
+   *   The status description.
+   */
+  public function getStatusDescription($status = null): string {
+    $status = $status ? $status : $this->get('status')->value;
+    return self::REQUIREMENT_DICTIONARY[$status] ?? $status;
+  }
 
   /**
    * {@inheritdoc}
@@ -160,19 +186,19 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setLabel(t('Status'))
       ->setDescription(t('The last known summary of this metric.'))
       ->setSettings([
-        'allowed_values' => [
-          self::REQUIREMENT_INFO => 'Info',
-          self::REQUIREMENT_OK => 'OK',
-          self::REQUIREMENT_WARNING => 'Warning',
-          self::REQUIREMENT_ERROR => 'Error',
-        ],
+        'allowed_values' => self::REQUIREMENT_DICTIONARY,
       ])
       ->setRequired(TRUE)
-      ->setDefaultValue('null')
+      ->setDefaultValue(self::REQUIREMENT_INVALID)
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', ['weight' => 10])
-      ->setDisplayOptions('view', ['weight' => 0]);
+      ->setDisplayOptions('view', [
+          'weight' => 0,
+          'type' => 'status_formatter',
+          'label' => 'inline',
+        ]
+      );
 
     // The data field. Used for simple values or structured data
     $fields['data'] = BaseFieldDefinition::create('string_long')
@@ -182,10 +208,16 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDisplayOptions('form', [
         'type' => 'text_textarea',
         'weight' => 10,
+        'settings' => [
+          'rows' => 1,
+        ],
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayOptions('view', ['weight' => 0]);
+      ->setDisplayOptions('view', [
+        'weight' => 3,
+        'label' => 'inline',
+      ]);
 
       // The comment field.
       $fields['note'] = BaseFieldDefinition::create('string_long')
@@ -198,7 +230,10 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayOptions('view', ['weight' => 0]);
+      ->setDisplayOptions('view', [
+        'weight' => 6,
+        'label' => 'inline',
+      ]);
 
     // The date field.
     // Default widget is datetime_timestamp but that's annoying.
@@ -220,7 +255,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'timestamp',
-        'weight' => 0,
+        'weight' => 11,
         'settings' => [
           'date_format' => 'medium',
         ],
@@ -239,9 +274,9 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
         'weight' => 10,
       ])
       ->setDisplayOptions('view', [
-        'label' => 'hidden',
         'type' => 'entity_reference_label',
         'weight' => 0,
+        'label' => 'inline',
         'settings' => ['link' => TRUE],
       ]);
 
@@ -269,23 +304,48 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    */
   protected function getProject() {
     // Dereference the entityreference.
-    /**
-     * @var Project
-     */
-    static $project;
-    if (!empty($project)) {
-      return $project;
+    if (empty($this->project)) {
+      $this->project=$this->get('target')
+        ?->first()
+        ?->get('entity')
+        ?->getTarget()
+        ?->getValue();
     }
-    return $this->get('target')
-      ?->first()
-      ?->get('entity')
-      ?->getTarget()
-      ?->getValue();
+    return $this->project;
   }
+
+  /**
+   * Return either the given logger,
+   * the already attached logger,
+   * or a generic global one.
+   *
+   * @param $logger \Psr\Log\LoggerInterface
+   *
+   * @return \Psr\Log\LoggerInterface
+   */
+  protected function getLogger($logger = null): LoggerInterface {
+    if ($logger) (
+      $this->logger = $logger;
+    )
+    if (empty($this->logger)) {
+      $this->logger = \Drupal::service('logger.factory')->get('platformsh_project');
+    }
+    return $this->logger;
+  }
+
   /**
    *
    */
   public function label(): string  {
     return "Un-named Metric";
   }
+
+  public function refresh() {
+    $this
+      ->set('status', self::REQUIREMENT_INVALID)
+      ->set('data', date('c'))
+      ->set('note', 'Refreshed ' . date("Y-m-d H:i:s"))
+      ->save();
+  }
+
 }

@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+# Project diagnostics and review.
+
+# Does Fastly service exist for this project?
+# Are the Fastly variables set on the target environment?
+# Does the service ID match the environment variable?
+# Do the set credentials work?
+#
+# These fails could exit early, as each step depends on the previous.
+
+# Source the library relative to this script's location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../feedback_functions.lib"
+source "$SCRIPT_DIR/../audit_reporting.lib"
+
+# Validate prerequisite variables. (so we can run out of context safely)
+REQUIRED_PARAMETERS=( PLATFORM_PROJECT PLATFORM_CLI  FASTLY_TOKEN )
+export PLATFORM_PROJECT=${1:-$PLATFORM_PROJECT};
+check_required_parameters_are_set || exit $?
+
+# Error code variables
+exit_code=0;
+
+# Checks in this script
+CHECK_GROUP="fastly_service"
+CHECK_LIST=(
+  "service_exists"
+  "fastly_api_service_variable_set"
+  "fastly_api_service_variable_match"
+  "fastly_api_service_variable_misnamed"
+  "fastly_api_credentials_work"
+)
+
+# Does it exist?
+check_id="service_exists"
+log_notice "Looking for Fastly service info named after project '$PLATFORM_PROJECT' from CLI (slow)..."
+# Astonishingly slow. ~30s
+command="fastly service describe --service-name=$PLATFORM_PROJECT --json"
+command="curl -s -H 'Fastly-Key: $FASTLY_TOKEN' \
+           https://api.fastly.com/service  | \
+           jq -r 'map(select(.name == \"$PLATFORM_PROJECT\"))' "
+log_info "Running: $command"
+if output=$($command 2>&1); then
+    export FASTLY_SERVICE_JSON="$output";
+    export FASTLY_SERVICE_ID=$(echo "$output" | jq -r '.ServiceID');
+    audit_report_result $check_id "OK" "$FASTLY_SERVICE_ID"
+else
+    audit_report_result $check_id "ERROR" "$FASTLY_SERVICE_ID" "Failed to get Fastly service ID named '$PLATFORM_PROJECT': $output"
+    exit_code=$exit_error
+    # Early exit if the service does not exist.
+    exit $exit_code
+fi
+
+# Are the variables set on the target environment?
+log_notice "Fetching Fastly creds from project environment"
+
+# First retrieve the default production branch for this project
+export PLATFORM_BRANCH="$($PLATFORM_CLI --project=$PLATFORM_PROJECT project:info default_branch)"
+log_debug "Using environment '${PLATFORM_BRANCH}'";
+
+command="$PLATFORM_CLI ssh 'echo \$FASTLY_API_SERVICE'"
+log_info "Running: $command"
+# Needs a little whitespace stripping to avoid issues with trailing newlines.
+PROJECT_FASTLY_API_SERVICE="$(eval $command  | sed -e 's/[[:space:]]*$//g')"
+
+command="$PLATFORM_CLI ssh 'echo \$FASTLY_API_TOKEN'"
+log_info "Running: $command"
+export PROJECT_FASTLY_API_TOKEN="$(eval $command | sed -e 's/[[:space:]]*$//g')"
+
+log_info "export FASTLY_API_SERVICE=$PROJECT_FASTLY_API_SERVICE"
+log_info "export FASTLY_API_TOKEN=$PROJECT_FASTLY_API_TOKEN"
+
+if [[ -z "$PROJECT_FASTLY_API_SERVICE" || -z "$PROJECT_FASTLY_API_TOKEN" ]]; then
+    audit_report_result $check_id "ERROR" "$FASTLY_SERVICE_ID"  "Expected variables FASTLY_API_SERVICE or FASTLY_API_TOKEN not found for project $PLATFORM_PROJECT. Please ensure the environment variable FASTLY_API_SERVICE is set."
+    exit_code=$exit_error
+
+    ## Some projects had the service ID variable named FASTLY_SERVICE_ID instead of FASTLY_API_SERVICE
+    # Check for that as a known issue
+    # Can't use variable:get with 'sensitive' variables, so we have to use ssh.
+    command="$PLATFORM_CLI ssh 'echo \$FASTLY_SERVICE_ID'"
+    PROJECT_FASTLY_SERVICE_ID="$(eval $command  | sed -e 's/[[:space:]]//g')"
+    if [[ "$PROJECT_FASTLY_SERVICE_ID" ]]; then
+        message="FASTLY_API_SERVICE variable is not set but FASTLY_SERVICE_ID is. Known legacy problem. This value should be renamed so that the fastly API can work for this project."
+        audit_report_result "fastly_api_service_variable_misnamed" "WARNING" "$PROJECT_FASTLY_SERVICE_ID"  "$message""
+        # Use this anyway for interim testing
+        PROJECT_FASTLY_API_SERVICE=$PROJECT_FASTLY_SERVICE_ID
+        exit_code=#exit_error
+    fi
+fi
+
+check_id="fastly_api_service_variable_match"
+if [[ "$PROJECT_FASTLY_API_SERVICE" != "$FASTLY_SERVICE_ID" ]]; then
+    message="Mismatch between Fastly Service ID found on Fastly API ($FASTLY_SERVICE_ID) and the environment variable seen on the server ($PROJECT_FASTLY_API_SERVICE)."
+    audit_report_result "fastly_api_service_variable_match" "ERROR" "$PROJECT_FASTLY_SERVICE_ID"  "$message""
+    exit_code=$exit_error
+fi
+
+# Verify via fastly API that these creds are correct.
+check_id="fastly_api_credentials_work"
+log_info "Verify these credentials actually work by pinging the Fastly API directly."
+command="curl -s -H \"Fastly-Key: $PROJECT_FASTLY_API_TOKEN\" \
+     -H \"Accept: application/json\" \
+     \"https://api.fastly.com/service/$PROJECT_FASTLY_API_SERVICE/details\""
+fastly_api_response=$($command);
+if [[ $? -eq 0  ]]; then
+    message="Fastly API connection tested successfully with given token."
+    audit_report_result "$check_id" "OK" "$PROJECT_FASTLY_API_SERVICE" "$message""
+else
+    message="Request to Fastly failed. The API credentials for service {$PROJECT_FASTLY_API_SERVICE} did not work."
+    audit_report_result "$check_id" "ERROR" "$PROJECT_FASTLY_API_SERVICE"  "$message""
+    exit_code=$exit_error
+fi
+
+log_info $fastly_api_response
+
+
+exit $exit_code

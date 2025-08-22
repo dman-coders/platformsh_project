@@ -35,6 +35,10 @@ abstract class Check {
     return static::name;
   }
 
+  public static function getLogger($logger): LoggerInterface {
+    return $logger ?? \Drupal::logger('platformsh_project.checks');
+  }
+
   /**
    * @param array $args
    * @param string|object $result reference to the result data.

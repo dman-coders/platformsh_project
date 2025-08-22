@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# Does Fastly service exist for this project?
+REQUIRED_PARAMETERS=( PLATFORM_PROJECT FASTLY_TOKEN )
+
+# Source the library relative to this script's location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/bootstrap_check.lib"
+
+# Helper to prevent jq from returning literal 'null' on ampty.
+jq_return_empty=" | if length == 0 then empty else . end"
+
+# Does it exist?
+log_notice "Looking for Fastly service info named after project '$PLATFORM_PROJECT' from API search by name (slow)..."
+# May fail on:
+# * bad credentials (403)
+# * Invalid response
+# * no service by that name
+# * invalid service (unknown reason)
+
+# Could do this as a one-liner, but I want to distinguish between 'could not list services' and 'cannot find named service in list'.
+# Astonishingly slow. ~30s.
+# There is no select by name we can do on the server, have to retrieve all list and filter locally.
+# command="fastly service describe --service-name=$PLATFORM_PROJECT --json"
+command='curl -s -H "Fastly-Key: $FASTLY_TOKEN" https://api.fastly.com/service'
+log_info "Running: $command"
+fastly_services_json=$( eval $command ) || {
+    audit_report_result $check_id "ERROR" "" "Failed to fetch Fastly services list from API using command: $command"
+    exit $exit_access_error
+}
+log_trace "$fastly_services_json"
+
+log_info "Scanning JSON for service with name=$PLATFORM_PROJECT"
+if ! fastly_service_json=$(echo "$fastly_services_json" | jq -r --arg project "$PLATFORM_PROJECT" "map(select(.name == \"\$project\")) $jq_return_empty"); then
+    audit_report_result $check_id "ERROR" "$exit_content_error" "Failed to parse json response from API."
+    exit $exit_content_error
+fi
+
+log_trace "$fastly_service_json"
+
+# If the service of that name was found, extract its ID
+if [ -z "$fastly_service_json" ]; then
+    audit_report_result $check_id "ERROR" "$exit_content_error" "No Fastly service named '$PLATFORM_PROJECT' found in the list of services from Fastly API."
+    exit $exit_content_error
+fi
+
+log_debug "Found a service named '$PLATFORM_PROJECT'" | jq
+# Before logging, Discard the huge `versions` array to avoid clutter
+fastly_service_json=$(echo "$fastly_service_json" | jq 'del(.[0].versions)' )
+log_trace "$fastly_service_json" | jq
+FASTLY_SERVICE_ID=$(echo "$fastly_service_json" | jq -r '.[0].id');
+
+if [ -z "$FASTLY_SERVICE_ID"]   ]; then
+    audit_report_result $check_id "ERROR" "$exit_content_error" "Failed to extract Fastly service ID from the service JSON."
+    exit $exit_content_error
+fi
+
+audit_report_result $check_id "OK" "$FASTLY_SERVICE_ID"
+echo $FASTLY_SERVICE_ID;
+exit $exit_success;

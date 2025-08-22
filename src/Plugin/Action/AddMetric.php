@@ -69,7 +69,7 @@ class AddMetric extends ActionBase implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute($object = NULL) {
+  public function execute($object = NULL): void {
     /** @var NodeInterface $object */
     if ($object->getType() != 'project') {
       $this->messenger()
@@ -79,7 +79,6 @@ class AddMetric extends ActionBase implements ContainerFactoryPluginInterface {
 
     // Do it.
     $this->messenger()->addMessage($this->t('Open the add metric form'));
-    $this->context['results']['redirect_url'] = Url::fromRoute('metric.add_unknown_metric_to_project', ['project' => $object->id()]);
     $url = Url::fromRoute('metric.add_unknown_metric_to_project', ['project' => $object->id()]);
     $redirect = new RedirectResponse($url->toString());
     // Immediately sending here is ill-advised.
