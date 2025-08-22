@@ -166,7 +166,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     // Base fields - ID etc - are provided by the system if we ask for them
     // in the annotation by defining entity_keys.
     // This must be done explicitly for every subclass.
-    $fields = parent::baseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entityType);
 
     // The data model refers of the Drupal hook_requirements report model.
     // A "requirement" check returns a
@@ -332,7 +332,10 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   }
 
   /**
-   * Return either the given logger, the already attached logger, or a\n   * generic global one.
+   * Return the active logger.
+   *
+   * Either the already attached logger, or a
+   * generic global one.
    *
    * @param \Psr\Log\LoggerInterface|null $logger
    *   An optional logger instance.

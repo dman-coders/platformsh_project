@@ -108,10 +108,9 @@ class CheckCommand extends Command {
   }
 
   /**
-   * Map the return codes from the Check class to the Symfony Command\n   *
-   * status codes.
+   * Map return codes to the Symfony Command status codes.
    *
-   * These are mostly identical (0,1,2) but the Check class has an additional
+   * These are mostly identical (0,1,2), but the Check class has an additional
    * status code for "Not Applicable".
    *
    * @param int $status

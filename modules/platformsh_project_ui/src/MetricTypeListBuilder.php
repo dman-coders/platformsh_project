@@ -41,8 +41,9 @@ class MetricTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    *
-   * This lists the metric types that are returned by ::load() in MetricController.
-   * a query that returns entities where entityTypeId='metric_type'
+   * This lists the metric types that are returned
+   * by ::load() in MetricController.
+   * A query that returns entities where entityTypeId='metric_type'
    */
   public function render() {
     $build = parent::render();

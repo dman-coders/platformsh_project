@@ -52,11 +52,12 @@ class AddMetricForm extends FormBase {
     FormStateInterface $form_state,
     ?NodeInterface $project = NULL,
     ?MetricType $metric_type = NULL,
-  ) {
+  ): array {
     $form['#title'] = $this->t('Add a Metric');
 
     // This form may be called with an owning entity (a project node)
-    // already chosen. This info should be retained and used to populate the data.
+    // already chosen. This info should be retained and used to populate
+    // the data.
     // Store the node ID in the form's state.
     $form_state->set('node_id', $project->id());
 
@@ -83,7 +84,7 @@ class AddMetricForm extends FormBase {
     // Return $form;.
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $submit_label,
+      '#value' => t("Submit"),
       '#button_type' => 'primary',
     ];
     return $form;

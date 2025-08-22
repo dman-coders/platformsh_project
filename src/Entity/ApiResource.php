@@ -22,14 +22,18 @@ abstract class ApiResource extends Node {
   // to it. Basically reflects the content data model that we care about.
 
   /**
-   * Fields that get copied directly from the remote object into local field\n   * storage as-is.
+   * Fields that get copied directly from the remote object.
+   *
+   * They get stored into local field storage as-is.
    *
    * @var string[]
    */
   protected array $fieldKeys = [];
 
   /**
-   * Fields that are GUID references, and need to be set to refer to other\n   * entities.
+   * Fields that are GUID references.
+   *
+   * These need to be set to refer to other entities.
    *
    * This maps a local object type (like 'User')
    * against the remote field name (like `owner`)
@@ -246,8 +250,8 @@ abstract class ApiResource extends Node {
     $updated += $this->alterData($resource);
     $updated += $this->autocreateTargetEntities($raw_dump);
 
-    // $node->set('field_' . 'updated_at' , $response->getData()['updated_at']);
-    // Take care, as this action may be called on hook_entity_presave.\n    // Avoid a loop.
+    // Take care, as this action may be called on hook_entity_presave.
+    // Avoid a loop.
     if (!empty($updated) && !$this->isNew()) {
       try {
         $this->save();
@@ -263,7 +267,7 @@ abstract class ApiResource extends Node {
   }
 
   /**
-   * For each external entity that a Project refers to, ensure the named\n   * target exists.
+   * For each external entity, ensure the named target exists.
    *
    * We have a list of `referenceKeys`, eg 'owner'.
    * If this resources data contains a value for `owner`, this will be a GUID.
@@ -308,7 +312,6 @@ abstract class ApiResource extends Node {
         $target_info = ['target_id' => $target->id()];
         if ($this->get('field_' . $key_name) != $target->id()) {
           $updated['field_' . $key_name] = TRUE;
-          // @todo check this logic
         }
         $this->set('field_' . $key_name, $target_info);
       }
@@ -334,7 +337,9 @@ abstract class ApiResource extends Node {
    */
   private function autocreateTargetEntity(string $entityTypeId, array $values) {
     $this->messenger()
-      ->addStatus("Auto-creating an {$values['bundle']} called {$values['field_id']}");
+      ->addStatus(
+        "Auto-creating an {$values['bundle']} called {$values['field_id']}"
+      );
     $entity = \Drupal::entityTypeManager()
       ->getStorage($entityTypeId)
       ->create($values);
