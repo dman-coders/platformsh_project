@@ -4,25 +4,25 @@ use Drupal\Core\Entity\ContentEntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- *
+ * Form for selecting metric types.
  */
 class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'metric_type_select';
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $node_id = NULL) {
+  public function buildForm(array $form, FormStateInterface $formState, $nodeId = NULL) {
     $form['#title'] = $this->t('Choose the type of metric');
 
     // Store the node ID in the form's state.
-    $form_state->set('node_id', $node_id);
+    $formState->set('node_id', $nodeId);
 
     // List all available metric types.
     $bundleInfo = Drupal::service('entity_type.bundle.info')
@@ -43,14 +43,14 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $formState) {
     // Get the node ID from the form's state.
-    $node_id = $form_state->get('node_id');
+    $nodeId = $formState->get('node_id');
 
     // Get the bundle value from the form's state.
-    $metric_type = $form_state->getValue('metric_type');
+    $metricType = $formState->getValue('metric_type');
 
     // Do something with the node ID and bundle.
     // For example, create a new entity of the selected bundle type.

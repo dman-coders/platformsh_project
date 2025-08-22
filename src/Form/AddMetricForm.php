@@ -24,7 +24,7 @@ use Drupal\platformsh_project\Entity\MetricType;
 class AddMetricForm extends FormBase {
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function getFormId(): string {
     return 'add_metric_action_form';

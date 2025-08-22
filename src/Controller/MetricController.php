@@ -49,7 +49,7 @@ class MetricController extends EntityController {
     $bundle_entity_type_id = $entity_type->getBundleEntityType();
 
     // Find the current target project - what was the `project` ID in
-    //  path: '/node/{project}/metric/add'.
+    // path: '/node/{project}/metric/add'.
     /** @var \Drupal\Core\Routing\RouteMatchInterface $route_match */
     $route_match = \Drupal::routeMatch();
     /** @var \Drupal\node\NodeInterface $node */

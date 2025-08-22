@@ -23,38 +23,46 @@ use Drupal\platformsh_project\Entity\MetricType;
 class MetricForm extends ContentEntityForm {
 
   /**
+   * {@inheritdoc}
+   *
    * @param array $form
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $formState
+   *   The form state.
    * @param \Drupal\node\NodeInterface|null $project
-   * @param \Drupal\platformsh_project\Entity\MetricType|null $metric_type
+   *   The project node, if any.
+   * @param \Drupal\platformsh_project\Entity\MetricType|null $metricType
+   *   The metric type, if any.
    *
    * @return array
+   *   The form array.
+   *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-   * @throws \exception
+   * @throws \Exception
    */
   public function buildForm(
     array $form,
-    FormStateInterface $form_state,
+    FormStateInterface $formState,
     ?NodeInterface $project = NULL,
-    ?MetricType $metric_type = NULL,
+    ?MetricType $metricType = NULL,
   ): array {
     // Need to create a dummy entity if it's not already done.
     // When we 'add metric' through the usual forms, magic happens to prepare that.
     // If this form is being called from a custom context,
     // I need to fill in some context for contentEntityForm requirements.
     if (empty($this->entity)) {
-      throw new \exception('Pretty sure we should no longer hit the case where an entity form is being built without a placeholder entity being instantiated. If this logic is never hit, then this chunk should be removed.');
+      throw new \Exception('Pretty sure we should no longer hit the case where an entity form is being built without a placeholder entity being instantiated. If this logic is never hit, then this chunk should be removed.');
       // Emulate:
-      // $entity = $this->getEntityFromRouteMatch($route_match, $metric_type->id());
+      // $entity = $this->getEntityFromRouteMatch($route_match, $metricType->id());
       // Instantiate a new metric entity of the requested type.
-      $entity_type_id = 'metric';
-      $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
+      $entityTypeId = 'metric';
+      $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
       // 'bundle'
-      $bundle_key = $entity_type->getKey('bundle');
+      $bundleKey = $entityType->getKey('bundle');
       $values = [];
-      $values[$bundle_key] = $metric_type->id();
-      $entity = $this->entityTypeManager->getStorage($entity_type_id)
+      $values[$bundleKey] = $metricType->id();
+      $entity = $this->entityTypeManager->getStorage($entityTypeId)
         ->create($values);
       $this->setEntity($entity);
     }
@@ -66,20 +74,22 @@ class MetricForm extends ContentEntityForm {
       $this->entity->set('target', $project);
     }
 
-    $form = parent::buildForm($form, $form_state);
+    $form = parent::buildForm($form, $formState);
 
     // This form may be called with the desired metric type already defined.
     // Pre-fill that selection.
-    if ($metric_type) {
-      $form['metric_type']['#default_value'] = $metric_type->id();
+    if ($metricType) {
+      $form['metric_type']['#default_value'] = $metricType->id();
       if (!empty($project)) {
         $form['#title'] = $this->t('Add a @label metric to @project project', [
-          '@label' => $metric_type->get('label'),
+          '@label' => $metricType->get('label'),
           '@project' => $project->getTitle(),
         ]);
       }
       else {
-        $form['#title'] = $this->t('Add a @label metric', ['@label' => $metric_type->get('label')]);
+        $form['#title'] = $this->t('Add a @label metric', [
+          '@label' => $metricType->get('label'),
+        ]);
       }
     }
 
@@ -94,13 +104,13 @@ class MetricForm extends ContentEntityForm {
    *
    * @throws \Drupal\Core\Entity\EntityMalformedException
    */
-  public function save(array $form, FormStateInterface $form_state): int {
-    $result = parent::save($form, $form_state);
+  public function save(array $form, FormStateInterface $formState): int {
+    $result = parent::save($form, $formState);
 
     $entity = $this->getEntity();
 
-    $message_arguments = ['%label' => $entity->toLink()->toString()];
-    $logger_arguments = [
+    $messageArguments = ['%label' => $entity->toLink()->toString()];
+    $loggerArguments = [
       '%label' => $entity->label(),
       'link' => $entity->toLink($this->t('View'))->toString(),
     ];
@@ -108,20 +118,20 @@ class MetricForm extends ContentEntityForm {
     switch ($result) {
       case SAVED_NEW:
         $this->messenger()
-          ->addStatus($this->t('New platformsh metric %label has been created.', $message_arguments));
+          ->addStatus($this->t('New platformsh metric %label has been created.', $messageArguments));
         $this->logger('platformsh_project')
-          ->notice('Created new platformsh metric %label', $logger_arguments);
+          ->notice('Created new platformsh metric %label', $loggerArguments);
         break;
 
       case SAVED_UPDATED:
         $this->messenger()
-          ->addStatus($this->t('The platformsh metric %label has been updated.', $message_arguments));
+          ->addStatus($this->t('The platformsh metric %label has been updated.', $messageArguments));
         $this->logger('platformsh_project')
-          ->notice('Updated platformsh metric %label.', $logger_arguments);
+          ->notice('Updated platformsh metric %label.', $loggerArguments);
         break;
     }
 
-    $form_state->setRedirect('entity.metric.canonical', ['metric' => $entity->id()]);
+    $formState->setRedirect('entity.metric.canonical', ['metric' => $entity->id()]);
 
     return $result;
   }

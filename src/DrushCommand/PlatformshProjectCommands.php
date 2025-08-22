@@ -174,6 +174,7 @@ class PlatformshProjectCommands extends DrushCommands {
 
   /**
    * Attempt to reset the entity fields to factory settings.
+   *
    * Scaffolding function.
    *
    * @command platformsh:reset-fields

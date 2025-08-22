@@ -17,9 +17,9 @@ use Psr\Log\LoggerInterface;
  */
 abstract class Check {
 
-  const name = "Check";
+  const NAME = "Check";
 
-  const description = "This is a check";
+  const DESCRIPTION = "This is a check";
 
   const OK = 0;
 
@@ -30,42 +30,63 @@ abstract class Check {
   const NA = 3;
 
   /**
+   * Get the name of this check.
    *
+   * @return string
+   *   The check name.
    */
   public function getName(): string {
-    return static::name;
+    return static::NAME;
   }
 
   /**
+   * Get a logger instance.
    *
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   An optional logger instance.
+   *
+   * @return \Psr\Log\LoggerInterface
+   *   A logger instance.
    */
   public static function getLogger($logger): LoggerInterface {
     return $logger ?? \Drupal::logger('platformsh_project.checks');
   }
 
   /**
-   * @param array $args
-   * @param string|object $result
-   *   reference to the result data.
-   * @param \Psr\Log\LoggerInterface|null $logger
-   *   reference to a logger interface.
+   * Execute the check.
    *
-   * @return int The status code (OK, ERROR, NOTICE, or NA)
+   * @param array $args
+   *   The arguments for the check.
+   * @param string|object $result
+   *   Reference to the result data.
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   Reference to a logger interface.
+   *
+   * @return int
+   *   The status code (OK, ERROR, NOTICE, or NA).
    */
   abstract public static function execute(array $args, string|object &$result, ?LoggerInterface &$logger = NULL): int;
 
   /**
+   * Execute the check and return JSON result.
    *
+   * @param array $args
+   *   The arguments for the check.
+   * @param int|null $status
+   *   Reference to store the status code.
+   *
+   * @return string
+   *   The JSON-encoded result.
    */
-  public static function execute_as_json($args, &$status = NULL): string {
-    $raw_result = '';
-    $status = self::execute($args, $raw_result);
-    $struct_result = [
-      'check' => static::name,
+  public static function executeAsJson($args, &$status = NULL): string {
+    $rawResult = '';
+    $status = self::execute($args, $rawResult);
+    $structResult = [
+      'check' => static::NAME,
       'args' => $args,
-      'result' => $raw_result,
+      'result' => $rawResult,
     ];
-    return json_encode($struct_result);
+    return json_encode($structResult);
   }
 
 }

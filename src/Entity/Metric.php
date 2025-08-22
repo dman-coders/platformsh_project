@@ -107,7 +107,7 @@ use Psr\Log\LoggerInterface;
 class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 
   use EntityChangedTrait;
-  use LoggerChannelTrait;
+  use Drupal\Core\Logger\LoggerChannelTrait;
 
   const REQUIREMENT_INFO = -1;
 
@@ -127,11 +127,25 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     self::REQUIREMENT_INVALID => 'Invalid',
   ];
 
+  /**
+   * The project this metric belongs to.
+   *
+   * @var \Drupal\platformsh_project\Entity\Project
+   */
   public Project $project;
+
+  /**
+   * The logger service.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
   public LoggerInterface $logger;
 
   /**
    * Get the human-readable status description.
+   *
+   * @param int|null $status
+   *   The status code, or NULL to use the current status.
    *
    * @return string
    *   The status description.
@@ -144,7 +158,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     // Base fields are attached directly to the main entity table
     // as additional columns, like a traditional db schema
     // Base fields are not referred to as `field_data` style lookups
@@ -297,7 +311,8 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    *
    * Commonly used by several metrics.
    *
-   * @return Project
+   * @return \Drupal\platformsh_project\Entity\Project
+   *   The project entity.
    *
    * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
@@ -314,13 +329,13 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   }
 
   /**
-   * Return either the given logger,
-   * the already attached logger,
-   * or a generic global one.
+   * Return either the given logger, the already attached logger, or a generic global one.
    *
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   An optional logger instance.
    *
    * @return \Psr\Log\LoggerInterface
+   *   The logger instance.
    */
   protected function getLogger($logger = NULL): LoggerInterface {
     if ($logger) {
@@ -335,14 +350,17 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   }
 
   /**
+   * Get the label for this metric.
    *
+   * @return string
+   *   The metric label.
    */
   public function label(): string {
     return "Un-named Metric";
   }
 
   /**
-   *
+   * Refresh this metric.
    */
   public function refresh() {
     $this

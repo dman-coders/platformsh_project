@@ -12,16 +12,30 @@ class User extends ApiResource {
   /**
    * Custom behavior here.
    */
-  protected array $field_keys = ['country', 'first_name', 'last_name'];
-
-  protected array $reference_keys = [];
-
-  protected string $title_key = 'username';
+  protected array $fieldKeys = ['country', 'first_name', 'last_name'];
 
   /**
-   * @param $remoteEntityID
+   * Reference keys for this entity.
    *
-   * @return false|\Platformsh\Client\Model\user
+   * @var array
+   */
+  protected array $referenceKeys = [];
+
+  /**
+   * The title key for this entity.
+   *
+   * @var string
+   */
+  protected string $titleKey = 'username';
+
+  /**
+   * Get the Platform.sh API user.
+   *
+   * @param string $remoteEntityID
+   *   The remote entity ID.
+   *
+   * @return \\Platformsh\\Client\\Model\\ApiResourceBase|false
+   *   The API resource or FALSE on failure.
    */
   public function getResource($remoteEntityID): bool|ApiResourceBase {
     return $this->getApiClient()->getUser($remoteEntityID);

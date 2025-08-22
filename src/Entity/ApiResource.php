@@ -18,42 +18,55 @@ abstract class ApiResource extends Node {
 
   use MessengerTrait;
 
-  // Static properties that each subclass should define to say what is special to it.
-  // Basically reflects the content data model that we care about.
+  // Static properties that each subclass should define to say what is special
+  // to it. Basically reflects the content data model that we care about.
 
   /**
+   * Fields that get copied directly from the remote object into local field storage as-is.
+   *
    * @var string[]
-   * Fields that get copied directly from the remote object into local field
-   *   storage as-is
    */
-  protected array $field_keys = [];
+  protected array $fieldKeys = [];
 
   /**
-   * @var string[]
-   * Fields that are GUID references, and need to be set to refer to other
-   *   entities
+   * Fields that are GUID references, and need to be set to refer to other entities.
    *
    * This maps a local object type (like 'User')
    * against the remote field name (like `owner`)
    * to state the rule that:
    * the value of the 'owner' field
    * becomes a reference to a "User" object.
+   *
+   * @var string[]
    */
-  protected array $reference_keys = [];
+  protected array $referenceKeys = [];
 
   /**
-   * @var string
    * What is the key that should be used as the title of this object?
+   *
+   * @var string
    */
-  protected string $title_key = 'title';
+  protected string $titleKey = 'title';
 
   /**
-   * Active properties.
+   * The API service.
+   *
+   * @var \Drupal\platformsh_api\ApiService
    */
-  protected ApiService $api_service;
+  protected ApiService $apiService;
 
-  protected PlatformClient $api_client;
+  /**
+   * The Platform.sh API client.
+   *
+   * @var \Platformsh\Client\PlatformClient
+   */
+  protected PlatformClient $apiClient;
 
+  /**
+   * The remote entity ID.
+   *
+   * @var string
+   */
   protected string $remoteEntityID;
 
   /**
@@ -62,7 +75,11 @@ abstract class ApiResource extends Node {
    * This is expected to be overridden by the subclass to match the
    * \Platformsh\Client methods.
    *
+   * @param string $remoteEntityID
+   *   The remote entity ID.
+   *
    * @return \Platformsh\Client\Model\ApiResourceBase|false
+   *   The API resource or FALSE on failure.
    *
    * @see ApiResourceBase::get
    */
@@ -76,34 +93,39 @@ abstract class ApiResource extends Node {
    * This is expected to be overridden by the subclass if extra
    * if/then logic is needed.
    *
-   * @param $raw_data
+   * @param array $rawData
+   *   The raw data from the API.
    *
-   * @return mixed
+   * @return array
+   *   The altered data.
    */
-  protected function alterKeys($raw_data) {
-    return $raw_data;
+  protected function alterKeys(array $rawData): array {
+    return $rawData;
   }
 
   /**
    * Localised extra data processing to run during refreshFromAPI.
    *
-   * @param ApiResource $resource
+   * @param \Platformsh\Client\Model\ApiResourceBase $resource
+   *   The API resource.
    *
-   * @return mixed
+   * @return array
+   *   Array of updated fields.
    */
-  protected function alterData($resource) {
-    return $raw_data;
+  protected function alterData($resource): array {
+    return [];
   }
 
   /**
-   * Utility.
+   * Get the Platform.sh API client.
    *
    * @return \Platformsh\Client\PlatformClient
+   *   The API client.
    */
-  protected function getApiClient() {
-    $this->api_service = \Drupal::service('platformsh_api.fetcher');
-    $this->api_client = $this->api_service->getApiClient();
-    return $this->api_client;
+  protected function getApiClient(): PlatformClient {
+    $this->apiService = \Drupal::service('platformsh_api.fetcher');
+    $this->apiClient = $this->apiService->getApiClient();
+    return $this->apiClient;
   }
 
   /**
@@ -117,11 +139,12 @@ abstract class ApiResource extends Node {
    * Anything that is unique to a model can be in its own
    * corresponding class.
    *
-   * @return bool success
+   * @return bool
+   *   TRUE on success, FALSE on failure.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function refreshFromAPI(): bool {
+  public function refreshFromApi(): bool {
     // Everything hinges on the field_id, which must be set by now.
     $remoteEntityID = $this->get('field_id')->value;
     if (empty($remoteEntityID)) {
@@ -172,15 +195,15 @@ abstract class ApiResource extends Node {
     $this->messenger()->addStatus($json_dump);
 
     try {
-      if ($this->getTitle() != $resource->getProperty($this->title_key)) {
-        $this->setTitle($resource->getProperty($this->title_key));
+      if ($this->getTitle() != $resource->getProperty($this->titleKey)) {
+        $this->setTitle($resource->getProperty($this->titleKey));
         $updated['title'] = TRUE;
       }
     }
     catch (\Exception $e) {
       // This should never happen, but it did, so...
       $this->messenger()
-        ->addError("Resource doesn't have a " . $this->title_key . " property");
+        ->addError("Resource doesn't have a " . $this->titleKey . " property");
       $this->messenger()->addError(print_r($resource->getPropertyNames(), 1));
     }
 
@@ -193,12 +216,12 @@ abstract class ApiResource extends Node {
     }
 
     // There may be special cases that the class needs to deal with.
-    $this->alterKeys($raw_dump);
+    $raw_dump = $this->alterKeys($raw_dump);
 
     // Now set the values we extracted.
-    // field_keys and reference_keys are the field mapping rules
+    // fieldKeys and referenceKeys are the field mapping rules
     // for converting between the object from the API and the local storage model.
-    foreach ($this->field_keys as $key_name) {
+    foreach ($this->fieldKeys as $key_name) {
       $field_name = 'field_' . $key_name;
       if (
         isset($raw_dump[$key_name])
@@ -239,46 +262,45 @@ abstract class ApiResource extends Node {
   }
 
   /**
-   * For each external entity that a Project refers to,
-   * Ensure the named target exists, creating it if necessary.
+   * For each external entity that a Project refers to, ensure the named target exists.
    *
-   * We have a list of `reference_keys`, eg 'owner'.
-   * If this resources data contains avalue for `owner`, this will be a GUID.
+   * We have a list of `referenceKeys`, eg 'owner'.
+   * If this resources data contains a value for `owner`, this will be a GUID.
    * We need to see if we already recognise that GUID, and if so, link to it.
    * If not, create a placeholder for it, and link to that.
    *
-   * @var \Drupal\node\Entity\NodeInterface $node
+   * @param array $rawData
+   *   The raw data from the API.
    *
-   * @param array $raw_data
-   *
-   * @return array A list of what, if anything, was updated.
+   * @return array
+   *   A list of what, if anything, was updated.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function autocreateTargetEntities(array $raw_data): array {
+  public function autocreateTargetEntities(array $rawData): array {
     $updated = [];
     // References need extra help.
-    foreach ($this->reference_keys as $key_type => $key_name) {
+    foreach ($this->referenceKeys as $key_type => $key_name) {
       /** @var \Drupal\Core\Field\FieldItemListInterface $value */
-      $target_guid = $raw_data[$key_name];
+      $target_guid = $rawData[$key_name];
       if (empty($target_guid)) {
         continue;
       }
 
       // Fetch or create the target first.
-      $target = $this->api_service::getEntityById($target_guid);
+      $target = $this->apiService::getEntityById($target_guid);
 
       if (empty($target)) {
         // Attempt auto create.
-        $entity_type_id = 'node';
-        $target_data = [
+        $entityTypeId = 'node';
+        $targetData = [
           // it's aliased as 'type'. yay.
           'bundle' => $key_type,
           'type' => $key_type,
           'title' => $target_guid,
           'field_id' => $target_guid,
         ];
-        $target = $this->autocreateTargetEntity($entity_type_id, $target_data);
+        $target = $this->autocreateTargetEntity($entityTypeId, $targetData);
       }
 
       if (!empty($target)) {
@@ -299,18 +321,21 @@ abstract class ApiResource extends Node {
   /**
    * Create a new node entity of the requested type.
    *
-   * @param string $entity_type_id
+   * @param string $entityTypeId
+   *   The entity type ID.
    * @param array $values
+   *   The values for the new entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   The created entity.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  private function autocreateTargetEntity(string $entity_type_id, array $values) {
+  private function autocreateTargetEntity(string $entityTypeId, array $values) {
     $this->messenger()
-      ->addStatus("Auto-creating an {{values['bundle']} called {$values['field_id']}");
+      ->addStatus("Auto-creating an {$values['bundle']} called {$values['field_id']}");
     $entity = \Drupal::entityTypeManager()
-      ->getStorage($entity_type_id)
+      ->getStorage($entityTypeId)
       ->create($values);
     $entity->save();
     return $entity;

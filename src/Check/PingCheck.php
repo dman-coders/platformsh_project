@@ -12,20 +12,24 @@ use Psr\Log\NullLogger;
  */
 class PingCheck extends Check {
 
-  const name = "PingCheck";
+  const NAME = "PingCheck";
 
-  const description = "Does an URL respond without error?";
+  const DESCRIPTION = "Does an URL respond without error?";
 
-  const expected_arguments = ['url'];
+  const EXPECTED_ARGUMENTS = ['url'];
 
   /**
    * Execute the check.
    *
    * @param array $args
    *   The arguments to the check.
+   * @param string|object $result
+   *   Reference to the result data.
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   Reference to a logger interface.
    *
-   * @return string
-   *   The result of the check
+   * @return int
+   *   The status code.
    */
   public static function execute(array $args, string|object &$result, ?LoggerInterface &$logger = NULL): int {
     $logger = $logger ?? new NullLogger();

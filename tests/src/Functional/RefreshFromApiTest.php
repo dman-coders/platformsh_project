@@ -12,11 +12,13 @@ use Drupal\Tests\platformsh_api\Functional\PlatformshBrowserTestBase;
 class RefreshFromApiTest extends PlatformshBrowserTestBase {
 
   /**
-   * @var bool
    * For reasons that are not my fault?
+   *
    * In a testing context, the `system.action` config entities (from core)
    * are not defined and throw a "missing schema" fatal error during the
    * module install process where the `config/install` yamls are being read.
+   *
+   * @var bool
    * > core testing base classes add a config schema checker during testing.
    *
    * Normal module installation with normal dependency resolution works fine,

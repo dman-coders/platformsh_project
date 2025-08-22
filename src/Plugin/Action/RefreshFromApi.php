@@ -46,20 +46,28 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterface {
 
-  private ApiService $api_service;
+  /**
+   * The API service.
+   *
+   * @var \Drupal\platformsh_api\ApiService
+   */
+  private ApiService $apiService;
 
   /**
+   * Constructs a RefreshFromApi action.
+   *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
+   * @param string $pluginId
    *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
+   * @param mixed $pluginDefinition
    *   The plugin implementation definition.
-   * @param \Drupal\platformsh_api\ApiService $api_service
+   * @param \Drupal\platformsh_api\ApiService $apiService
+   *   The API service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->api_service = $api_service;
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, ApiService $apiService) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->apiService = $apiService;
   }
 
   /**
@@ -85,8 +93,9 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   }
 
   /**
-   * Tell the given target entity to refreshFromAPI() itself,
-   * if that method is implemented.
+   * Tell the given target entity to refreshFromAPI() itself.
+   *
+   * If that method is implemented.
    *
    * {@inheritdoc}
    */

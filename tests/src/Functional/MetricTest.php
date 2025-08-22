@@ -20,12 +20,27 @@ class MetricTest extends BrowserTestBase {
    */
   protected $user;
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
   protected static $modules = [
     'platformsh_project',
   ];
 
+  /**
+   * The installation profile to use.
+   *
+   * @var string
+   */
   protected $profile = 'minimal';
 
+  /**
+   * The default theme to use.
+   *
+   * @var string
+   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -59,7 +74,7 @@ class MetricTest extends BrowserTestBase {
   /**
    * Tests UI buttons and routes around metric management.
    */
-  public function testMetricUI() {
+  public function testMetricUi() {
     // Add a metric using the UI form.
     $web_user = $this->drupalCreateUser(['administer metrics']);
     $this->drupalLogin($web_user);

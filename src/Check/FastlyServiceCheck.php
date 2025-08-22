@@ -10,19 +10,22 @@ use Psr\Log\LoggerInterface;
  */
 class FastlyServiceCheck extends Check {
 
-  const name = "FastlyServiceCheck";
-  const description = "Does the project have a Fastly service?";
-  const expected_arguments = ['PLATFORM_PROJECT', 'PLATFORM_CLI'];
+  const NAME = "FastlyServiceCheck";
+  const DESCRIPTION = "Does the project have a Fastly service?";
+  const EXPECTED_ARGUMENTS = ['PLATFORM_PROJECT', 'PLATFORM_CLI'];
 
   /**
    * Execute the check.
    *
    * @param array $args
    *   The arguments to the check.
+   * @param string|object $result
+   *   Reference to the result data.
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   Reference to a logger interface.
    *
    * @return int
-   *   The status result of the check. Further info can be retained in the
-   *   $result.
+   *   The status result of the check.
    */
   public static function execute(array $args, string|object &$result, ?LoggerInterface &$logger = NULL): int {
     $logger = self::getLogger($logger);

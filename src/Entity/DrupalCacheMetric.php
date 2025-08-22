@@ -8,7 +8,7 @@ namespace Drupal\platformsh_project\Entity;
 class DrupalCacheMetric extends Metric {
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function label(): string {
     return "Cache review";
@@ -17,30 +17,29 @@ class DrupalCacheMetric extends Metric {
   /**
    * Probe the project and check the cache settings.
    *
-   * @return void
-   *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function refresh() {
-    $environment_test_url = $this->getProject()->getUrl();
-    $response_headers = $this->getResponseHeaders($environment_test_url);
+    $environmentTestUrl = $this->getProject()->getUrl();
+    $responseHeaders = $this->getResponseHeaders($environmentTestUrl);
 
     // Responses are exploded by comma, but not key-value tagged.
     //
     // array (
-    //  'Cache-Control' => [
-    //    0 => 'max-age=604800'
-    //  ],
+    // 'Cache-Control' => [
+    // 0 => 'max-age=604800'
+    // ],
     // )
-    foreach ($response_headers as $major_key => $major_value_list) {
+    foreach ($responseHeaders as $majorKey => $majorValueList) {
+      // Process headers as needed.
     }
 
     // un-cook the response back into text.
-    $response_headers_string = '';
-    foreach ($response_headers as $name => $values) {
-      $response_headers_string .= $name . ': ' . implode(', ', $values) . "\r\n";
+    $responseHeadersString = '';
+    foreach ($responseHeaders as $name => $values) {
+      $responseHeadersString .= $name . ': ' . implode(', ', $values) . "\r\n";
     }
-    $this->set('field_response_header', $response_headers_string);
+    $this->set('field_response_header', $responseHeadersString);
 
     // Summarize.
     $report = [];
@@ -81,11 +80,14 @@ class DrupalCacheMetric extends Metric {
 
   /**
    * No built-in way to pull headers out of an http request?
-   * do it via stackoverflow methods
    *
-   * @param $url
+   * Do it via stackoverflow methods.
+   *
+   * @param string $url
+   *   The URL to check.
    *
    * @return array
+   *   The response headers.
    */
   private function getResponseHeaders($url) {
     /** @var \GuzzleHttp\Client $client */

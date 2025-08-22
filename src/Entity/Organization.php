@@ -7,16 +7,35 @@ namespace Drupal\platformsh_project\Entity;
  */
 class Organization extends ApiResource {
 
-  protected array $field_keys = [];
-
-  protected array $reference_keys = [];
-
-  protected string $title_key = 'name';
+  /**
+   * Field keys for this entity.
+   *
+   * @var array
+   */
+  protected array $fieldKeys = [];
 
   /**
-   * @param $remoteEntityID
+   * Reference keys for this entity.
    *
-   * @return false|\Platformsh\Client\Model\Organization
+   * @var array
+   */
+  protected array $referenceKeys = [];
+
+  /**
+   * The title key for this entity.
+   *
+   * @var string
+   */
+  protected string $titleKey = 'name';
+
+  /**
+   * Get the Platform.sh API organization.
+   *
+   * @param string $remoteEntityID
+   *   The remote entity ID.
+   *
+   * @return bool
+   *   Always FALSE as API doesn't support organization retrieval yet.
    */
   public function getResource($remoteEntityID): bool {
     return FALSE;

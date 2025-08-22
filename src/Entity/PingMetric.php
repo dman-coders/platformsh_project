@@ -14,21 +14,21 @@ use Drupal\platformsh_project\Check\PingCheck;
 class PingMetric extends Metric {
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function label(): string {
     return "A ping";
   }
 
   /**
-   *
+   * Refresh this metric.
    */
   public function refresh() {
     $url = $this->getProject()->getUrl();
     $status = NULL;
     $response = PingCheck::execute(['url' => $url], $status);
     $this->set('data', $response)
-      ->set('note', "pinged $url " . "\n" . date("Y-m-d H:i:s") . "\n" . $response)
+      ->set('note', "pinged $url\n" . date("Y-m-d H:i:s") . "\n" . $response)
       ->set('status', $status)
       ->save();
   }

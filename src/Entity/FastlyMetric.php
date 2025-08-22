@@ -14,14 +14,14 @@ use Drupal\platformsh_project\Check\FastlyServiceCheck;
 class FastlyMetric extends Metric {
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function label(): string {
     return "Fastly check";
   }
 
   /**
-   *
+   * Refresh this metric.
    */
   public function refresh() {
     // Check for the existence of a Fastly service for this project.
@@ -33,7 +33,7 @@ class FastlyMetric extends Metric {
     $this
       ->set('status', $status)
       ->set('data', $result)
-      ->set('note', "Checked Fastly Account. Response:" . "\n" . $result)
+      ->set('note', "Checked Fastly Account. Response:\n" . $result)
       ->save();
   }
 
