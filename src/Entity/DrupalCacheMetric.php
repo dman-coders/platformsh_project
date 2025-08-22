@@ -1,27 +1,16 @@
-<?php /** @noinspection PhpUnreachableStatementInspection */
-
-/** @noinspection PhpUnreachableStatementInspection */
+<?php
 
 namespace Drupal\platformsh_project\Entity;
 
-use Drupal;
-use Drupal\Core\Entity\Annotation\ContentEntityType;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
-use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
-
 /**
  * A metric entity that checks the state of Drupal page cache and TTL.
- *
  */
 class DrupalCacheMetric extends Metric {
 
   /**
    *
    */
-  public function label(): string  {
+  public function label(): string {
     return "Cache review";
   }
 
@@ -30,7 +19,7 @@ class DrupalCacheMetric extends Metric {
    *
    * @return void
    *
-   * @throws EntityStorageException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function refresh() {
     $environment_test_url = $this->getProject()->getUrl();
@@ -99,9 +88,9 @@ class DrupalCacheMetric extends Metric {
    * @return array
    */
   private function getResponseHeaders($url) {
-    /** @var Client $client */
-    /** @var ResponseInterface $response */
-    $response = Drupal::httpClient()->request('GET', $url);
+    /** @var \GuzzleHttp\Client $client */
+    /** @var \Psr\Http\Message\ResponseInterface $response */
+    $response = \Drupal::httpClient()->request('GET', $url);
     $statusCode = $response->getStatusCode();
     return $response->getHeaders();
   }

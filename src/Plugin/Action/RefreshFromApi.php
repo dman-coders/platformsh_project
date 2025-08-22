@@ -6,7 +6,6 @@ use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\node\NodeInterface;
 use Drupal\platformsh_api\ApiService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -56,7 +55,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param ApiService $api_service
+   * @param \Drupal\platformsh_api\ApiService $api_service
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ApiService $api_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -78,8 +77,8 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
-    /** @var NodeInterface $object */
+  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
+    /** @var \Drupal\node\NodeInterface $object */
     $access = $object->access('update', $account, TRUE)
       ->andIf($object->get('title')->access('edit', $account, TRUE));
     return $return_as_object ? $access : $access->isAllowed();
@@ -92,7 +91,7 @@ class RefreshFromApi extends ActionBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public function execute($object = NULL) {
-    /** @var NodeInterface $object * */
+    /** @var \Drupal\node\NodeInterface $object * */
     if (method_exists($object, 'refreshFromAPI')) {
       return $object->refreshFromAPI();
     }

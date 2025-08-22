@@ -5,7 +5,6 @@ namespace Drupal\Tests\platformsh_project\Functional;
 use Drupal\platformsh_project\Entity\Metric;
 use Drupal\platformsh_project\Entity\NoteMetric;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\user\Entity\User;
 
 /**
  * Tests the Metric entity.
@@ -17,7 +16,7 @@ class MetricTest extends BrowserTestBase {
   /**
    * The user to use during the test.
    *
-   * @var User
+   * @var \Drupal\user\Entity\User
    */
   protected $user;
 

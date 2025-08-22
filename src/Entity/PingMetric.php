@@ -2,9 +2,6 @@
 
 namespace Drupal\platformsh_project\Entity;
 
-use Drupal\Core\Entity\Annotation\ContentEntityType;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\platformsh_project\Check\PingCheck;
 
 /**
@@ -19,7 +16,7 @@ class PingMetric extends Metric {
   /**
    *
    */
-  public function label(): string  {
+  public function label(): string {
     return "A ping";
   }
 
@@ -30,7 +27,7 @@ class PingMetric extends Metric {
     $url = $this->getProject()->getUrl();
     $status = NULL;
     $response = PingCheck::execute(['url' => $url], $status);
-    $this->set('data', $response )
+    $this->set('data', $response)
       ->set('note', "pinged $url " . "\n" . date("Y-m-d H:i:s") . "\n" . $response)
       ->set('status', $status)
       ->save();

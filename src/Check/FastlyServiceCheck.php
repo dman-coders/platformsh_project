@@ -2,10 +2,8 @@
 
 namespace Drupal\platformsh_project\Check;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 /**
  * Check if there is a fastly service for this project.
@@ -20,13 +18,13 @@ class FastlyServiceCheck extends Check {
    * Execute the check.
    *
    * @param array $args
-   *   The arguments to the check
+   *   The arguments to the check.
    *
-   * @return int`
+   * @return int
    *   The status result of the check. Further info can be retained in the
    *   $result.
    */
-  public static function execute(array $args, string|object &$result, LoggerInterface &$logger = NULL): int {
+  public static function execute(array $args, string|object &$result, ?LoggerInterface &$logger = NULL): int {
     $logger = self::getLogger($logger);
     if (empty($args['PLATFORM_CLI'])) {
       $args['PLATFORM_CLI'] = 'platform';
@@ -46,7 +44,8 @@ class FastlyServiceCheck extends Check {
       $env_vars .= $var_name . '=' . escapeshellarg($var_value) . ' ';
     }
     $command = "$env_vars  $shell_audits_directory/$command_file";
-    $command .= ' 2>&1';  // Redirect STDERR to STDOUT
+    // Redirect STDERR to STDOUT.
+    $command .= ' 2>&1';
     // Need to run this in a bash shell to get the env vars set properly.
     // Also need to escape the whole command.
     $command = "bash -c '" . escapeshellcmd($command) . "'";
@@ -70,14 +69,15 @@ class FastlyServiceCheck extends Check {
           'return_code' => $return_var,
           'result' => $result,
         ];
-        $logger->error($message, $context);        $status = static::ERROR;
+        $logger->error($message, $context);
+        $status = static::ERROR;
       }
 
     }
     catch (RequestException $exception) {
       $logger->error('Error executing {command}: {error}', [
         'command' => $command,
-        'error' => $exception->getMessage()
+        'error' => $exception->getMessage(),
       ]);
 
       $result = "Error executing '$command' : " . $exception->getMessage() . "";

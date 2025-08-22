@@ -2,16 +2,10 @@
 
 namespace Drupal\platformsh_project\Entity;
 
-use Drupal;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\node\Entity\Node;
-use Drupal\node\NodeInterface;
 use Drupal\platformsh_api\ApiService;
-use Exception;
-use InvalidArgumentException;
 use Platformsh\Client\Model\ApiResourceBase;
 use Platformsh\Client\PlatformClient;
 
@@ -68,7 +62,7 @@ abstract class ApiResource extends Node {
    * This is expected to be overridden by the subclass to match the
    * \Platformsh\Client methods.
    *
-   * @return ApiResourceBase|false
+   * @return \Platformsh\Client\Model\ApiResourceBase|false
    *
    * @see ApiResourceBase::get
    */
@@ -91,7 +85,7 @@ abstract class ApiResource extends Node {
   }
 
   /**
-   * Localised extra data processing to run during refreshFromAPI
+   * Localised extra data processing to run during refreshFromAPI.
    *
    * @param ApiResource $resource
    *
@@ -104,10 +98,10 @@ abstract class ApiResource extends Node {
   /**
    * Utility.
    *
-   * @return PlatformClient
+   * @return \Platformsh\Client\PlatformClient
    */
   protected function getApiClient() {
-    $this->api_service = Drupal::service('platformsh_api.fetcher');
+    $this->api_service = \Drupal::service('platformsh_api.fetcher');
     $this->api_client = $this->api_service->getApiClient();
     return $this->api_client;
   }
@@ -124,7 +118,8 @@ abstract class ApiResource extends Node {
    * corresponding class.
    *
    * @return bool success
-   * @throws EntityStorageException
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function refreshFromAPI(): bool {
     // Everything hinges on the field_id, which must be set by now.
@@ -134,7 +129,7 @@ abstract class ApiResource extends Node {
       return FALSE;
     }
 
-    /** @var ApiResourceBase $resource
+    /** @var \Platformsh\Client\Model\ApiResourceBase $resource
      *   Either a project or a user or whatever.
      */
     try {
@@ -145,7 +140,7 @@ abstract class ApiResource extends Node {
       // This is fatal, but better than infinite hang.
       $max_execution_time = ini_get('max_execution_time');
       ini_set('max_execution_time', 10);
-      Drupal::logger('platformsh_project')
+      \Drupal::logger('platformsh_project')
         ->info(sprintf("Making a request to the API for resource `%s`. (May timeout if network issues)", $remoteEntityID));
       $resource = $this->getResource($remoteEntityID);
       ini_set('max_execution_time', $max_execution_time);
@@ -158,7 +153,7 @@ abstract class ApiResource extends Node {
         return FALSE;
       }
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       $this->messenger()->addError("API call failed: " . $e->getMessage());
       return FALSE;
     }
@@ -182,7 +177,7 @@ abstract class ApiResource extends Node {
         $updated['title'] = TRUE;
       }
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       // This should never happen, but it did, so...
       $this->messenger()
         ->addError("Resource doesn't have a " . $this->title_key . " property");
@@ -252,19 +247,19 @@ abstract class ApiResource extends Node {
    * We need to see if we already recognise that GUID, and if so, link to it.
    * If not, create a placeholder for it, and link to that.
    *
-   * @var NodeInterface $node
+   * @var \Drupal\node\Entity\NodeInterface $node
    *
    * @param array $raw_data
    *
    * @return array A list of what, if anything, was updated.
    *
-   * @throws EntityStorageException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function autocreateTargetEntities(array $raw_data): array {
     $updated = [];
     // References need extra help.
     foreach ($this->reference_keys as $key_type => $key_name) {
-      /** @var FieldItemListInterface $value */
+      /** @var \Drupal\Core\Field\FieldItemListInterface $value */
       $target_guid = $raw_data[$key_name];
       if (empty($target_guid)) {
         continue;
@@ -295,7 +290,7 @@ abstract class ApiResource extends Node {
         $this->set('field_' . $key_name, $target_info);
       }
       else {
-        throw new InvalidArgumentException("Could not find or auto create target entity " . $target_guid->getString());
+        throw new \InvalidArgumentException("Could not find or auto create target entity " . $target_guid->getString());
       }
     }
     return $updated;
@@ -307,14 +302,14 @@ abstract class ApiResource extends Node {
    * @param string $entity_type_id
    * @param array $values
    *
-   * @return EntityInterface
+   * @return \Drupal\Core\Entity\EntityInterface
    *
-   * @throws EntityStorageException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   private function autocreateTargetEntity(string $entity_type_id, array $values) {
     $this->messenger()
       ->addStatus("Auto-creating an {{values['bundle']} called {$values['field_id']}");
-    $entity = Drupal::entityTypeManager()
+    $entity = \Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($values);
     $entity->save();

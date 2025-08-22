@@ -2,9 +2,6 @@
 
 namespace Drupal\platformsh_project\Entity;
 
-use Drupal\Core\Entity\Annotation\ContentEntityType;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\FieldDefinition;
 use Drupal\platformsh_project\Check\FastlyServiceCheck;
 
 /**
@@ -13,7 +10,6 @@ use Drupal\platformsh_project\Check\FastlyServiceCheck;
  * Each bundle definition needs to be declared in the
  * platformsh_project_entity_bundle_info() also.
  * Cannot use annotations without things getting snarled up.
- *
  */
 class FastlyMetric extends Metric {
 
@@ -24,16 +20,19 @@ class FastlyMetric extends Metric {
     return "Fastly check";
   }
 
+  /**
+   *
+   */
   public function refresh() {
-    # Check for the existence of a Fastly service for this project.
-    $result="";
-    $logger=$this->getLogger();
+    // Check for the existence of a Fastly service for this project.
+    $result = "";
+    $logger = $this->getLogger();
     $project_id = $this->getProject()->get('field_id')->value;
     $args = ['PLATFORM_PROJECT' => $project_id];
     $status = FastlyServiceCheck::execute($args, $result, $logger);
     $this
       ->set('status', $status)
-      ->set('data', $result )
+      ->set('data', $result)
       ->set('note', "Checked Fastly Account. Response:" . "\n" . $result)
       ->save();
   }

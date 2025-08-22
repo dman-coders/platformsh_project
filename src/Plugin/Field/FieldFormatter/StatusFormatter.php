@@ -4,7 +4,6 @@ namespace Drupal\platformsh_project\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\platformsh_project\Entity\Metric;
 
 /**
@@ -19,7 +18,6 @@ use Drupal\platformsh_project\Entity\Metric;
  * )
  */
 class StatusFormatter extends FormatterBase {
-
 
   /**
    * {@inheritdoc}

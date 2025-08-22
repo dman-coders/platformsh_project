@@ -2,12 +2,7 @@
 
 namespace Drupal\platformsh_project\DrushCommand;
 
-use Drupal;
-use Drupal\node\Entity\Node;
-use Drupal\platformsh_project\Entity\Metric;
-use Drupal\platformsh_project\Entity\MetricType;
 use Drush\Commands\DrushCommands;
-use InvalidArgumentException;
 
 /**
  * A Drush commandfile.
@@ -38,8 +33,8 @@ class PlatformshProjectCommands extends DrushCommands {
     $entity_type_id = 'node';
 
     // Look-ahead to avoid creating a dupe.
-    /** @var Node $project */
-    $existing_project = Drupal::entityTypeManager()
+    /** @var \Drupal\node\Entity\Node $project */
+    $existing_project = \Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->loadByProperties(['field_id' => $project_id]);
     if (!empty($existing_project)) {
@@ -49,8 +44,8 @@ class PlatformshProjectCommands extends DrushCommands {
     }
 
     $this->logger()->info(sprintf("Creating a project %s", $project_id));
-    /** @var Node $project */
-    $project = Drupal::entityTypeManager()
+    /** @var \Drupal\node\Entity\Node $project */
+    $project = \Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($field_values);
     // hook_entity_presave() will do a lookup to prepopulate new project info.
@@ -123,7 +118,7 @@ class PlatformshProjectCommands extends DrushCommands {
 
     // Validate the metric type.
     /** @var array $bundle_info */
-    $bundle_info = Drupal::service('entity_type.bundle.info')
+    $bundle_info = \Drupal::service('entity_type.bundle.info')
       ->getBundleInfo('metric');
     if (!isset($bundle_info[$metric_type])) {
       $message = sprintf("Invalid metric type '%s'. Available types are: %s", $metric_type, implode(', ', array_keys($bundle_info)));
@@ -139,7 +134,7 @@ class PlatformshProjectCommands extends DrushCommands {
 
     // Look-ahead to avoid creating a dupe.
     /** @var \Drupal\node\Entity\Metric $metric */
-    $existing_metric = Drupal::entityTypeManager()
+    $existing_metric = \Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->loadByProperties($field_values);
     if (!empty($existing_metric)) {
@@ -151,17 +146,17 @@ class PlatformshProjectCommands extends DrushCommands {
     $this->logger()
       ->info(sprintf("Creating a '%s' metric for project:'%s'", $metric_type, $project->getTitle()));
 
-    /** @var Metric $metric */
-    $metric = Drupal::entityTypeManager()
+    /** @var \Drupal\platformsh_project\Entity\Metric $metric */
+    $metric = \Drupal::entityTypeManager()
       ->getStorage($entity_type_id)
       ->create($field_values);
     $metric->save();
-    /** @var MetricType $metrictype_entity */
+    /** @var \Drupal\platformsh_project\Entity\MetricType $metrictype_entity */
     $metrictype_entity = $metric->bundle->entity;
     // ? Should not be possible, but sometimes we can create a Metric
     // with an invalid $metric_type
     if (empty($metrictype_entity)) {
-      throw new InvalidArgumentException(sprintf("Created a metric of type %s, but this is apparently an invalid MetricType. This happens if there is not a required config/install/platformsh_project.metric_type.{%s}.yml file.", $metric_type, $metric_type));
+      throw new \InvalidArgumentException(sprintf("Created a metric of type %s, but this is apparently an invalid MetricType. This happens if there is not a required config/install/platformsh_project.metric_type.{%s}.yml file.", $metric_type, $metric_type));
     }
     /** @var string $bundle_label */
     $bundle_label = $metrictype_entity->label();

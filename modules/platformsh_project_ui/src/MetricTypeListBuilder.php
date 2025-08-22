@@ -14,7 +14,6 @@ use Drupal\Core\Url;
  * This seems to add no extra value, can we do without it?
  * SHows up on /admin/structure/metric_types
  * Thanks to being defined as a `collection` link in MetricType annotations.
- *
  */
 class MetricTypeListBuilder extends ConfigEntityListBuilder {
 

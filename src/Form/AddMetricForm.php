@@ -2,7 +2,6 @@
 
 namespace Drupal\platformsh_project\Form;
 
-use Drupal;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
@@ -24,12 +23,15 @@ use Drupal\platformsh_project\Entity\MetricType;
  */
 class AddMetricForm extends FormBase {
 
+  /**
+   *
+   */
   public function getFormId(): string {
     return 'add_metric_action_form';
   }
 
   /**
-   * stub
+   * Stub.
    */
   public function updateFields() {
     return 'successfully changed';
@@ -45,10 +47,11 @@ class AddMetricForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form,
+  public function buildForm(
+    array $form,
     FormStateInterface $form_state,
-    NodeInterface $project = NULL,
-    MetricType $metric_type = NULL
+    ?NodeInterface $project = NULL,
+    ?MetricType $metric_type = NULL,
   ) {
     $form['#title'] = $this->t('Add a Metric');
 
@@ -60,10 +63,10 @@ class AddMetricForm extends FormBase {
     // This form may be called with The desired metric type already defined.
     // Pre-fill that selection.
     // List all available metric types.
-    $bundleInfo = Drupal::service('entity_type.bundle.info')
+    $bundleInfo = \Drupal::service('entity_type.bundle.info')
       ->getBundleInfo('metric');
     // Extract the bundle IDs and labels into a flat array.
-    $bundleOptions = array_map(function($bundle) {
+    $bundleOptions = array_map(function ($bundle) {
       return $bundle['label'];
     }, $bundleInfo);
 

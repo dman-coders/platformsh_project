@@ -16,7 +16,7 @@ class Project extends ApiResource {
    * BUT the API changed schema remotely, so we have to translate sometimes.
    */
   protected array $field_keys = [
-    # 'plan', # Special case, handled by alterData()
+    // 'plan', # Special case, handled by alterData()
     'default_domain',
     'region',
     'namespace',
@@ -26,7 +26,7 @@ class Project extends ApiResource {
    * Some fields in the API response are a reference to another entity.
    * This array maps entity type to the remote field name.
    *
-   * $key_type => $key_name
+   * $key_type => $key_name.
    */
   protected array $reference_keys = [
     'user' => 'owner',
@@ -90,7 +90,7 @@ class Project extends ApiResource {
    * but I don't want to replicate a whole subscription object.
    * Just extract the value and put it in the field.
    *
-   * @param ApiResourceBase $resource
+   * @param \Platformsh\Client\Model\ApiResourceBase $resource
    *
    * @return mixed
    */

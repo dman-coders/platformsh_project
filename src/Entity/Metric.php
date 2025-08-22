@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\Core\Url;
 use Psr\Log\LoggerInterface;
 
@@ -120,16 +119,16 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
 
   const REQUIREMENT_INVALID = 3;
 
-  const REQUIREMENT_DICTIONARY =  [
-          self::REQUIREMENT_INFO => 'Info',
-          self::REQUIREMENT_OK => 'OK',
-          self::REQUIREMENT_WARNING => 'Warning',
-          self::REQUIREMENT_ERROR => 'Error',
-          self::REQUIREMENT_INVALID => 'Invalid',
-        ];
+  const REQUIREMENT_DICTIONARY = [
+    self::REQUIREMENT_INFO => 'Info',
+    self::REQUIREMENT_OK => 'OK',
+    self::REQUIREMENT_WARNING => 'Warning',
+    self::REQUIREMENT_ERROR => 'Error',
+    self::REQUIREMENT_INVALID => 'Invalid',
+  ];
 
-  var Project $project;
-  var LoggerInterface $logger;
+  public Project $project;
+  public LoggerInterface $logger;
 
   /**
    * Get the human-readable status description.
@@ -137,7 +136,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    * @return string
    *   The status description.
    */
-  public function getStatusDescription($status = null): string {
+  public function getStatusDescription($status = NULL): string {
     $status = $status ? $status : $this->get('status')->value;
     return self::REQUIREMENT_DICTIONARY[$status] ?? $status;
   }
@@ -194,13 +193,13 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', ['weight' => 10])
       ->setDisplayOptions('view', [
-          'weight' => 0,
-          'type' => 'status_formatter',
-          'label' => 'inline',
-        ]
+        'weight' => 0,
+        'type' => 'status_formatter',
+        'label' => 'inline',
+      ]
       );
 
-    // The data field. Used for simple values or structured data
+    // The data field. Used for simple values or structured data.
     $fields['data'] = BaseFieldDefinition::create('string_long')
       ->setLabel(t('Data'))
       ->setDescription(t('Used for simple values like response codes, or IDs, or structured data like yaml'))
@@ -219,8 +218,8 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
         'label' => 'inline',
       ]);
 
-      // The comment field.
-      $fields['note'] = BaseFieldDefinition::create('string_long')
+    // The comment field.
+    $fields['note'] = BaseFieldDefinition::create('string_long')
       ->setLabel(t('Note'))
       ->setDescription(t('Additional notes. Freetext summary or explanation of warnings.'))
       ->setRequired(FALSE)
@@ -300,12 +299,12 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    *
    * @return Project
    *
-   * @throws MissingDataException
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   protected function getProject() {
     // Dereference the entityreference.
     if (empty($this->project)) {
-      $this->project=$this->get('target')
+      $this->project = $this->get('target')
         ?->first()
         ?->get('entity')
         ?->getTarget()
@@ -319,16 +318,18 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    * the already attached logger,
    * or a generic global one.
    *
-   * @param $logger \Psr\Log\LoggerInterface
+   * @param \Psr\Log\LoggerInterface $logger
    *
    * @return \Psr\Log\LoggerInterface
    */
-  protected function getLogger($logger = null): LoggerInterface {
-    if ($logger) (
+  protected function getLogger($logger = NULL): LoggerInterface {
+    if ($logger) {
+      (
       $this->logger = $logger;
-    )
-    if (empty($this->logger)) {
-      $this->logger = \Drupal::service('logger.factory')->get('platformsh_project');
+      )
+      if (empty($this->logger)) {
+        $this->logger = \Drupal::service('logger.factory')->get('platformsh_project');
+      }
     }
     return $this->logger;
   }
@@ -336,10 +337,13 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   /**
    *
    */
-  public function label(): string  {
+  public function label(): string {
     return "Un-named Metric";
   }
 
+  /**
+   *
+   */
   public function refresh() {
     $this
       ->set('status', self::REQUIREMENT_INVALID)

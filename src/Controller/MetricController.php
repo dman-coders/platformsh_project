@@ -2,12 +2,9 @@
 
 namespace Drupal\platformsh_project\Controller;
 
-use Drupal;
 use Drupal\Core\Entity\Controller\EntityController;
 use Drupal\Core\Link;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\NodeInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Provides the add-page callback for a Metric add form.
@@ -38,7 +35,7 @@ class MetricController extends EntityController {
    * @param string $entity_type_id
    *   The entity type ID.
    *
-   * @return RedirectResponse|array
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse|array
    *   If there's only one available bundle, a redirect response.
    *   Otherwise, a render array with the add links for each bundle.
    */
@@ -53,9 +50,9 @@ class MetricController extends EntityController {
 
     // Find the current target project - what was the `project` ID in
     //  path: '/node/{project}/metric/add'.
-    /** @var RouteMatchInterface $route_match */
-    $route_match = Drupal::routeMatch();
-    /** @var NodeInterface $node */
+    /** @var \Drupal\Core\Routing\RouteMatchInterface $route_match */
+    $route_match = \Drupal::routeMatch();
+    /** @var \Drupal\node\NodeInterface $node */
     $node = $route_match->getParameter('project');
     if (!$node instanceof NodeInterface) {
       // Problem.

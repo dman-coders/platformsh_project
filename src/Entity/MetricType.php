@@ -2,10 +2,8 @@
 
 namespace Drupal\platformsh_project\Entity;
 
-use Drupal;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\EntityDescriptionInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * Defines the Metric type configuration entity.
@@ -80,10 +78,10 @@ class MetricType extends ConfigEntityBundleBase implements EntityDescriptionInte
    */
   public function getDescription() {
     // Get the class annotation object where the description info is.
-    /** @var EntityTypeInterface $entity_info */
-    $entity_info = Drupal::entityTypeManager()->getDefinition($this->id, FALSE);
+    /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_info */
+    $entity_info = \Drupal::entityTypeManager()->getDefinition($this->id, FALSE);
     if (!$entity_info) {
-      $entity_info = Drupal::entityTypeManager()->getDefinition('metric');
+      $entity_info = \Drupal::entityTypeManager()->getDefinition('metric');
     }
     return $entity_info->get('description');
   }

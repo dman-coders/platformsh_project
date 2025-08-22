@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * Check if an URL responds OK
+ * Check if an URL responds OK.
  */
 class PingCheck extends Check {
 
@@ -19,15 +19,15 @@ class PingCheck extends Check {
   const expected_arguments = ['url'];
 
   /**
-   * Execute the check
+   * Execute the check.
    *
    * @param array $args
-   *   The arguments to the check
+   *   The arguments to the check.
    *
    * @return string
    *   The result of the check
    */
-  public static function execute(array $args, string|object &$result, LoggerInterface &$logger = NULL): int {
+  public static function execute(array $args, string|object &$result, ?LoggerInterface &$logger = NULL): int {
     $logger = $logger ?? new NullLogger();
 
     $client = new Client();

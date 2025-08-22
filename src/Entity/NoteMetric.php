@@ -2,8 +2,6 @@
 
 namespace Drupal\platformsh_project\Entity;
 
-use Drupal\Core\Entity\Annotation\ContentEntityType;
-
 /**
  * A metric entity that performs no special action,
  * it just exists as a repository for notes entered manually.
@@ -17,7 +15,7 @@ class NoteMetric extends Metric {
   /**
    *
    */
-  public function label(): string  {
+  public function label(): string {
     return "A note";
   }
 

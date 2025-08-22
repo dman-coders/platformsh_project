@@ -6,7 +6,6 @@ use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
-use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -59,8 +58,8 @@ class AddMetric extends ActionBase implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var NodeInterface $object */
+  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+    /** @var \Drupal\node\NodeInterface $object */
     $access = $object->access('update', $account, TRUE)
       ->andIf($object->title->access('edit', $account, TRUE));
     return $return_as_object ? $access : $access->isAllowed();
@@ -70,7 +69,7 @@ class AddMetric extends ActionBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function execute($object = NULL): void {
-    /** @var NodeInterface $object */
+    /** @var \Drupal\node\NodeInterface $object */
     if ($object->getType() != 'project') {
       $this->messenger()
         ->addError($this->t('This action cannot be applied to the @bundle bundle.', ['@bundle' => $bundle]));

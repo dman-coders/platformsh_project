@@ -28,7 +28,7 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
     $bundleInfo = Drupal::service('entity_type.bundle.info')
       ->getBundleInfo('metric');
     // Extract the bundle IDs and labels into a flat array.
-    $bundleOptions = array_map(function($bundle) {
+    $bundleOptions = array_map(function ($bundle) {
       return $bundle['label'];
     }, $bundleInfo);
 
