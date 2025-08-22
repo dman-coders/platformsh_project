@@ -33,7 +33,7 @@ class CheckCommand extends Command {
    *
    * @var array
    */
-  protected static $allowedFormatOptions = ['text', 'json', 'html'];
+  protected static array $allowedFormatOptions = ['text', 'json', 'html'];
 
   /**
    * The logger instance.
@@ -42,20 +42,20 @@ class CheckCommand extends Command {
    */
   private $logger;
 
-  public function __construct() {
-    // Create a log channel
-    // $this->logger = new Logger('log_to_stderr');
-    // $this->logger->pushHandler(new StreamHandler("php://stderr"));.
-    parent::__construct();
-  }
-
   /**
    * Configure the command.
    */
   protected function configure() {
     $allowedFormatOptions = static::$allowedFormatOptions;
     $this->setDescription('Checks the status of things')
-      ->addOption('format', 'f', InputArgument::OPTIONAL, 'The format of the output. ', 'text', $allowedFormatOptions);
+      ->addOption(
+        'format',
+        'f',
+        InputArgument::OPTIONAL,
+        'The format of the output.',
+        'text',
+        $allowedFormatOptions
+      );
   }
 
   /**
@@ -108,7 +108,8 @@ class CheckCommand extends Command {
   }
 
   /**
-   * Map the return codes from the Check class to the Symfony Command status codes.
+   * Map the return codes from the Check class to the Symfony Command\n   *
+   * status codes.
    *
    * These are mostly identical (0,1,2) but the Check class has an additional
    * status code for "Not Applicable".

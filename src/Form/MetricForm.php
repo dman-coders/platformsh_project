@@ -48,23 +48,12 @@ class MetricForm extends ContentEntityForm {
     ?MetricType $metricType = NULL,
   ): array {
     // Need to create a dummy entity if it's not already done.
-    // When we 'add metric' through the usual forms, magic happens to prepare that.
+    // When we 'add metric' through the usual forms, magic happens to prepare
+    // that.
     // If this form is being called from a custom context,
     // I need to fill in some context for contentEntityForm requirements.
     if (empty($this->entity)) {
       throw new \Exception('Pretty sure we should no longer hit the case where an entity form is being built without a placeholder entity being instantiated. If this logic is never hit, then this chunk should be removed.');
-      // Emulate:
-      // $entity = $this->getEntityFromRouteMatch($route_match, $metricType->id());
-      // Instantiate a new metric entity of the requested type.
-      $entityTypeId = 'metric';
-      $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
-      // 'bundle'
-      $bundleKey = $entityType->getKey('bundle');
-      $values = [];
-      $values[$bundleKey] = $metricType->id();
-      $entity = $this->entityTypeManager->getStorage($entityTypeId)
-        ->create($values);
-      $this->setEntity($entity);
     }
     // If this form was called from the context of a project,
     // then the metric should be preset to use that node as a target.

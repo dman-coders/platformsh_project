@@ -174,12 +174,15 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     // * value
     // * description
     // * severity
-    // And these mini-reports get collated into a larger report on the system status report page.
+    // And these mini-reports get collated into a larger report on the system
+    // status report page.
     // Our metric checks will be a very similar shape.
     // The 'changed' field is a special thing.
-    // Internal tooling (EntityChangedTrait)  helps it work the same as other entities.
+    // Internal tooling (EntityChangedTrait) helps it work the same as other
+    // entities.
     // `changed` will only get updated if some value actually changed.
-    // Setting a value and running save() will NOT touch `changed` unless appropriate.
+    // Setting a value and running save() will NOT touch `changed` unless
+    // appropriate.
     // This seems to be provided by the EntityChangedInterface that we use.
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
@@ -329,7 +332,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   }
 
   /**
-   * Return either the given logger, the already attached logger, or a generic global one.
+   * Return either the given logger, the already attached logger, or a\n   * generic global one.
    *
    * @param \Psr\Log\LoggerInterface|null $logger
    *   An optional logger instance.

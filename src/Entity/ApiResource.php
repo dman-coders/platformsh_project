@@ -22,14 +22,14 @@ abstract class ApiResource extends Node {
   // to it. Basically reflects the content data model that we care about.
 
   /**
-   * Fields that get copied directly from the remote object into local field storage as-is.
+   * Fields that get copied directly from the remote object into local field\n   * storage as-is.
    *
    * @var string[]
    */
   protected array $fieldKeys = [];
 
   /**
-   * Fields that are GUID references, and need to be set to refer to other entities.
+   * Fields that are GUID references, and need to be set to refer to other\n   * entities.
    *
    * This maps a local object type (like 'User')
    * against the remote field name (like `owner`)
@@ -220,7 +220,8 @@ abstract class ApiResource extends Node {
 
     // Now set the values we extracted.
     // fieldKeys and referenceKeys are the field mapping rules
-    // for converting between the object from the API and the local storage model.
+    // for converting between the object from the API and the local storage
+    // model.
     foreach ($this->fieldKeys as $key_name) {
       $field_name = 'field_' . $key_name;
       if (
@@ -246,7 +247,7 @@ abstract class ApiResource extends Node {
     $updated += $this->autocreateTargetEntities($raw_dump);
 
     // $node->set('field_' . 'updated_at' , $response->getData()['updated_at']);
-    // Take care, as this action may be called on hook_entity_presave. Avoid a loop.
+    // Take care, as this action may be called on hook_entity_presave.\n    // Avoid a loop.
     if (!empty($updated) && !$this->isNew()) {
       try {
         $this->save();
@@ -262,7 +263,7 @@ abstract class ApiResource extends Node {
   }
 
   /**
-   * For each external entity that a Project refers to, ensure the named target exists.
+   * For each external entity that a Project refers to, ensure the named\n   * target exists.
    *
    * We have a list of `referenceKeys`, eg 'owner'.
    * If this resources data contains a value for `owner`, this will be a GUID.
