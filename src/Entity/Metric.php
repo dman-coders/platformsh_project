@@ -107,7 +107,7 @@ use Psr\Log\LoggerInterface;
 class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
 
   use EntityChangedTrait;
-  use Drupal\Core\Logger\LoggerChannelTrait;
+
 
   const REQUIREMENT_INFO = -1;
 
@@ -343,11 +343,9 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    * @return \Psr\Log\LoggerInterface
    *   The logger instance.
    */
-  protected function getLogger($logger = NULL): LoggerInterface {
+  protected function getLogger(LoggerInterface $logger = NULL): LoggerInterface {
     if ($logger) {
-      (
       $this->logger = $logger;
-      )
       if (empty($this->logger)) {
         $this->logger = \Drupal::service('logger.factory')->get('platformsh_project');
       }

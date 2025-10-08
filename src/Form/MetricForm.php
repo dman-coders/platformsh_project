@@ -27,7 +27,7 @@ class MetricForm extends ContentEntityForm {
    *
    * @param array $form
    *   The form array.
-   * @param \Drupal\Core\Form\FormStateInterface $formState
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    * @param \Drupal\node\NodeInterface|null $project
    *   The project node, if any.
@@ -43,7 +43,7 @@ class MetricForm extends ContentEntityForm {
    */
   public function buildForm(
     array $form,
-    FormStateInterface $formState,
+    FormStateInterface $form_state = NULL,
     ?NodeInterface $project = NULL,
     ?MetricType $metricType = NULL,
   ): array {
@@ -63,7 +63,7 @@ class MetricForm extends ContentEntityForm {
       $this->entity->set('target', $project);
     }
 
-    $form = parent::buildForm($form, $formState);
+    $form = parent::buildForm($form, $form_state);
 
     // This form may be called with the desired metric type already defined.
     // Pre-fill that selection.

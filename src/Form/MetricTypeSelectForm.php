@@ -18,11 +18,11 @@ class MetricTypeSelectForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $formState, $nodeId = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $nodeId = NULL) {
     $form['#title'] = $this->t('Choose the type of metric');
 
     // Store the node ID in the form's state.
-    $formState->set('node_id', $nodeId);
+    $form_state->set('node_id', $nodeId);
 
     // List all available metric types.
     $bundleInfo = Drupal::service('entity_type.bundle.info')
