@@ -67,6 +67,20 @@ function platformsh_project_entity_bundle_info(): array {
  */
 function platformsh_project_entity_info() {
   $entities = [];
+  $base_values = [
+    'bundle' => 'metric_type',
+    'fieldable' => TRUE,
+    'entity keys' => [
+      'id' => 'id',
+      'label' => 'label',
+      'uuid' => 'uuid',
+      ]
+    ];
+
+  $entities['note_metrics'] = [
+    'label' => t('Note Metric via info'),
+    'entity class' => 'Drupal\platformsh_project\Entity\NoteMetric',
+   ] + $base_values;
 
   $entities['ping_metric'] = [
     'label' => t('Ping Metric'),
@@ -91,6 +105,10 @@ function platformsh_project_entity_info() {
       'uuid' => 'uuid',
     ],
   ];
+  $entities['project_metrics'] = [
+      'label' => t('Project Metric via info'),
+      'entity class' => 'Drupal\platformsh_project\Entity\ProjectMetric',
+    ] + $base_values;
 
   return $entities;
 }
