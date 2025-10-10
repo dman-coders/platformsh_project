@@ -31,7 +31,7 @@ metric.add_unknown_metric_to_project:
 metric.add_known_metric_to_project:
   path: '/node/{project}/metric/add/{metric_type}'
   defaults:
-    _title: Add Metric
+    _title_callback: '\Drupal\platformsh_project\Controller\MetricController::addPageTitle'
     _form: \Drupal\platformsh_project\Form\MetricForm
     # By defining the _entity_form controller,
     # the system should be told to use the rest of the features

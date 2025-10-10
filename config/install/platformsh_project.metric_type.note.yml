@@ -1,9 +1,0 @@
-langcode: en
-status: true
-dependencies:
-  enforced:
-    module:
-      - platformsh_project
-
-id: note
-label: Note (yml)

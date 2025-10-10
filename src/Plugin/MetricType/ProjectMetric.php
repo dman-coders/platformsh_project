@@ -1,14 +1,18 @@
 <?php
 
-namespace Drupal\platformsh_project\Entity;
+namespace Drupal\platformsh_project\Plugin\MetricType;
 
 use Drupal\platformsh_project\Check\CliCheck;
+use Drupal\platformsh_project\Entity\Metric;
 
 /**
  * Check project info
  *
- *  Each bundle definition needs to be declared in the
- *  platformsh_project_entity_bundle_info() also.
+ * @MetricType(
+ *   id = "project",
+ *   label = @Translation("Project Check"),
+ *   description = @Translation("Checks project information via Platform.sh CLI")
+ * )
  */
 class ProjectMetric extends Metric {
 

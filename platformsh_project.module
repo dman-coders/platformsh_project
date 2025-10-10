@@ -14,104 +14,6 @@ use Drupal\platformsh_project\Entity\Organization;
 use Drupal\platformsh_project\Entity\Project;
 use Drupal\platformsh_project\Entity\User;
 
-/**
- * hook_entity_bundle_info()
- *
- * https://www.drupal.org/node/3191609
- * An alternative to declaring everything in yaml files.
- *
- * @param array $bundles
- *
- * @return array
- */
-function platformsh_project_entity_bundle_info(): array {
-  $bundles['metric']['pong']['label'] = t('A Pong!');
-  $bundles['metric']['pong']['class'] = Drupal\platformsh_project\Entity\PingMetric::class;
-
-  $bundles['metric']['note'] = [
-    'label' => t('Note'),
-    'description' => t("An arbitrary user-added note"),
-    'class' => Drupal\platformsh_project\Entity\NoteMetric::class,
-  ];
-
-  $bundles['metric']['ping'] = [
-    'label' => t('Ping'),
-    'description' => t("Ping the respoonse from the domain"),
-    'class' => Drupal\platformsh_project\Entity\PingMetric::class,
-  ];
-
-  $bundles['metric']['highsla'] = [
-    'label' => t('HighSLA'),
-    'description' => t("Checks if HighSLA monitoring is active"),
-    'class' => Drupal\platformsh_project\Entity\HighSlaMetric::class,
-  ];
-
-  $bundles['metric']['drupalcache'] = [
-    'label' => t('Drupal Cache'),
-    'description' => t("Reviews the Drupal cache settings"),
-    'class' => Drupal\platformsh_project\Entity\DrupalCacheMetric::class,
-  ];
-
-  $bundles['metric']['fastly'] = [
-    'label' => t('Check Fastly status'),
-    'description' => t("Fastly metric"),
-    'class' => Drupal\platformsh_project\Entity\FastlyMetric::class,
-  ];
-
-  return $bundles;
-}
-
-
-/**
- * Implements hook_entity_info().
- */
-function platformsh_project_entity_info() {
-  $entities = [];
-  $base_values = [
-    'bundle' => 'metric_type',
-    'fieldable' => TRUE,
-    'entity keys' => [
-      'id' => 'id',
-      'label' => 'label',
-      'uuid' => 'uuid',
-      ]
-    ];
-
-  $entities['note_metrics'] = [
-    'label' => t('Note Metric via info'),
-    'entity class' => 'Drupal\platformsh_project\Entity\NoteMetric',
-   ] + $base_values;
-
-  $entities['ping_metric'] = [
-    'label' => t('Ping Metric'),
-    'entity class' => 'Drupal\platformsh_project\Entity\PingMetric',
-    'bundle' => 'metric_type',
-    'fieldable' => TRUE,
-    'entity keys' => [
-      'id' => 'id',
-      'label' => 'label',
-      'uuid' => 'uuid',
-    ],
-  ];
-
-  $entities['fastly_metric'] = [
-    'label' => t('Fastly Metric'),
-    'entity class' => 'Drupal\platformsh_project\Entity\FastlyMetric',
-    'bundle' => 'metric_type',
-    'fieldable' => TRUE,
-    'entity keys' => [
-      'id' => 'id',
-      'label' => 'label',
-      'uuid' => 'uuid',
-    ],
-  ];
-  $entities['project_metrics'] = [
-      'label' => t('Project Metric via info'),
-      'entity class' => 'Drupal\platformsh_project\Entity\ProjectMetric',
-    ] + $base_values;
-
-  return $entities;
-}
 
 /**
  * hook_entity_bundle_info_alter is how we attach a custom Class
@@ -137,17 +39,15 @@ function platformsh_project_entity_bundle_info_alter(array &$bundles): void {
     $bundles['node']['organization']['class'] = Organization::class;
   }
 
-  // Find all metric bundle classes, and make sure they are registered as expected.
-  // TODO check if this is still relevant now that this is done in hook_entity_bundle_info()
-  // getDefinitions doesn't work on for us if the classes are not annotated.
-
-  if (FALSE) {
-    $entities = Drupal::entityTypeManager()->getDefinitions();
-    foreach ($entities as $entity_id => $entity_definition) {
-      if ($entity_definition->getBundleEntityType() == 'metric_type') {
-        $bundles['metric'][$entity_definition->id()]['class'] = $entity_definition->getClass();
-        $bundles['metric'][$entity_definition->id()]['label'] = $entity_definition->getLabel();
-      }
+  // Auto-discover metric bundles from @MetricType plugins.
+  // This allows adding new metric types by simply creating a new class
+  // in Plugin/MetricType/ with the @MetricType annotation.
+  $plugin_manager = \Drupal::service('plugin.manager.metric_type');
+  foreach ($plugin_manager->getDefinitions() as $plugin_id => $definition) {
+    $bundles['metric'][$plugin_id]['class'] = $definition['class'];
+    $bundles['metric'][$plugin_id]['label'] = $definition['label'];
+    if (!empty($definition['description'])) {
+      $bundles['metric'][$plugin_id]['description'] = $definition['description'];
     }
   }
 }

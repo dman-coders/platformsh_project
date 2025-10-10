@@ -1,8 +1,0 @@
-langcode: en
-status: true
-dependencies:
-  enforced:
-    module:
-      - platformsh_project
-id: pong
-label: 'A Pong!'

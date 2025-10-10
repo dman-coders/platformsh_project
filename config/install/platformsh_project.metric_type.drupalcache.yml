@@ -1,8 +1,0 @@
-langcode: en
-status: true
-dependencies:
-  enforced:
-    module:
-      - platformsh_project
-id: drupalcache
-label: 'Drupal Cache'

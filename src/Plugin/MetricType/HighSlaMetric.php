@@ -1,13 +1,17 @@
 <?php
 
-namespace Drupal\platformsh_project\Entity;
+namespace Drupal\platformsh_project\Plugin\MetricType;
+
+use Drupal\platformsh_project\Entity\Metric;
 
 /**
  * A metric entity that checks if Nodeping HighSLA monitoring is enabled.
  *
- * Each bundle definition needs to be declared in the
- * platformsh_project_entity_bundle_info() also.
- * Cannot use annotations without things getting snarled up.
+ * @MetricType(
+ *   id = "highsla",
+ *   label = @Translation("HighSLA"),
+ *   description = @Translation("Checks if HighSLA monitoring is active")
+ * )
  */
 class HighSlaMetric extends Metric {
 

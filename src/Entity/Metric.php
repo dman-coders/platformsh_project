@@ -21,12 +21,9 @@ use Psr\Log\LoggerInterface;
  *
  * This generic Class defines attributes common to all.
  *
- * Every new type of metric that we create with a subclass
- * also needs a corresponding
- * `config/install/platformsh_project.metric_type.{bundle}}.yml`
- * and must be referred to by
- * `platformsh_project.module:platformsh_project_entity_bundle_info_alter()`
- * to register it.
+ * New metric types are created by adding bundle classes in
+ * Plugin/MetricType/ with @MetricType annotations. They are
+ * auto-discovered by the MetricTypePluginManager.
  *
  * Implementation notes:
  * Too much magic is packed into annotations.
@@ -81,7 +78,8 @@ use Psr\Log\LoggerInterface;
  *     },
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *     }
+ *     },
+ *     "bundle_class" = "Drupal\Core\Entity\BundleClassFieldMapHandler",
  *   },
  *   base_table = "metric",
  *   admin_permission = "administer metrics",
@@ -98,6 +96,7 @@ use Psr\Log\LoggerInterface;
  *     "delete-form" = "/metric/{metric}/delete",
  *   },
  *   bundle_entity_type = "metric_type",
+ *   bundle_plugin_type = "metric_type",
  *   bundle_label = @Translation("Metric type"),
  *   field_ui_base_route = "entity.metric_type.edit_form"
  * )

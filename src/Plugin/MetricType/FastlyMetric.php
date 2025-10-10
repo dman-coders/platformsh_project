@@ -1,15 +1,18 @@
 <?php
 
-namespace Drupal\platformsh_project\Entity;
+namespace Drupal\platformsh_project\Plugin\MetricType;
 
 use Drupal\platformsh_project\Check\FastlyServiceCheck;
+use Drupal\platformsh_project\Entity\Metric;
 
 /**
  * A metric entity that saves the result of a fastly test.
  *
- * Each bundle definition needs to be declared in the
- * platformsh_project_entity_bundle_info() also.
- * Cannot use annotations without things getting snarled up.
+ * @MetricType(
+ *   id = "fastly",
+ *   label = @Translation("Fastly Check"),
+ *   description = @Translation("Check Fastly status")
+ * )
  */
 class FastlyMetric extends Metric {
 

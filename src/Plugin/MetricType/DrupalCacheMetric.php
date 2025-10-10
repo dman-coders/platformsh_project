@@ -1,9 +1,17 @@
 <?php
 
-namespace Drupal\platformsh_project\Entity;
+namespace Drupal\platformsh_project\Plugin\MetricType;
+
+use Drupal\platformsh_project\Entity\Metric;
 
 /**
  * A metric entity that checks the state of Drupal page cache and TTL.
+ *
+ * @MetricType(
+ *   id = "drupalcache",
+ *   label = @Translation("Drupal Cache"),
+ *   description = @Translation("Reviews the Drupal cache settings")
+ * )
  */
 class DrupalCacheMetric extends Metric {
 
