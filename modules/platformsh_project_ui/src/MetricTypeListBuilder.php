@@ -12,8 +12,10 @@ use Drupal\Core\Url;
  * @see \Drupal\platformsh_project\Entity\MetricType
  * @todo remove this
  * This seems to add no extra value, can we do without it?
- * SHows up on /admin/structure/metric_types
+ * Shows up on /admin/structure/metric_types
  * Thanks to being defined as a `collection` link in MetricType annotations.
+ *
+ * @see \Drupal\platformsh_project\Entity\MetricType
  */
 class MetricTypeListBuilder extends ConfigEntityListBuilder {
 
@@ -44,6 +46,8 @@ class MetricTypeListBuilder extends ConfigEntityListBuilder {
    * This lists the metric types that are returned
    * by ::load() in MetricController.
    * A query that returns entities where entityTypeId='metric_type'
+   *
+   * @see \Drupal\platformsh_project\Controller\MetricController
    */
   public function render() {
     $build = parent::render();

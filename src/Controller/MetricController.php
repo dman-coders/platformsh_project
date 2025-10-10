@@ -30,6 +30,8 @@ class MetricController extends EntityController {
   /**
    * Displays add links for the available bundles.
    *
+   * "Add Metric to project"
+   *
    * Redirects to the add form if there's only one bundle available.
    *
    * @param string $entity_type_id
@@ -39,7 +41,7 @@ class MetricController extends EntityController {
    *   If there's only one available bundle, a redirect response.
    *   Otherwise, a render array with the add links for each bundle.
    */
-  public function addPage($entity_type_id) {
+  public function addPage($entity_type_id): \Symfony\Component\HttpFoundation\RedirectResponse|array {
     // Generic entity parameters setup copied from parent method.
     // We will always be $bundle_entity_type_id=metric
     // and won't have to worry about cases where no bundle exists.
@@ -55,7 +57,7 @@ class MetricController extends EntityController {
     /** @var \Drupal\node\NodeInterface $node */
     $node = $route_match->getParameter('project');
     if (!$node instanceof NodeInterface) {
-      // Problem.
+      throw new \Exception('No valid project node was specified. could not load project id:' . $route_match->getParameter('project'));
     }
     $project_id = $node->id();
 

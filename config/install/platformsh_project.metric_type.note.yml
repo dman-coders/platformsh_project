@@ -6,4 +6,4 @@ dependencies:
       - platformsh_project
 
 id: note
-label: Note
+label: Note (yml)

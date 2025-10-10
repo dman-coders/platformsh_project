@@ -48,7 +48,7 @@ abstract class Check {
    * @return \Psr\Log\LoggerInterface
    *   A logger instance.
    */
-  public static function getLogger($logger): LoggerInterface {
+  public static function getLogger(?LoggerInterface $logger): LoggerInterface {
     return $logger ?? \Drupal::logger('platformsh_project.checks');
   }
 
