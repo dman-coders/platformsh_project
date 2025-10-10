@@ -10,6 +10,22 @@ namespace Drupal\platformsh_project\Entity;
  * Each bundle definition needs to be declared in the
  * platformsh_project_entity_bundle_info() also.
  * Cannot use annotations without things getting snarled up.
+ *
+ * @ContentEntityType(
+ *    description = @Translation("Just a manually aded note."),
+ *    id = "note_metric",
+ *    label = @Translation("Note Metric via annotation"),
+ *    entity_keys = {
+ *      "id" = "id",
+ *      "label" = "label",
+ *      "uuid" = "uuid",
+ *      "uid" = "user_id",
+ *      "langcode" = "langcode",
+ *      "status" = "status",
+ *    },
+ *    bundle_entity_type = "metric_type",
+ *    permission_granularity = "bundle",
+ *   )
  */
 class NoteMetric extends Metric {
 
@@ -23,9 +39,10 @@ class NoteMetric extends Metric {
   /**
    * Refresh this metric.
    */
-  public function refresh() {
+  public function refresh(): void {
     $this->set('data', 'Refreshed ' . date("Y-m-d H:i:s"))
       ->save();
+    parent::refresh();
   }
 
 }

@@ -23,7 +23,7 @@ class FastlyMetric extends Metric {
   /**
    * Refresh this metric.
    */
-  public function refresh() {
+  public function refresh(): void {
     // Check for the existence of a Fastly service for this project.
     $result = "";
     $logger = $this->getLogger();
@@ -35,6 +35,8 @@ class FastlyMetric extends Metric {
       ->set('data', $result)
       ->set('note', "Checked Fastly Account. Response:\n" . $result)
       ->save();
+    parent::refresh();
+
   }
 
 }

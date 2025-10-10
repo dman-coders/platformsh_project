@@ -2,14 +2,12 @@
 
 namespace Drupal\platformsh_project\Entity;
 
-use Drupal\aggregator\ItemInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Url;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -63,12 +61,13 @@ use Psr\Log\LoggerInterface;
  * @ContentEntityType(
  *   id = "metric",
  *   label = @Translation("Metric"),
- *   description = @Translation("Generic Abstract Metric description should get
- *   overridden"), label_collection = @Translation("Platformsh metrics"),
- *   label_singular = @Translation("platformsh metric"), label_plural =
- *   @Translation("platformsh metrics"), label_count = @PluralTranslation(
- *   singular = "@count platformsh metrics", plural = "@count platformsh
- *   metrics",
+ *   description = @Translation("Generic Abstract Metric description."),
+ *   label_collection = @Translation("Platformsh metrics"),
+ *   label_singular = @Translation("platformsh metric"),
+ *   label_plural = @Translation("platformsh metrics"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count platformsh metrics",
+ *     plural = "@count platformsh metrics",
  *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\Core\Entity\EntityListBuilder",
@@ -99,7 +98,6 @@ use Psr\Log\LoggerInterface;
  *     "delete-form" = "/metric/{metric}/delete",
  *   },
  *   bundle_entity_type = "metric_type",
- *   uri_callback = "Drupal\platformsh_project\Entity\metric::buildUri",
  *   bundle_label = @Translation("Metric type"),
  *   field_ui_base_route = "entity.metric_type.edit_form"
  * )
@@ -158,7 +156,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     // Base fields are attached directly to the main entity table
     // as additional columns, like a traditional db schema
     // Base fields are not referred to as `field_data` style lookups
@@ -166,7 +164,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     // Base fields - ID etc - are provided by the system if we ask for them
     // in the annotation by defining entity_keys.
     // This must be done explicitly for every subclass.
-    $fields = parent::baseFieldDefinitions($entityType);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     // The data model refers of the Drupal hook_requirements report model.
     // A "requirement" check returns a
@@ -299,15 +297,6 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     return $fields;
   }
 
-  /**
-   * Entity URI callback.
-   *
-   * For some reason this wasn't being autodetected from the bundle.
-   * I'd expected it to be deduced from the annotation links:canonic.
-   */
-  public static function buildUri(ItemInterface $item) {
-    return Url::fromUri($item->getLink());
-  }
 
   /**
    * Utility to return the referenced project entity.
@@ -366,11 +355,13 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   /**
    * Refresh this metric.
    */
-  public function refresh() {
+  public function refresh(): void {
+    // Called after the individual metric has done its work.
+    // This just updates the changed time.
+    // Subclasses should call parent::refresh() at the end of their own
+    // refresh() implementations.
     $this
-      ->set('status', self::REQUIREMENT_INVALID)
-      ->set('data', date('c'))
-      ->set('note', 'Refreshed ' . date("Y-m-d H:i:s"))
+      ->set('timestamp',  time())
       ->save();
   }
 

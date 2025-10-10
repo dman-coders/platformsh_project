@@ -21,9 +21,11 @@ class HighSlaMetric extends Metric {
   /**
    * Refresh this metric.
    */
-  public function refresh() {
+  public function refresh(): void {
     $this->set('data', 'pinged ' . date("Y-m-d H:i:s"))
       ->save();
+    parent::refresh();
+
   }
 
 }

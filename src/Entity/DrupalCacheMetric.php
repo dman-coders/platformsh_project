@@ -19,7 +19,7 @@ class DrupalCacheMetric extends Metric {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function refresh() {
+  public function refresh(): void {
     $environmentTestUrl = $this->getProject()->getUrl();
     $responseHeaders = $this->getResponseHeaders($environmentTestUrl);
 
@@ -76,6 +76,7 @@ class DrupalCacheMetric extends Metric {
 
     $this->set('data', print_r($report, 1))
       ->save();
+    parent::refresh();
   }
 
   /**
