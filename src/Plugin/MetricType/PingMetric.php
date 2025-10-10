@@ -16,12 +16,6 @@ use Drupal\platformsh_project\Entity\Metric;
  */
 class PingMetric extends Metric {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function label(): string {
-    return "A ping";
-  }
 
   /**
    * Refresh this metric.

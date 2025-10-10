@@ -15,12 +15,6 @@ use Drupal\platformsh_project\Entity\Metric;
  */
 class HighSlaMetric extends Metric {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function label(): string {
-    return "HighSLA Check";
-  }
 
   /**
    * Refresh this metric.

@@ -17,13 +17,6 @@ use Drupal\platformsh_project\Entity\Metric;
 class FastlyMetric extends Metric {
 
   /**
-   * {@inheritdoc}
-   */
-  public function label(): string {
-    return "Fastly check";
-  }
-
-  /**
    * Refresh this metric.
    */
   public function refresh(): void {

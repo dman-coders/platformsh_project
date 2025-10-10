@@ -17,13 +17,6 @@ use Drupal\platformsh_project\Entity\Metric;
 class ProjectMetric extends Metric {
 
   /**
-   * {@inheritdoc}
-   */
-  public function label(): string {
-    return "Project check (class)";
-  }
-
-  /**
    * Refresh this metric.
    */
   public function refresh(): void {

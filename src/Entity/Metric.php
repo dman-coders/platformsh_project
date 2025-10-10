@@ -341,15 +341,6 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
     return $this->logger;
   }
 
-  /**
-   * Get the label for this metric.
-   *
-   * @return string
-   *   The metric label.
-   */
-  public function label(): string {
-    return "Un-named Metric";
-  }
 
   /**
    * Refresh this metric.

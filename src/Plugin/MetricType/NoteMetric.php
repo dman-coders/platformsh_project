@@ -18,13 +18,6 @@ use Drupal\platformsh_project\Entity\Metric;
 class NoteMetric extends Metric {
 
   /**
-   * {@inheritdoc}
-   */
-  public function label(): string {
-    return "A note";
-  }
-
-  /**
    * Refresh this metric.
    */
   public function refresh(): void {

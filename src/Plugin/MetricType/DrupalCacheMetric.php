@@ -15,12 +15,6 @@ use Drupal\platformsh_project\Entity\Metric;
  */
 class DrupalCacheMetric extends Metric {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function label(): string {
-    return "Cache review";
-  }
 
   /**
    * Probe the project and check the cache settings.
