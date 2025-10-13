@@ -4,6 +4,11 @@ services:
     class: Drupal\platformsh_project\MetricTypePluginManager
     parent: default_plugin_manager
 
+  paramconverter.metric_type:
+    class: Drupal\platformsh_project\ParamConverter\MetricTypeConverter
+    tags:
+      - { name: paramconverter }
+
   drush_create_project.commands:
     class: \Drupal\platformsh_project\DrushCommand\PlatformshProjectCommands
     tags:

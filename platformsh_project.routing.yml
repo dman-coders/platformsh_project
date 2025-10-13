@@ -45,4 +45,4 @@ metric.add_known_metric_to_project:
       project:
         type: entity:node
       metric_type:
-        type: entity:metric_type
+        type: metric_type_plugin
