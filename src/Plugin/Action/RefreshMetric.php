@@ -45,9 +45,9 @@ class RefreshMetric extends ActionBase {
    */
   public function execute($metric = NULL): void {
     /** @var \Drupal\platformsh_project\Entity\Metric $metric */
-    $metric
-      ->set('data', 'New title ' . date("Y-m-d H:i:s"))
-      ->save();
+    #$metric
+    #  ->set('data', 'New title ' . date("Y-m-d H:i:s"))
+    #  ->save();
 
     if (method_exists($metric, 'refresh')) {
       $metric->refresh();

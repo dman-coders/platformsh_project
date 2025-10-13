@@ -40,6 +40,7 @@ class MetricController extends EntityController {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse|array
    *   If there's only one available bundle, a redirect response.
    *   Otherwise, a render array with the add links for each bundle.
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function addPage($entity_type_id): \Symfony\Component\HttpFoundation\RedirectResponse|array {
     // Most of the page build is identical to parent "Add X" page.
