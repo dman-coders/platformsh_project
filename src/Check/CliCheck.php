@@ -32,14 +32,14 @@ class CliCheck extends Check {
     $logger = $logger ?? new NullLogger();
     $check_name = $args['check_name'] ?? NULL;
     $module_path = \Drupal::service('extension.path.resolver')->getPath('module', 'platformsh_project');
-    $cli_dir = $module_path . '/bin/checks';
-    $check_file = $cli_dir . '/' . $check_name;
+    $bin_dir = $module_path . '/bin';
+    $check_file = $bin_dir . '/checks/' . $check_name;
     if (empty($check_name)) {
       $logger->warning('No check named. ' . print_r($args, 1));
     }
 
     if (!file_exists($check_file)) {
-      $result = "Check file $check_file does not exist in $cli_dir";
+      $result = "Check file $check_file does not exist";
       $logger->error($result);
       return static::NA;
     }
@@ -52,7 +52,7 @@ class CliCheck extends Check {
       'PLATFORM_ENVIRONMENT=' . ($args['PLATFORM_ENVIRONMENT'] ?? ''),
     ]);
 
-    $cli_command = "$cli_dir/check $check_name";
+    $cli_command = "$bin_dir/run_check $check_name";
     // execute the CLI command, capturing the response code and stdout and stderr separately
     $command = "bash -c '$env_vars $cli_command 2>&1' ";
     $logger->info('Running {command}', ['command' => $command]);
