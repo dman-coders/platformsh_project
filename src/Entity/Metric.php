@@ -106,22 +106,31 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   use EntityChangedTrait;
 
 
+  const REQUIREMENT_QUEUED = -3;
+
+  const REQUIREMENT_PROCESSING = -2;
+
   const REQUIREMENT_INFO = -1;
 
   const REQUIREMENT_OK = 0;
 
-  const REQUIREMENT_WARNING = 1;
+  const REQUIREMENT_ERROR = 1;
 
-  const REQUIREMENT_ERROR = 2;
+  const REQUIREMENT_NOTICE = 2;
 
   const REQUIREMENT_INVALID = 3;
 
+  const REQUIREMENT_TIMEOUT = 4;
+
   const REQUIREMENT_DICTIONARY = [
+    self::REQUIREMENT_QUEUED => 'Queued',
+    self::REQUIREMENT_PROCESSING => 'Processing',
     self::REQUIREMENT_INFO => 'Info',
     self::REQUIREMENT_OK => 'OK',
-    self::REQUIREMENT_WARNING => 'Warning',
     self::REQUIREMENT_ERROR => 'Error',
+    self::REQUIREMENT_NOTICE => 'Notice',
     self::REQUIREMENT_INVALID => 'Invalid',
+    self::REQUIREMENT_TIMEOUT => 'Timeout',
   ];
 
   /**

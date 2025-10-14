@@ -29,6 +29,8 @@ abstract class Check {
 
   const NA = 3;
 
+  const TIMEOUT = 4;
+
   /**
    * Get the name of this check.
    *

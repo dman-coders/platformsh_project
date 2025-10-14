@@ -69,8 +69,8 @@ Common environment variables:
 
 **Exit codes:**
 - `0` = OK/Success
-- `1` = Warning
-- `2` = Error/Failure
+- `1` = Error/Failure (standard Unix convention)
+- `2` = Warning/Notice (less severe issue)
 - `3+` = Check-specific status codes
 
 **STDOUT:** The check result value
@@ -98,7 +98,7 @@ check() {
   if [ "$response_code" = "200" ]; then
     return 0  # OK
   else
-    return 2  # Error
+    return 1  # Error
   fi
 }
 ```

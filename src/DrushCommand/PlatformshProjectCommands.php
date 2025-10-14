@@ -52,7 +52,7 @@ class PlatformshProjectCommands extends DrushCommands {
     $project->save();
     if ($project->id()) {
       $message = sprintf("Created a project %s", $project->getTitle());
-      // $this->logger()->success($message);
+      $this->logger()->success($message, ['link' => $project->toLink('View project')->toString()]);
     }
     else {
       $message = sprintf("Failed to create a project %s", $project->getTitle());
@@ -111,7 +111,7 @@ class PlatformshProjectCommands extends DrushCommands {
     // Find the project object that the project_id refers to.
     $project = platformsh_project_get_project_by_project_id($project_id);
     if (!$project) {
-      $message = sprintf("Failed to find a project with ID %s. aborting.", $project_id);
+      $message = sprintf("Failed to find a project with ID %s. Aborting.", $project_id);
       $this->logger()->error($message);
       return $message;
     }
@@ -138,13 +138,15 @@ class PlatformshProjectCommands extends DrushCommands {
       ->getStorage($entity_type_id)
       ->loadByProperties($field_values);
     if (!empty($existing_metric)) {
-      $message = sprintf("Metric %s already exists on project %s . Not creating a duplicate", $metric_type, $project->getTitle());
-      $this->logger()->error($message);
+      $message = sprintf("Metric %s already exists on project %s. Not creating a duplicate", $metric_type, $project->getTitle());
+      $this->logger()->error($message, ['link' => $project->toLink('View project')->toString()]);
       return $message;
     }
 
     $this->logger()
-      ->info(sprintf("Creating a '%s' metric for project:'%s'", $metric_type, $project->getTitle()));
+      ->info(sprintf("Creating a '%s' metric for project:'%s'", $metric_type, $project->getTitle()), [
+        'link' => $project->toLink('View project')->toString(),
+      ]);
 
     /** @var \Drupal\platformsh_project\Entity\Metric $metric */
     $metric = \Drupal::entityTypeManager()
@@ -162,12 +164,16 @@ class PlatformshProjectCommands extends DrushCommands {
     $bundle_label = $metrictype_entity->label();
     if ($metric->id()) {
       $message = sprintf("Created a metric %s", $bundle_label);
-      $this->logger()->success($message);
-      $this->logger()->info(print_r($metric->get('target')->getValue(), TRUE));
+      $this->logger()->success($message, [
+        'link' => implode(' | ', [
+          $metric->toLink('View metric')->toString(),
+          $project->toLink('View project')->toString(),
+        ]),
+      ]);
     }
     else {
       $message = sprintf("Failed to create a metric %s", $bundle_label);
-      $this->logger()->error($message);
+      $this->logger()->error($message, ['link' => $project->toLink('View project')->toString()]);
     }
     return $message;
   }
