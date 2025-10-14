@@ -56,6 +56,7 @@ class CliCheck extends Check {
     // execute the CLI command, capturing the response code and stdout and stderr separately
     $command = "bash -c '$env_vars $cli_command 2>&1' ";
     $logger->info('Running {command}', ['command' => $command]);
+
     $output = [];
     $return_var = 0;
     exec($command, $output, $return_var);
@@ -66,6 +67,15 @@ class CliCheck extends Check {
         return static::OK;
       case 1:
         return static::ERROR;
+      case 2:
+        return static::NOTICE;
+      case 3:
+        return static::NA;
+      case 4:
+        return static::TIMEOUT;
+      case 124: // timeout command killed process with SIGTERM
+      case 137: // timeout command killed process with SIGKILL
+        return static::TIMEOUT;
       default:
         throw new \Exception("Unexpected return value: '$return_var' after running command: $command");
     }
