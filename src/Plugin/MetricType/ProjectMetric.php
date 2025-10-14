@@ -24,6 +24,7 @@ class ProjectMetric extends Metric {
     $logger = $this->getLogger();
     $project_id = $this->getProject()->get('field_id')->value;
     $args = [
+      'check_name' => 'check_project_organization',
       'PLATFORM_PROJECT' => $project_id
     ];
 

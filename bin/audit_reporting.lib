@@ -128,3 +128,12 @@ EOF
 sqlite3_escape() {
   echo "${1//\'/\'\'}"
 }
+
+audit_status_code_to_text() {
+  case "$1" in
+    0) echo "OK" ;;
+    1) echo "ERROR" ;;
+    -1) echo "N/A" ;;
+    *) echo "WARNING" ;;
+  esac
+}

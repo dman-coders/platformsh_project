@@ -1,7 +1,17 @@
 # Commandline checks for Platform.sh projects
 
-Until the checks are migrated fully into project 'Metrics` entities,
-we will prototype the check process by enwrapping these already-existing bash scripts that perform the same functions.
+For atomic simplicity, it is helpful to have a number of small scripts that each check one thing about a project.
+Thus, specific one-liners can be documented and tested, independent of the surrounding audit framework.
+
+If I wanted to request an address and check its cache-response heder, this COULD be done by opening a
+HTTP Request Session and invoking that.
+Or, we could just run `curl` and `grep` (or `print-result`).
+
+The second method is easier to share and removes a lot of dependence on context and tooling.
+I have built this tooling anyway, but at ist heart, as much as possible,
+it runs these basic commands and reports on them - not on the response from a library.
+
+The `check` script found here enwrapps these already-existing bash scripts that perform the same functions.
 
 A check found in the `bin/audits` directory is a check for a specific project status.
 
