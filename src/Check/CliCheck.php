@@ -45,10 +45,10 @@ class CliCheck extends Check {
     $env_vars = implode(' ', [
       'PLATFORM_CLI=platform',
       'PLATFORM_PROJECT=' . ($args['PLATFORM_PROJECT'] ?? ''),
-      'PLATFORM_ENVIRONMENT=' . ($args['PLATFORM_ENVIRONMENT'] ?? '',
+      'PLATFORM_ENVIRONMENT=' . ($args['PLATFORM_ENVIRONMENT'] ?? ''),
     ]);
 
-    $cli_command = '$cli_dir/check $check_name`;
+    $cli_command = '$cli_dir/check $check_name';
     // execute the CLI command, capturing the response code and stdout and stderr separately
     $command = "bash -c '$env_vars $cli_command 2>&1' ";
     $logger->info('Running {command}', ['command' => $command]);
@@ -62,6 +62,8 @@ class CliCheck extends Check {
         return static::OK;
       case 1:
         return static::ERROR;
+      default:
+        throw new \Exception('Unexpected value');
     }
   }
 

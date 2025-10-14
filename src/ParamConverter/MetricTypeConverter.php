@@ -10,6 +10,8 @@ use Symfony\Component\Routing\Route;
  *
  * This allows routes to reference metric types dynamically discovered from
  * @MetricType plugins without requiring MetricType config entities to exist.
+ *
+ * @see platformsh_project.routing.yml where this is leveraged.
  */
 class MetricTypeConverter implements ParamConverterInterface {
 

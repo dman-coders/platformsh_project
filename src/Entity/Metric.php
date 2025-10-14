@@ -136,7 +136,7 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
    *
    * @var \Psr\Log\LoggerInterface
    */
-  public LoggerInterface $logger;
+  public ?LoggerInterface $logger = NULL;
 
   /**
    * Get the human-readable status description.
@@ -334,9 +334,9 @@ class Metric extends ContentEntityBase implements ContentEntityInterface, Entity
   protected function getLogger(LoggerInterface $logger = NULL): LoggerInterface {
     if ($logger) {
       $this->logger = $logger;
-      if (empty($this->logger)) {
-        $this->logger = \Drupal::service('logger.factory')->get('platformsh_project');
-      }
+    }
+    if (empty($this->logger)) {
+      $this->logger = \Drupal::service('logger.factory')->get('platformsh_project');
     }
     return $this->logger;
   }
