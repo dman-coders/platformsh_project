@@ -27,6 +27,13 @@ class ProjectMetric extends Metric {
       'check_name' => 'check_project_organization',
       'PLATFORM_PROJECT' => $project_id
     ];
+    $this->getLogger()->debug("Project refresh start. %data ",
+      [
+        '%data' => $result,
+        'link' => $this->toLink('View metric')->toString(),
+      ]
+    );
+
 
     $status = CliCheck::execute($args, $result, $logger);
     $this
@@ -36,6 +43,12 @@ class ProjectMetric extends Metric {
       ->save();
     parent::refresh();
 
+    $this->getLogger()->debug("Project refresh done. %data %note",
+      [
+        '%data' => $result, '%note' => $this->get('note')->value,
+        'link' => $this->toLink('View metric')->toString(),
+      ]
+    );
   }
 
 }
