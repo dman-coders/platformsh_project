@@ -382,12 +382,12 @@ function platformsh_project_theme($existing, $type, $theme, $path): array {
     'field__node__field_data__project' => [
       'render element' => 'elements',
       'base hook' => 'field',
-      'template' => 'summary-field'
+      'template' => 'summary-data-field'
     ],
     'field__node__field_raw__metric' => [
       'render element' => 'elements',
       'base hook' => 'field',
-      'template' => 'summary-field'
+      'template' => 'summary-data-field'
     ],
   ];
 }
