@@ -101,10 +101,8 @@ class Project extends ApiResource {
   }
 
   /**
-   * The subscription plan is a nested value.
-   *
-   * I don't want to replicate a whole subscription object.
-   * Just extract the value and put it in the field.
+   * The subscription plan is a referenced object.
+   * Need to fetch it separately to figure out the plan size.
    *
    * @param \Platformsh\Client\Model\ApiResourceBase $resource
    *   The API resource.
@@ -114,11 +112,13 @@ class Project extends ApiResource {
    */
   protected function alterData($resource): array {
     $updated = [];
-    if (isset($resource->getData()['subscription'])) {
-      // Don't support subscription as an entity, just flatten the value.
+    # Project subscriptions are their own thing.
+    $subscriptionId = $resource->getSubscriptionId();
+    $subscription = $this->apiService->getSubscription($subscriptionId);
+    if (!empty($subscription)) {
       $fieldName = 'field_plan';
-      if ($this->get($fieldName) != $resource->getData()['subscription']) {
-        $this->set($fieldName, $resource->getData()['subscription']['plan']);
+      if ($this->get($fieldName) != $subscription->plan) {
+        $this->set($fieldName, $subscription->plan);
         $updated[$fieldName] = TRUE;
       }
     }
