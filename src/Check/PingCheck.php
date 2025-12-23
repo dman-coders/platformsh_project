@@ -36,6 +36,10 @@ class PingCheck extends Check {
 
     $client = new Client();
     $url = $args['url'];
+    // Allow URL objects.
+    if (! is_string($url)) {
+      $url = $url->toString();
+    }
     $result = '';
     $logger->info("Requesting $url");
 

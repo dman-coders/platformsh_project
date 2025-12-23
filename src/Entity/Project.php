@@ -2,6 +2,7 @@
 
 namespace Drupal\platformsh_project\Entity;
 
+use Drupal\Core\Url;
 use Platformsh\Client\Model\ApiResourceBase;
 
 /**
@@ -132,7 +133,10 @@ class Project extends ApiResource {
    *   The project URL.
    */
   public function getUrl(): string {
-    return "https://example.com/";
+    $domain = $this->get('field_default_domain')->value;
+    // Sure, it could/should be a string, but why not use the Url class?
+    # return Url::fromUri('https://' . $domain);
+    return 'https://' . $domain . '/';
   }
 
 }

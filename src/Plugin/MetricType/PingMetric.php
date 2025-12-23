@@ -22,7 +22,7 @@ class PingMetric extends Metric {
    */
   public function refresh(): void {
     $url = $this->getProject()->getUrl();
-    $status = NULL;
+    $status = "pending";
     $response = PingCheck::execute(['url' => $url], $status);
     $this->set('data', $response)
       ->set('note', "pinged $url\n" . date("Y-m-d H:i:s") . "\n" . $response)

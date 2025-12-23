@@ -16,10 +16,16 @@ use Psr\Log\LoggerInterface;
  * The Metric object holds a single measurement on a single axis.
  * The metric abstract class is subclassed by metrics that define their
  * own dimension and their own way of measuring it.
+ *
  * A 'Ping' metric will measure response time, and provide a summary
  * about it being "good" or "bad" or other.
  *
  * This generic Class defines attributes common to all.
+ *
+ * A Metric includes context and reporting features,
+ * like how the results are displayed or rated.
+ * It is often a container for a 'Check' - a check is a single-value test that has no context.
+ * A Metric retains persistence of data.
  *
  * New metric types are created by adding bundle classes in
  * Plugin/MetricType/ with @MetricType annotations. They are
