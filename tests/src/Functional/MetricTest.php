@@ -3,7 +3,7 @@
 namespace Drupal\Tests\platformsh_project\Functional;
 
 use Drupal\platformsh_project\Entity\Metric;
-use Drupal\platformsh_project\Entity\NoteMetric;
+use Drupal\platformsh_project\Plugin\MetricType\NoteMetric;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -73,12 +73,14 @@ class MetricTest extends BrowserTestBase {
 
   /**
    * Tests UI buttons and routes around metric management.
+   *
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   public function testMetricUi() {
     // Add a metric using the UI form.
     $web_user = $this->drupalCreateUser(['administer metrics']);
     $this->drupalLogin($web_user);
-    $this->webUser = $web_user;
+    $this->user = $web_user;
     $edit = [
       'type' => 'note',
       'data' => 'bar',
@@ -88,12 +90,15 @@ class MetricTest extends BrowserTestBase {
     ];
     $this->drupalGet('metric/add/' . $edit['type']);
     $page = $this->getSession()->getPage();
+    // Assert the page is OK.
+    $this->assertSession()->statusCodeEquals(200);
+
     // Can use just the label as a locator.
     $page->selectFieldOption('Status', $edit['status']);
     $page->fillField('Data', $edit['data']);
     $this->submitForm([], 'Save');
 
-    // Verify that visiting the metric cannonic view page shows a
+    // Verify that visiting the metric canonic view page shows a
     // "refresh" button in the UI.
   }
 
