@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\platformsh_project\Plugin\MetricType;
+namespace Drupal\platformsh_project\Entity\Bundle;
 
 use Drupal\platformsh_project\Check\PingCheck;
 use Drupal\platformsh_project\Entity\Metric;

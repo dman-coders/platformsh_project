@@ -10,7 +10,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  * Provides a MetricType plugin manager.
  *
  * This discovers MetricType bundle classes via @MetricType annotations.
- * Bundle classes should be placed in Plugin/MetricType/ subdirectory.
+ * Bundle classes should be placed in Entity/Bundle/ subdirectory.
  */
 class MetricTypePluginManager extends DefaultPluginManager {
 
@@ -27,7 +27,7 @@ class MetricTypePluginManager extends DefaultPluginManager {
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct(
-      'Plugin/MetricType',
+      'Entity/Bundle',
       $namespaces,
       $module_handler,
       'Drupal\platformsh_project\Entity\Metric',

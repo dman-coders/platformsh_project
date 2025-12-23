@@ -3,7 +3,7 @@
 namespace Drupal\Tests\platformsh_project\Functional;
 
 use Drupal\platformsh_project\Entity\Metric;
-use Drupal\platformsh_project\Plugin\MetricType\NoteMetric;
+use Drupal\platformsh_project\Entity\Bundle\NoteMetric;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -49,7 +49,7 @@ class MetricTest extends BrowserTestBase {
   public function testMetric() {
     // Create a new Metric entity.
     $metric = NoteMetric::create([
-      'type' => 'note',
+      'bundle' => 'note',
       'status' => '0',
       'data' => 'bar',
       'timestamp' => strtotime('2022-03-01'),
@@ -64,8 +64,8 @@ class MetricTest extends BrowserTestBase {
 
     // Assert that the loaded entity has the same properties as the original.
     $this->assertEquals('metric', $loaded_metric->getEntityTypeId());
-    $this->assertEquals('metric', $loaded_metric->get('bundle')->value);
-    $this->assertEquals('note', $loaded_metric->get('status')->value);
+    $this->assertEquals('note', $loaded_metric->bundle());
+    $this->assertEquals('0', $loaded_metric->get('status')->value);
     $this->assertEquals('bar', $loaded_metric->get('data')->value);
     $timestamp = $loaded_metric->get('timestamp')->value;
     $this->assertEquals('2022-03-01', date('Y-m-d', $timestamp));
@@ -77,6 +77,11 @@ class MetricTest extends BrowserTestBase {
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   public function testMetricUi() {
+    // Rebuild plugin cache to ensure metric types are discovered.
+    \Drupal::service('plugin.cache_clearer')->clearCachedDefinitions();
+    \Drupal::service('kernel')->invalidateContainer();
+    $this->container->get('router.builder')->rebuild();
+
     // Add a metric using the UI form.
     $web_user = $this->drupalCreateUser(['administer metrics']);
     $this->drupalLogin($web_user);

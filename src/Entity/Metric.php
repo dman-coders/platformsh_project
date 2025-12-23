@@ -28,7 +28,7 @@ use Psr\Log\LoggerInterface;
  * A Metric retains persistence of data.
  *
  * New metric types are created by adding bundle classes in
- * Plugin/MetricType/ with @MetricType annotations. They are
+ * Entity/Bundle/ with @MetricType annotations. They are
  * auto-discovered by the MetricTypePluginManager.
  *
  * Implementation notes:
@@ -64,12 +64,11 @@ use Psr\Log\LoggerInterface;
  * @ContentEntityType(
  *   id = "metric",
  *   label = @Translation("Metric"),
- *   description = @Translation("Generic Abstract Metric description."),
  *   label_collection = @Translation("Platformsh metrics"),
  *   label_singular = @Translation("platformsh metric"),
  *   label_plural = @Translation("platformsh metrics"),
  *   label_count = @PluralTranslation(
- *     singular = "@count platformsh metrics",
+ *     singular = "@count platformsh metric",
  *     plural = "@count platformsh metrics",
  *   ),
  *   handlers = {
@@ -80,12 +79,10 @@ use Psr\Log\LoggerInterface;
  *       "default" = "Drupal\platformsh_project\Form\MetricForm",
  *       "add" = "Drupal\platformsh_project\Form\MetricForm",
  *       "edit" = "Drupal\platformsh_project\Form\MetricForm",
- *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "html" = "Drupal\platformsh_project\Routing\MetricRouteProvider",
  *     },
- *     "bundle_class" = "Drupal\Core\Entity\BundleClassFieldMapHandler",
  *   },
  *   base_table = "metric",
  *   admin_permission = "administer metrics",
@@ -103,8 +100,7 @@ use Psr\Log\LoggerInterface;
  *   },
  *   bundle_entity_type = "metric_type",
  *   bundle_plugin_type = "metric_type",
- *   bundle_label = @Translation("Metric type"),
- *   field_ui_base_route = "entity.metric_type.edit_form"
+ *   bundle_label = @Translation("Metric bundle type")
  * )
  */
 class Metric extends ContentEntityBase implements ContentEntityInterface, EntityChangedInterface {
